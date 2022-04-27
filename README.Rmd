@@ -1,0 +1,16 @@
+---
+output: github_document
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  out.width = "100%"
+)
+```
+
+<!-- badges: start -->
+[![pkgdown](https://github.com/caravagnalab/LineaGT/workflows/pkgdown/badge.svg)](https://github.com/caravagnalab/LineaGT/actions)
+[![R-CMD-check](https://github.com/caravagnalab/LineaGT/workflows/R-CMD-check/badge.svg)](https://github.com/caravagnalab/LineaGT/actions)
+<!-- badges: end -->
