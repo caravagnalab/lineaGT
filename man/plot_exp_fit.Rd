@@ -4,7 +4,7 @@
 \alias{plot_exp_fit}
 \title{Exponential fitting}
 \usage{
-plot_exp_fit(obj, highlight = c(), min_ccf = 0, facet = F)
+plot_exp_fit(obj, highlight = c(), min_ccf = 0, facet = F, viber = F)
 }
 \description{
 

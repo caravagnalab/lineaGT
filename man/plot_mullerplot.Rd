@@ -10,7 +10,8 @@ plot_mullerplot(
   highlight = c(),
   min_ccf = 0,
   legend.pos = "right",
-  wrap = F
+  wrap = F,
+  viber = F
 )
 }
 \description{
