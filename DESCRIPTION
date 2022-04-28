@@ -29,7 +29,9 @@ Imports:
     stringr,
     tibble,
     VIBER,
-    Polychrome
+    Polychrome,
+    easypar
 Remotes:
     caravagn/VIBER
+    carvagn/easypar
 RoxygenNote: 7.1.2
