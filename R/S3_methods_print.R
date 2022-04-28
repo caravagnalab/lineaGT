@@ -9,9 +9,6 @@
 #'
 #' @exportS3Method print mvnmm
 #' @export print.mvnmm
-#'
-#' @examples
-#' print(fitted_object)
 
 print.mvnmm = function() {
 

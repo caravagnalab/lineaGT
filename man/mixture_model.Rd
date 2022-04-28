@@ -27,11 +27,3 @@ will contain the inferred parameters, the python object
 \description{
 Add
 }
-\examples{
-dataset = homo_ltr.coverage
-lineages = list("MNC", "B", "T", "Myeloid")
-obj = lineaGT::mixture_model(20, dataset \%>\% dplyr::select(starts_with("cov")), IS_values=dataset$IS, lineages=lineages)
-obj = lineaGT::filter_dataset(obj)
-obj = lineaGT::run_inference(obj)
-obj = lineaGT::classifier(obj)
-}

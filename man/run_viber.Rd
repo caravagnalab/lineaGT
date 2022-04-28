@@ -17,6 +17,3 @@ mvnmm object with added the VAF dataframe annotated with the found clusters and 
 \description{
 add
 }
-\examples{
-obj = run_viber(obj, lineaGT::homo_ltr.vaf, min_ccf=0.07)
-}

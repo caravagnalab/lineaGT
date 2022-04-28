@@ -9,9 +9,6 @@
 #'
 #' @exportS3Method plot mvnmm
 #' @export plot.mvnmm
-#'
-#' @examples
-#' plot(fitted_object)
 
 
 plot.mvnmm = function(x, ...) {

@@ -9,7 +9,7 @@ Description: More about what it does (maybe more than one line)
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
-Depends: R (>= 4.0.0),
+Depends: R (>= 3.6.0),
 Config/reticulate:
   list(
     packages = list(
@@ -22,5 +22,14 @@ Imports:
     dplyr,
     ggmuller,
     magrittr,
-    purrr
+    purrr,
+    MASS,
+    ggplot2,
+    reshape2,
+    stringr,
+    tibble,
+    VIBER,
+    Polychrome
+Remotes:
+    caravagn/VIBER
 RoxygenNote: 7.1.2

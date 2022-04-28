@@ -1,17 +1,13 @@
 get_object = function(py_model) {
   obj = list()
-
   obj$dataframe = get_dataset(py_model)
   obj$params = get_params(py_model)
-
   obj$K = py_model$params$K
   obj$N = py_model$params$N
   obj$`T` = py_model$params$`T`
-
   obj$dimensions = py_model$dimensions
   obj$lineages = py_model$lineages
   obj$py_model = py_model
-
   obj$color_palette = get_colors(obj=obj)
 
   class(obj) = "mvnmm"
@@ -23,39 +19,33 @@ get_object = function(py_model) {
 
 get_params = function(py_model) {
   params = list()
-
   params$mean = get_mean(py_model)
   params$weights = get_weights(py_model)
   params$sigma = get_sigma(py_model)
   params$Sigma = get_covariance_Sigma(py_model)
-
   params$assignments = get_z_assignments(py_model)
   params$probabilites = get_z_probs(py_model)
-
   params$labels = get_labels(py_model)
-
   return(params)
 }
 
 
 get_dataset = function(py_model) {
   dataset = py_model$dataset$detach()$numpy() %>% data.frame() %>% dplyr::mutate_all(as.integer)
-  colnames(dataset) = py_model$dimensions
-  dataset$IS = py_model$IS
 
-  try(
-    expr = {
+  try(expr = {
+    colnames(dataset) = py_model$dimensions
+    dataset$IS = py_model$IS
+    try(expr = {
       labels = get_labels(py_model)
-      dataset$labels = labels
-    }, silent = T)
+      dataset$labels = labels }, silent = T)
 
-  try(
-    expr = {
+    try(expr = {
       labels_init = get_labels(py_model, initial_lab=T)
-      dataset$labels_init = labels_init
-    }, silent = T)
+      dataset$labels_init = labels_init }, silent = T)
+  }, silent = T)
 
-  return(dataset %>% as_tibble())
+  return(dataset %>% tidyr::as_tibble())
 }
 
 
@@ -67,10 +57,15 @@ update_params = function(obj) {
   return(obj)
 }
 
+
 update_dataframe = function(obj) {
   obj$dataframe = get_dataset(obj$py_model)
   return(obj)
 }
 
 
+add_vaf = function(obj, vaf_df) {
+  obj$vaf_dataframe = vaf_df
+  return(obj)
+}
 

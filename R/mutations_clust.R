@@ -6,55 +6,48 @@
 #' @param vaf_df a VAF dataframe, with required columns mutation,dp,ref,alt of depth, reference and alternative reads
 #' @return mvnmm object with added the VAF dataframe annotated with the found clusters and the VIBER fit for each cluster
 #'
-#' @import VIBER
-#'
 #' @export run_viber
-#'
-#' @examples
-#' obj = run_viber(obj, lineaGT::homo_ltr.vaf, min_ccf=0.07)
 
-run_viber = function(obj, vaf_df, min_ccf=0, highlight=list()) {
-  viber_df = get_input_viber(vaf_df)
 
-  if (purrr::is_empty(highlight)) highlight = viber_df$joined$labels %>% unique() %>% droplevels()
+run_viber = function(obj, min_ccf=0, highlight=list()) {
+  vaf_df = obj$vaf_dataframe
+  viber_input = get_input_viber(vaf_df)
+
+  if (purrr::is_empty(highlight)) highlight = viber_input$vaf_df$labels %>% unique() %>% droplevels()
   clusters_joined = intersect(select_relevant_clusters(obj, min_ccf), highlight)
 
   joined = data.frame()
   fit_all = list()
   for (cluster in clusters_joined) {
-    fit_k = fit_cluster(viber_df, cluster=cluster)
+    fit_k = fit_cluster(viber_input, cluster=cluster)
     joined = rbind(joined, fit_k$df)
     fit_all[[cluster]] = fit_k$fit
   }
-  obj$dataframe_vaf = joined %>% as_tibble()
+  obj$vaf_dataframe = joined %>% as_tibble()
   obj$viber_run = fit_all
   return(obj)
 }
 
 
-fit_cluster = function(viber_df, cluster, by_lineage=F) {
-  viber_df_k = list("successes"=viber_df$successes %>% filter(labels==cluster) %>%
-                      dplyr::select(starts_with(c("early", "mid", "late"))) %>% as_tibble(),
-                    "trials"=viber_df$trials %>% filter(labels==cluster) %>%
-                      dplyr::select(starts_with(c("early", "mid", "late"))) %>% as_tibble(),
-                    "joined"=viber_df$joined %>% filter(labels==cluster))
+fit_cluster = function(viber_input, cluster) {
+  viber_df_k = list("successes"=viber_input$successes %>% filter(labels==cluster) %>%
+                      dplyr::select(-labels) %>% tidyr::as_tibble(),
+                    "trials"=viber_input$trials %>% filter(labels==cluster) %>%
+                      dplyr::select(-labels) %>% tidyr::as_tibble(),
+                    "vaf_df"=viber_input$vaf_df %>% filter(labels==cluster))
   k = viber_df_k$successes %>% nrow
-
+  fit = ""
   try(expr = {
     fit = VIBER::variational_fit(viber_df_k$successes, viber_df_k$trials, K=k)
     fit = VIBER::choose_clusters(fit, binomial_cutoff=0, dimensions_cutoff=0, pi_cutoff=0.01)
 
     labels = fit$labels$cluster.Binomial
-    viber_df_k$joined$labels_viber = labels
-    viber_df_k$joined$pi_viber = fit$pi_k[labels] %>% as.vector() }, silent = T)
+    viber_df_k$vaf_df$labels_viber = labels
+    viber_df_k$vaf_df$pi_viber = fit$pi_k[labels] %>% as.vector() }, silent = T)
 
-  if (!"pi_viber" %in% (viber_df_k$joined %>% colnames)) {
-    fit = ""
-    viber_df_k$joined$labels_viber = ""
-    viber_df_k$joined$pi_viber = 0
-  }
+  if (fit == "") { viber_df_k$vaf_df$labels_viber = ""; viber_df_k$vaf_df$pi_viber = 0 }
 
-  return(list("df"=viber_df_k$joined, "fit"=fit))
+  return(list("df"=viber_df_k$vaf_df, "fit"=fit))
 }
 
 

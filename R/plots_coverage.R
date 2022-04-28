@@ -11,10 +11,7 @@
 #' @importFrom purrr is_empty map
 #' @importFrom dplyr select all_of
 #' @export plot_scatter_density
-#'
-#' @examples
-#' plot_list = plot_scatter_density(obj, plot_density=TRUE, facet=FALSE)
-#' plot_list$`cov_early_B:cov_early_MNC`
+
 
 plot_scatter_density = function(obj, plot_density=T, facet=FALSE, highlight=c()) {
   py_model = obj$py_model
@@ -26,7 +23,7 @@ plot_scatter_density = function(obj, plot_density=T, facet=FALSE, highlight=c())
   color_palette = highlight_palette(obj$color_palette, highlight)
   if (purrr::is_empty(highlight)) highlight = get_unique_labels(obj)
 
-  if (plot_density) density = lineaGT::compute_density(obj) else density = NULL
+  if (plot_density) density = compute_density(obj) else density = NULL
 
   combinations = get_pairs(dataset, columns=obj$dimensions)
   max_val = max(dataset %>% dplyr::select(dplyr::all_of(obj$dimensions))) +10

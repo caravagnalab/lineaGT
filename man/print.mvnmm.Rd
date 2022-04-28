@@ -17,6 +17,3 @@
 \description{
 add
 }
-\examples{
-print(fitted_object)
-}

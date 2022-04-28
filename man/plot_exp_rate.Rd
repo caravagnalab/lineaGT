@@ -9,6 +9,3 @@ plot_exp_rate(obj, highlight = c())
 \description{
 
 }
-\examples{
-plot_exp_rate(obj)
-}

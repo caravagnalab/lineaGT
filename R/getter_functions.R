@@ -1,4 +1,4 @@
-#' Functions to access elements of a mvnmm object.
+# Functions to access elements of a mvnmm object.
 
 get_unique_labels = function(obj) {
   py_model = get_model(obj)

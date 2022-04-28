@@ -9,6 +9,3 @@ plot_exp_fit(obj, highlight = c(), facet = F)
 \description{
 
 }
-\examples{
-plot_exp_fit(obj)
-}

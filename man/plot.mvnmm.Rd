@@ -17,6 +17,3 @@
 \description{
 2D scatter and density plot for each pair of dimensions
 }
-\examples{
-plot(fitted_object)
-}

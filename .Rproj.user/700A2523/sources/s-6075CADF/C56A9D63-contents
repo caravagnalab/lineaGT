@@ -1,0 +1,94 @@
+get_pairs = function(dataset, columns) {
+  comb = t(combn(names(dataset %>% dplyr::select(dplyr::all_of(columns))), 2)) %>%
+    as.data.frame(stringsAsFactors=FALSE) %>%
+    mutate(pair_name=paste(V1, V2, sep=":"))
+  return(comb)
+}
+
+# To compute the Gaussian multivariate density given a fitted object
+compute_density = function(obj) {
+  mean = get_mean(obj)
+  sigma = get_covariance_Sigma(obj)
+
+  density = data.frame()
+  for (cl in get_unique_labels(obj)) {
+    dd = as.data.frame(MASS::mvrnorm(n=1000, mu=mean[cl,], Sigma=sigma[[cl]]))
+    colnames(dd) = obj$dimensions
+    dd$labels = cl
+    density = rbind(density, dd)
+  }
+  density = density %>% mutate(labels=factor(labels, levels=get_unique_labels(obj)))
+  return(density)
+}
+
+
+split_to_camelcase = function(txt) {
+  txt = stringr::str_replace_all(txt, "\\_|\\.", " ")
+  return(paste(toupper(substring(txt,1,1)), substring(txt,2), sep=""))
+}
+
+
+get_colors = function(obj=NULL, list_lab=list()) {
+  if (purrr::is_empty(list_lab)) {
+    N = obj$K
+    colss = Polychrome::createPalette(N, c("#856de3", "#9e461c"), target="normal", range=c(15, 80), M=100000)
+    colss = colss[1:N]
+    try({ names(colss) = obj$params$labels %>% levels() }, silent=T) }
+  else {
+    N = list_lab %>% length()
+    colss = Polychrome::createPalette(N, c("#856de3", "#9e461c"), target="normal", range=c(15, 80), M=100000)
+    colss = colss[1:N]
+    names(colss) = list_lab
+  }
+  return(colss)
+}
+
+
+highlight_palette = function(color_palette, highlight=c()) {
+  if (purrr::is_empty(highlight)) return(color_palette)
+
+  remove = color_palette[!names(color_palette) %in% highlight] %>% names
+  keep = color_palette[highlight]
+  grey_col = gray(runif(remove %>% length(), 0.6, 0.8))
+  names(grey_col) = remove
+  return(c(keep, grey_col))
+}
+
+
+
+get_muller_pop = function(obj) {
+  means = get_mean(obj)
+  labels = get_labels(obj)
+  timepoints = obj$dimensions
+  dataframe = obj$dataframe
+
+  pop_df = means %>% as.data.frame() %>% tibble::rownames_to_column() %>% reshape2::melt() %>%
+    tidyr::separate(variable, into=c("else", "Generation", "Lineage"), sep="_") %>%
+    mutate("else"=NULL, Identity=rowname, rowname=NULL, Population=value, value=NULL) %>%
+    group_by(Generation, Lineage) %>% mutate(Frequency=Population/sum(Population)) %>% ungroup()
+
+  pop_df = rbind(pop_df, list("Identity"=rep("P", obj$T), "Generation"=colnames(means),
+                              "Population"=rep(1, obj$T), "Lineage"=rep(obj$lineages, 3),
+                              "Frequency"=rep(1, obj$T))) %>%
+    mutate(Generation=dplyr::case_when(grepl("early", Generation) ~ "60",
+                                       grepl("mid", Generation) ~ "140",
+                                       grepl("late", Generation) ~ "280")) %>%
+    mutate(Generation=as.integer(Generation)) %>%
+    group_by(Identity, Lineage) %>% mutate(lm_a=coef(lm(log1p(Population)~Generation))[1],
+                                           lm_r=coef(lm(log1p(Population)~Generation))[2]) %>% ungroup()
+  return(pop_df)
+}
+
+
+get_muller_edges = function(obj) {
+  return(data.frame("Parent"="P", "Identity"=get_unique_labels(obj)))
+}
+
+
+select_relevant_clusters = function(obj, min_ccf) {
+  pop_df = get_muller_pop(obj)
+  clusters_keep = (pop_df %>% group_by(Identity) %>%
+                     filter(any(Frequency > min_ccf)))$Identity %>% unique()
+  return(clusters_keep)
+}
+

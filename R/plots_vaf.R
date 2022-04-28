@@ -11,10 +11,7 @@
 #' @importFrom purrr is_empty
 #'
 #' @export plot_vaf
-#'
-#' @examples
-#' obj = run_viber(obj, lineaGT::homo_ltr.vaf, min_ccf=0.07)
-#' plot_vaf(obj)
+
 
 plot_vaf = function(obj, min_ccf=0, highlight=c()) {
   dataframe = vaf_dataframe(obj)

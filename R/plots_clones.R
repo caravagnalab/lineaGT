@@ -6,11 +6,7 @@
 #' @import ggmuller
 #'
 #' @export
-#'
-#' @examples
-#' plot_mullerplot(obj, which="ccf")
-#' plot_mullerplot(obj, which="pop")
-#' plot_mullerplot(obj, which="fitness")
+
 
 
 plot_mullerplot = function(obj, which="ccf", highlight=c(), min_ccf=0, legend.pos="right", wrap=F) {
@@ -85,9 +81,7 @@ mullerplot_util = function(mullerdf, y, fill, lineage, color_palette, legend.pos
 #' @import ggplot2
 #'
 #' @export
-#'
-#' @examples
-#' plot_exp_fit(obj)
+
 
 plot_exp_fit = function(obj, highlight=c(), facet=F) {
   color_palette = highlight_palette(obj$color_palette, highlight)
@@ -131,9 +125,7 @@ exp_fit_util = function(p, pop_df, cl) {
 #' @import ggplot2
 #'
 #' @export
-#'
-#' @examples
-#' plot_exp_rate(obj)
+
 
 plot_exp_rate = function(obj, highlight=c()) {
   color_palette = highlight_palette(obj$color_palette, highlight)

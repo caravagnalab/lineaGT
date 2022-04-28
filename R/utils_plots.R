@@ -1,4 +1,3 @@
-
 get_pairs = function(dataset, columns) {
   comb = t(combn(names(dataset %>% dplyr::select(dplyr::all_of(columns))), 2)) %>%
     as.data.frame(stringsAsFactors=FALSE) %>%
@@ -66,7 +65,7 @@ get_muller_pop = function(obj) {
   pop_df = means %>% as.data.frame() %>% tibble::rownames_to_column() %>% reshape2::melt() %>%
     tidyr::separate(variable, into=c("else", "Generation", "Lineage"), sep="_") %>%
     mutate("else"=NULL, Identity=rowname, rowname=NULL, Population=value, value=NULL) %>%
-    group_by(Generation, Lineage) %>% mutate(Frequency=Population/sum(Population)) %>% ungroup()
+    group_by(Generation, Lineage) %>% mutate(Frequency=Population/sum(Population)) %>% dplyr::ungroup()
 
   pop_df = rbind(pop_df, list("Identity"=rep("P", obj$T), "Generation"=colnames(means),
                               "Population"=rep(1, obj$T), "Lineage"=rep(obj$lineages, 3),

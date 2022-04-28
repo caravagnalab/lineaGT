@@ -1,50 +1,90 @@
-#' Functions used to obtain and reshape some datasets
-#'
-#' NOTE: get_vaf_df returns a dataset with mutation,IS,lineage,timepoints,dp,ref,alt,vaf,... columns
-#'
-#' @importFrom tidyr separate unite pivot_wider pivot_longer
-#' @importFrom dplyr select inner_join rename_with
-#' @importFrom reshape2 melt dcast
+# Functions used to obtain and reshape some datasets
+#
+# NOTE: get_vaf_df returns a dataset with mutation,IS,lineage,timepoints,dp,ref,alt,vaf,... columns
+# usage:
+# vaf_df = vaf_df_from_file(vaf_file)
+# vaf_df = annotate_vaf_df(vaf_df, obj, min_ccf=0.07)
+# obj = add_vaf(obj, vaf_df)
 
-get_vaf_df = function(vaf_file, obj, min_ccf=0) {
+
+vaf_df_from_file = function(vaf_file) {
+  ## input is the file with the vaf, having a column per timepoint named dp.ref.alt
+  ## final dataframe will have:
+  ## mutation, lineage, IS, mut_type
+  ## vaf_early/mid/late,
+  ## cov_early/mid/late,
+  ## dp_early/mid/late,
+  ## ref_early/mid/late
+  ## alt_early/mid/late
+  vaf_df = read.csv(vaf_file)
+  try(expr = { vaf_df = vaf_df  %>%
+    dplyr::rename_with(.cols=all_of(dplyr::starts_with("dp_")),
+                       .fn=~paste0("cov_", str_replace_all(.x,"dp_",""))) }, silent = T)
+
+  vaf_df = vaf_df %>%
+    tidyr::pivot_longer(cols=starts_with("dp.ref.alt"), names_to="timepoint", values_to="dp:ref:alt") %>%
+    mutate(timepoint=stringr::str_replace_all(timepoint, "dp.ref.alt_", "")) %>%
+    separate("dp:ref:alt", into=c("dp", "ref", "alt"), sep=":") %>%
+    tidyr::pivot_wider(values_from=c("dp","ref","alt"), names_from="timepoint", values_fn=as.integer) %>%
+    update_trials()
+
+  return(vaf_df)
+}
+
+
+update_trials = function(vaf_df) {
+  # vaf_df is the dataframe from vaf_df_from_file
+  # returns a dataframe with same structure but dp_early/mid/late equals the
+  # mean of the other timepoints when 0
+
+  vaf_df_new = vaf_df %>%
+    tidyr::pivot_longer(cols=c(starts_with("dp")), names_to=c("timepoints"), values_to="dp",
+                        values_transform=list(dp=as.integer)) %>%
+    group_by(lineage, mutation, IS) %>%
+    mutate(dp=ifelse(dp==0, mean(dp), dp)) %>% dplyr::ungroup() %>%
+    tidyr::pivot_wider(values_from="dp", names_from="timepoints")
+
+  return(vaf_df_new)
+}
+
+
+annotate_vaf_df = function(vaf_df, obj, min_ccf=0) {
   lineages = obj$lineages
   highlight = select_relevant_clusters(obj, min_ccf=min_ccf)
 
   dataframe = obj$dataframe %>% filter(labels %in% highlight) %>%
-    reshape2::melt() %>% tidyr::separate(variable, into=c("else", "timepoint", "lineage"), sep="_") %>%
-    mutate("else"=NULL) %>%
-    tidyr::pivot_wider(names_from="timepoint", values_from="value", names_prefix="cov_")
+    tidyr::pivot_longer(cols=starts_with("cov"), names_to="cov_timepoints_lineage",
+                        values_to="cov", values_transform=list(cov=as.integer)) %>%
+    separate(cov_timepoints_lineage, into=c("cc", "timepoints", "lineage")) %>%
+    tidyr::pivot_wider(names_from=c("cc","timepoints"), values_from="cov")
+
   IS_keep = dataframe$IS
 
-  vaf_ref_alt = read.csv(vaf_file) %>% filter(IS %in% IS_keep, lineage %in% lineages)
+  vaf_df_filt = vaf_df %>% filter(IS %in% IS_keep, lineage %in% lineages) %>%
+    dplyr::select(starts_with("alt"), starts_with("dp"), starts_with("vaf"), mutation, IS, lineage)
 
-  vaf_cov_df = dplyr::inner_join(vaf_ref_alt, dataframe, by=c("IS", "lineage")) %>%
-    tidyr::pivot_longer(cols=starts_with("dp.ref.alt"), names_to="timepoint", values_to="dp.ref.alt") %>%
-    tidyr::separate(timepoint, into=c("else", "timepoint"), sep="_") %>%
-    tidyr::pivot_longer(cols=starts_with("vaf"), names_to="timepoint2", values_to="vaf") %>%
-    tidyr::separate(timepoint2, into=c("else", "timepoint2"), sep="_") %>%
-    filter(timepoint==timepoint2) %>% mutate("else"=NULL, timepoint2=NULL) %>%
-    dplyr::select(-starts_with("dp_"), -starts_with("cov_")) %>%
-    tidyr::separate("dp.ref.alt", into=c("dp", "ref", "alt"), sep="[:]") %>%
-    mutate(dp=as.integer(dp), ref=as.integer(ref), alt=as.integer(alt)) %>%
-    mutate(dp=ifelse(dp<alt, alt+ref, dp))
+  vaf_annotated = dplyr::inner_join(vaf_df_filt, dataframe, by=c("IS", "lineage"))
 
-  return(vaf_cov_df)
+  return(vaf_annotated)
 }
 
 
 # Function to get from a vaf dataframe obtained by get_vaf_df() the input for a VIBER run
 get_input_viber = function(vaf_df) {
-  trials = vaf_df %>% reshape2::dcast(IS+labels+mutation+experiment ~ timepoint+lineage, value.var="dp")
-  successes = vaf_df %>% reshape2::dcast(IS+labels+mutation+experiment ~ timepoint+lineage, value.var="alt")
+  vaf_df_wide = vaf_df %>%
+    tidyr::pivot_wider(values_from=c(starts_with("dp"), starts_with("alt"), starts_with("ref"),
+                                     starts_with("vaf"), starts_with("cov")),
+                       names_from=lineage, values_fn=as.numeric)
+  trials = vaf_df_wide %>% dplyr::select(starts_with("dp"), labels) %>%
+    rename_with(.fn=~str_replace_all(.x,"dp_",""))
+  successes = vaf_df_wide %>% dplyr::select(starts_with("alt"), labels) %>%
+    rename_with(.fn=~str_replace_all(.x,"alt_",""))
 
-  joined = dplyr::inner_join(trials, successes, by=c("mutation","IS","labels","experiment"),
-                      suffix=c(".dp", ".alt"))
-  return(list("successes"=successes, "trials"=trials, "joined"=joined))
+  return(list("successes"=successes, "trials"=trials, "vaf_df"=vaf_df_wide))
 }
 
 
-# As input a mvnmm object with already the VAF dataframe
+# As input a mvnmm object with already the fitted viber df
 vaf_dataframe = function(obj) {
   joined = obj$dataframe_vaf %>% tidyr::unite(col="labels_mut", c("labels", "labels_viber"), sep=".", remove=F)
   dp = joined %>%

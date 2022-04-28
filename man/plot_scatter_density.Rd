@@ -19,7 +19,3 @@ a list of plots, one for each timepoints combination.
 \description{
 Function to plot the scatterplots of the coverage, one timepoint against the other, together with the Gaussian density.
 }
-\examples{
-plot_list = plot_scatter_density(obj, plot_density=TRUE, facet=FALSE)
-plot_list$`cov_early_B:cov_early_MNC`
-}

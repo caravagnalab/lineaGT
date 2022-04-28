@@ -16,8 +16,3 @@ plot_mullerplot(
 \description{
 
 }
-\examples{
-plot_mullerplot(obj, which="ccf")
-plot_mullerplot(obj, which="pop")
-plot_mullerplot(obj, which="fitness")
-}

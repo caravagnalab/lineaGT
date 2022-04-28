@@ -16,7 +16,3 @@ plot_vaf(obj, min_ccf = 0, highlight = c())
 \description{
 Function to plot the VAFs of the mutations one timepoint against the other
 }
-\examples{
-obj = run_viber(obj, lineaGT::homo_ltr.vaf, min_ccf=0.07)
-plot_vaf(obj)
-}
