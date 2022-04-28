@@ -32,6 +32,6 @@ Imports:
     Polychrome,
     easypar
 Remotes:
-    caravagn/VIBER
+    caravagn/VIBER,
     caravagn/easypar
 RoxygenNote: 7.1.2
