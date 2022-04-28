@@ -4,7 +4,7 @@
 \alias{run_viber}
 \title{Functions to run VIBER for mutations clustering}
 \usage{
-run_viber(obj, vaf_df, min_ccf = 0, highlight = list())
+run_viber(obj, min_ccf = 0, highlight = list())
 }
 \arguments{
 \item{obj}{mvnmm object.}
