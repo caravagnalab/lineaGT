@@ -69,3 +69,29 @@ add_vaf = function(obj, vaf_df) {
   return(obj)
 }
 
+
+
+
+get_best_k = function(mod_sel, method="BIC") {
+  best = get_ic_df(mod_sel) %>%
+    group_by(K, variable) %>%
+    dplyr::summarise(value_best=min(value))
+
+  best_k = ((best %>% filter(variable=="BIC"))[(best %>% filter(variable=="BIC"))$value_best %>%
+                                                 which.min(),"K"] %>%
+              as.data.frame())[1,"K"] %>% droplevels() %>% levels() %>% as.integer()
+
+  return(best_k)
+}
+
+
+get_ic_df = function(mod_sel) {
+  ic_df = mod_sel$ic %>% rownames_to_column() %>%
+    reshape2::melt(id=c("rowname")) %>%
+    separate("rowname", into=c("K", "run")) %>%
+    mutate(K=as.integer(K)) %>%
+    mutate(K=factor(K, levels=paste(sort(K %>% unique()))))
+
+  return(ic_df)
+}
+

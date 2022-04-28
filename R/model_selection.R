@@ -37,10 +37,11 @@ run_selection = function(dataset, lineages, k_min=5, k_max=25, n_runs=3,
 }
 
 
-selection_util = function(run, k, df, lineages, columns_k, IS_k, steps, covariance, lr, random_state) {
+selection_util = function(run, k, df, lineages, columns_k, IS_k, steps=500, covariance="diag", lr=0.001, random_state=25) {
   print(paste("RUN", run, "- K =", k))
   obj_k = lineaGT::mixture_model(k, df, lineages=lineages, columns=columns_k, IS_values=IS_k)
-  obj_k = lineaGT::run_inference(obj_k, steps=steps, covariance=covariance, lr=lr, random_state=random_state)
+  obj_k = lineaGT::run_inference(obj_k, steps=as.integer(steps), covariance=covariance,
+                                 lr=as.numeric(lr), random_state=random_state)
   obj_k = lineaGT::classifier(obj_k)
 
   obj_k$BIC = obj_k$py_model$compute_ic(method="BIC")$numpy()

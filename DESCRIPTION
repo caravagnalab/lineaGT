@@ -30,7 +30,8 @@ Imports:
     tibble,
     VIBER,
     Polychrome,
-    easypar
+    easypar,
+    patchwork
 Remotes:
     caravagn/VIBER,
     caravagn/easypar

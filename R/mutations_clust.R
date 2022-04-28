@@ -23,7 +23,7 @@ run_viber = function(obj, min_ccf=0, highlight=list()) {
     joined = rbind(joined, fit_k$df)
     fit_all[[cluster]] = fit_k$fit
   }
-  obj$vaf_dataframe = joined %>% as_tibble()
+  obj$vaf_dataframe = joined
   obj$viber_run = fit_all
   return(obj)
 }

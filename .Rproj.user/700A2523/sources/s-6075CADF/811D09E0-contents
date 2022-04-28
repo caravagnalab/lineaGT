@@ -56,14 +56,20 @@ highlight_palette = function(color_palette, highlight=c()) {
 
 
 
-get_muller_pop = function(obj) {
-  means = get_mean(obj)
-  labels = get_labels(obj)
-  timepoints = obj$dimensions
-  dataframe = obj$dataframe
+get_muller_pop = function(obj, means=list()) {
+  if (purrr::is_empty(means)) {
+    means = get_mean(obj)
+    labels = obj$vaf_dataframe$labels_viber %>% levels
+    timepoints = obj$dimensions
+    dataframe = obj$vaf_dataframe
+  } else {
+    labels = get_labels(obj)
+    timepoints = obj$dimensions
+    dataframe = obj$dataframe
+  }
 
   pop_df = means %>% as.data.frame() %>% tibble::rownames_to_column() %>% reshape2::melt() %>%
-    tidyr::separate(variable, into=c("else", "Generation", "Lineage"), sep="_") %>%
+    tidyr::separate(variable, into=c("else", "Generation", "Lineage"), sep="\\.|\\_") %>%
     mutate("else"=NULL, Identity=rowname, rowname=NULL, Population=value, value=NULL) %>%
     group_by(Generation, Lineage) %>% mutate(Frequency=Population/sum(Population)) %>% dplyr::ungroup()
 
@@ -80,13 +86,14 @@ get_muller_pop = function(obj) {
 }
 
 
-get_muller_edges = function(obj) {
-  return(data.frame("Parent"="P", "Identity"=get_unique_labels(obj)))
+get_muller_edges = function(obj, labels=list()) {
+  if (purrr::is_empty(labels)) return(data.frame("Parent"="P", "Identity"=get_unique_labels(obj)))
+  return(data.frame("Parent"="P", "Identity"=labels))
 }
 
 
-select_relevant_clusters = function(obj, min_ccf) {
-  pop_df = get_muller_pop(obj)
+select_relevant_clusters = function(obj, min_ccf, means=list()) {
+  pop_df = get_muller_pop(obj, means)
   clusters_keep = (pop_df %>% group_by(Identity) %>%
                      filter(any(Frequency > min_ccf)))$Identity %>% unique()
   return(clusters_keep)

@@ -19,7 +19,7 @@
 #' @importFrom magrittr %>%
 #' @importFrom stringr str_replace_all
 #' @importFrom MASS mvrnorm
-#' @importFrom tibble rownames_to_column
+#' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom reshape2 melt dcast
 #' @importFrom grDevices gray
 #' @importFrom stats coef lm runif

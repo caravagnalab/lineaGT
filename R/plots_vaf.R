@@ -14,12 +14,17 @@
 
 
 plot_vaf = function(obj, min_ccf=0, highlight=c()) {
-  dataframe = vaf_dataframe(obj)
+  dataframe = obj$vaf_dataframe %>% mutate(labels_mut=paste(labels,labels_viber,sep=".")) %>%
+    dplyr::select(starts_with("vaf"), mutation, IS, contains("labels"), contains("viber")) %>%
+    tidyr::pivot_longer(cols=starts_with("vaf"), names_to="timepoints_lineage", values_to="vaf") %>%
+    separate(timepoints_lineage, into=c("vv","timepoints","lineage")) %>%
+    mutate(timepoints=paste(vv,timepoints,sep="."),vv=NULL) %>%
+    tidyr::pivot_wider(names_from=timepoints, values_from="vaf")
   try(expr = {dataframe = dataframe %>% dplyr::select(-"vaf.over")}, silent=T)
   try(expr = {dataframe = dataframe %>% dplyr::select(-"vaf.steady")}, silent=T)
 
-  color_palette = highlight_palette(obj$color_palette, highlight)
   if (purrr::is_empty(highlight)) highlight = select_relevant_clusters(obj, min_ccf)
+  color_palette = highlight_palette(obj$color_palette, highlight)
 
   combinations = get_pairs(dataframe, columns=dataframe %>% dplyr::select(dplyr::starts_with("vaf")) %>% colnames)
   color_palette = get_colors(list_lab=(dataframe %>% filter(labels %in% highlight))$labels_mut %>% unique())
@@ -49,3 +54,27 @@ plot_vaf_2D = function(dataframe, theta, dim1, dim2, color_palette) {
     ylim(0,100) + xlim(0,100) + labs(color="Clusters")
   return(pl)
 }
+
+
+
+
+# clusters = select_relevant_clusters(obj, min_ccf=0.07)
+# design = "AAACC
+#           AAACC
+#           AAABB
+#           AAABB"
+# df = obj$vaf_dataframe
+#
+# pdf("./plots/HOMO_PGK.viber_clusters.multipage2.pdf", height=10, width=12)
+# for (cluster in clusters) {
+#   print(cluster)
+#   if (df %>% filter(labels==cluster) %>% nrow > 0) {
+#     muller = plot_mullerplot(obj, highlight=c(cluster), wrap=T, legend.pos="none")
+#     p = plot_vaf(obj, highlight=c(cluster)) %>% patchwork::wrap_plots(guides="collect")
+#     exp = plot_exp_fit(obj, highlight = c(cluster)) + theme(legend.position = "none")
+#     wrapped = patchwork::wrap_plots(p, muller, exp, design=design)
+#     print(wrapped + patchwork::plot_annotation(title="VAF of mutations in experiments HOMO PGK across all lineages",
+#                                     subtitle="threshold kept of 7%"))
+#   }
+# }
+# dev.off()

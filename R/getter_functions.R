@@ -1,6 +1,8 @@
 # Functions to access elements of a mvnmm object.
 
 get_unique_labels = function(obj) {
+  try(expr = { labels = obj.homo_pgk$params$labels %>% levels(); if (!purrr::is_empty(labels)) return(labels) }, silent = T)
+
   py_model = get_model(obj)
   tryCatch(
     expr = {
@@ -10,6 +12,8 @@ get_unique_labels = function(obj) {
 }
 
 get_mean = function(obj) {
+  try(expr = { mean = obj$params$mean; if (!purrr::is_empty(mean)) return(mean) }, silent = T)
+
   py_model = get_model(obj)
   tryCatch(
     expr = {
@@ -22,6 +26,8 @@ get_mean = function(obj) {
 }
 
 get_weights = function(obj) {
+  try(expr = { weights = obj$params$weights; if (!purrr::is_empty(weights)) return(weights) }, silent = T)
+
   py_model = get_model(obj)
   tryCatch(
     expr = {
@@ -33,6 +39,8 @@ get_weights = function(obj) {
 }
 
 get_sigma = function(obj) {
+  try(expr = { sigma = obj$params$sigma; if (!purrr::is_empty(sigma)) return(sigma) }, silent = T)
+
   py_model = get_model(obj)
   tryCatch(
     expr = {
@@ -45,6 +53,8 @@ get_sigma = function(obj) {
 }
 
 get_covariance_Sigma = function(obj) {
+  try(expr = { Sigma = obj$params$Sigma; if (!purrr::is_empty(Sigma)) return(Sigma) }, silent = T)
+
   py_model = get_model(obj)
   tryCatch(
     expr = {
@@ -60,6 +70,8 @@ get_covariance_Sigma = function(obj) {
 }
 
 get_z_probs = function(obj) {
+  try(expr = { z_probs = obj$params$probabilites; if (!purrr::is_empty(z_probs)) return(z_probs) }, silent = T)
+
   py_model = get_model(obj)
   tryCatch(
     expr = {
@@ -72,6 +84,8 @@ get_z_probs = function(obj) {
 }
 
 get_z_assignments = function(obj) {
+  try(expr = { assignm = obj$params$assignments; if (!purrr::is_empty(assignm)) return(assignm) }, silent = T)
+
   py_model = get_model(obj)
   tryCatch(
     expr = {
@@ -84,6 +98,8 @@ get_z_assignments = function(obj) {
 }
 
 get_labels = function(obj, initial_lab=F) {
+  try(expr = { labs = obj$params$labels; if (!purrr::is_empty(labs)) return(labs) }, silent = T)
+
   py_model = get_model(obj)
   if (!initial_lab) {
     tryCatch(
