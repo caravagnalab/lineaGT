@@ -4,7 +4,7 @@ Title: LineaGT
 Version: 0.1.0
 Author: Elena Buscaroli
 Maintainer: Elena Buscaroli <ele.buscaroli@gmail.com>
-Description: 
+Description: Multi-lineage inference from vector integration sites and somatic mutations during gene therapy
 License: GNU
 Encoding: UTF-8
 LazyData: true
