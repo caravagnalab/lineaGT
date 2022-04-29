@@ -65,7 +65,7 @@ mullerplot_util = function(mullerdf, y, fill, lineage, color_palette, legend.pos
   if (fill=="Identity")
     pl = mullerdf %>% ggplot() +
       geom_area(aes_string(x="Generation", y=y, group="Group_id", fill="Identity", colour="Identity"), alpha=.9) +
-      guides(linetype=FALSE, color=FALSE) +
+      guides(linetype="none", color="none") +
       xlab("Time") + labs(title=split_to_camelcase(lineage)) +
       my_ggplot_theme(legend.pos=legend.pos) +
       scale_fill_manual(name="Clusters", values=color_palette, na.value="transparent") +
@@ -74,7 +74,7 @@ mullerplot_util = function(mullerdf, y, fill, lineage, color_palette, legend.pos
   if (fill == "lm_r")
     pl = mullerdf %>% ggplot() +
       geom_area(aes_string(x="Generation", y=y, group="Group_id", fill="lm_r"), alpha=.9) +
-      guides(linetype=FALSE, color=FALSE) +
+      guides(linetype="none", color="none") +
       xlab("Time") + labs(title=split_to_camelcase(lineage), fill="Exp rate") +
       my_ggplot_theme(legend.pos=legend.pos) +
       scale_fill_gradient2(mid="white", low="blue", high="red", limits=exp_limits)

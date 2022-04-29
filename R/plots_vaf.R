@@ -39,18 +39,37 @@ plot_vaf = function(obj, min_ccf=0, highlight=c()) {
 }
 
 
-plot_vaf_2D = function(dataframe, theta, dim1, dim2, color_palette) {
+
+plot_vaf_2D = function(dataframe,
+                       theta,
+                       dim1,
+                       dim2,
+                       color_palette) {
   pl = dataframe %>%
-    dplyr::select(starts_with("vaf"), labels, lineage, labels_mut, mutation, pi_viber) %>%
-    ggplot() + geom_point(aes_string(x=dim1, y=dim2, color="labels_mut"), alpha=.5) +
-    geom_point(data=theta, aes_string(x=dim1, y=dim2, color="labels_mut"), shape=15, inherit.aes=F) +
-    facet_grid(lineage~labels) + scale_color_manual(values=color_palette) +
-    my_ggplot_theme() + xlab(split_to_camelcase(dim1)) + ylab(split_to_camelcase(dim2)) +
-    ylim(0,100) + xlim(0,100) + labs(color="Clusters")
+    dplyr::select(starts_with("vaf"),
+                  labels,
+                  lineage,
+                  labels_mut,
+                  mutation,
+                  pi_viber) %>%
+    ggplot() +
+    geom_point(aes_string(x = dim1, y = dim2, color = "labels_mut"), alpha =
+                            .5) +
+    geom_point(
+      data = theta,
+      aes_string(x = dim1, y = dim2, color = "labels_mut"),
+      shape = 15,
+      inherit.aes = F
+    ) +
+    facet_grid(lineage ~ labels) +
+    scale_color_manual(values = color_palette) +
+    my_ggplot_theme() +
+    xlab(split_to_camelcase(dim1)) +
+    ylab(split_to_camelcase(dim2)) +
+    ylim(0, 100) + xlim(0, 100) + labs(color = "Clusters")
+
   return(pl)
 }
-
-
 
 
 # clusters = select_relevant_clusters(obj, min_ccf=0.07)
