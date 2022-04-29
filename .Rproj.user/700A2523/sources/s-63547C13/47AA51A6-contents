@@ -84,24 +84,6 @@ get_input_viber = function(vaf_df) {
 }
 
 
-# As input a mvnmm object with already the fitted viber df
-vaf_dataframe = function(obj) {
-  joined = obj$dataframe_vaf %>% tidyr::unite(col="labels_mut", c("labels", "labels_viber"), sep=".", remove=F)
-  dp = joined %>%
-    reshape2::melt(id=c("IS", "labels", "mutation", "experiment", "pi_viber", "labels_mut", "labels_viber")) %>%
-    tidyr::separate(variable, into=c("time_lin", "dp_alt"), sep="[.]") %>%
-    filter(dp_alt == "dp") %>% mutate(dp=value, value=NULL) %>% dplyr::select(-dp_alt)
-  alt = joined %>%
-    reshape2::melt(id=c("IS", "labels", "mutation", "experiment", "pi_viber", "labels_mut", "labels_viber")) %>%
-    tidyr::separate(variable, into=c("time_lin", "dp_alt"), sep="[.]") %>%
-    filter(dp_alt == "alt") %>% mutate(alt=value, value=NULL) %>% dplyr::select(-dp_alt)
-  vaf = dplyr::inner_join(dp, alt) %>% mutate(vaf=alt/dp*100) %>% mutate(vaf=ifelse(is.na(vaf), 0, vaf)) %>%
-    tidyr::separate("time_lin", into=c("timepoint", "lineage")) %>% dplyr::select(-"dp", -"alt") %>%
-    tidyr::pivot_wider(names_from=c("timepoint"), values_from="vaf", names_sep=".", names_prefix="vaf.")
-
-  return(vaf)
-}
-
 
 # As input a mvnmm object with already a viber_run performed
 get_binomial_theta = function(obj) {
@@ -117,7 +99,9 @@ get_binomial_theta = function(obj) {
   }
   theta = theta %>% reshape2::melt() %>% mutate(value=value*100) %>%
     tidyr::separate(variable, into=c("timepoint", "lineage"), sep="_") %>%
-    tidyr::pivot_wider(names_from="timepoint", values_from="value")
+    tidyr::pivot_wider(names_from="timepoint", values_from="value") %>%
+    tidyr::pivot_wider(names_from="lineage", values_from=starts_with("vaf")) %>%
+    dplyr::select(-labels) %>% tibble::column_to_rownames("labels_mut")
   return(theta)
 }
 

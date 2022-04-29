@@ -1,7 +1,7 @@
 # Functions to access elements of a mvnmm object.
 
 get_unique_labels = function(obj) {
-  try(expr = { labels = obj.homo_pgk$params$labels %>% levels(); if (!purrr::is_empty(labels)) return(labels) }, silent = T)
+  try(expr = { labels = obj$params$labels %>% levels(); if (!purrr::is_empty(labels)) return(labels) }, silent = T)
 
   py_model = get_model(obj)
   tryCatch(
@@ -9,6 +9,11 @@ get_unique_labels = function(obj) {
       clusters_sort = paste("C_", py_model$params$clusters$detach()$numpy() %>% unique() %>% sort(), sep="")
       return(clusters_sort) },
     error = function(e) return(0:(py_model$params$K - 1)) )
+}
+
+get_unique_viber_labels = function(obj) {
+  labels = obj$vaf_dataframe$labels_mut %>% unique()
+  return(labels)
 }
 
 get_mean = function(obj) {
@@ -121,4 +126,12 @@ get_labels = function(obj, initial_lab=F) {
 get_model = function(obj) {
   if ("mvnmm" %in% class(obj)) return(obj$py_model)
   if ("pylineaGT.mvnmm.MVNMixtureModel" %in% class(obj)) return(obj)
+}
+
+get_dataframe = function(obj) {
+  return(obj$dataframe)
+}
+
+get_vaf_dataframe = function(obj) {
+  return(obj$vaf_dataframe)
 }

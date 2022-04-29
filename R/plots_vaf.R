@@ -24,12 +24,16 @@ plot_vaf = function(obj, min_ccf=0, highlight=c()) {
   try(expr = {dataframe = dataframe %>% dplyr::select(-"vaf.steady")}, silent=T)
 
   if (purrr::is_empty(highlight)) highlight = select_relevant_clusters(obj, min_ccf)
-  color_palette = highlight_palette(obj$color_palette, highlight)
+  highlight_v = (dataframe %>% filter(labels %in% highlight))$labels_mut %>% unique()
+  color_palette = highlight_palette(obj$color_palette, c(highlight,highlight_v))
 
   combinations = get_pairs(dataframe, columns=dataframe %>% dplyr::select(dplyr::starts_with("vaf")) %>% colnames)
-  color_palette = get_colors(list_lab=(dataframe %>% filter(labels %in% highlight))$labels_mut %>% unique())
-
-  theta = get_binomial_theta(obj)
+  theta = get_binomial_theta(obj) %>% tibble::rownames_to_column(var="labels_mut") %>%
+    tidyr::pivot_longer(cols=starts_with("vaf"), names_to="timepoints_lineage", values_to="vaf") %>%
+    tidyr::separate(timepoints_lineage, into=c("timepoints","lineage"), sep="_") %>%
+    tidyr::pivot_wider(names_from="timepoints", values_from="vaf") %>%
+    mutate(labels=labels_mut) %>% separate(labels, into=c("labels","else"), sep="[.]") %>%
+    mutate("else"=NULL)
 
   p = list()
   for (t1_t2 in combinations$pair_name) {
@@ -37,9 +41,8 @@ plot_vaf = function(obj, min_ccf=0, highlight=c()) {
 
     df = dataframe %>% filter(labels %in% highlight)
     theta = theta %>% filter(labels %in% highlight)
-    if (nrow(df) > 0) { p[[t1_t2]] = plot_vaf_2D(df, theta, xy[1], xy[2], color_palette) }
+    if (nrow(df) > 0) { p[[t1_t2]] = plot_vaf_2D(df, theta, xy[1], xy[2], color_palette[highlight_v]) }
   }
-
   return(p)
 }
 
@@ -59,10 +62,10 @@ plot_vaf_2D = function(dataframe, theta, dim1, dim2, color_palette) {
 
 
 # clusters = select_relevant_clusters(obj, min_ccf=0.07)
-# design = "AAACC
-#           AAACC
+# design = "AAABB
 #           AAABB
-#           AAABB"
+#           AAACC
+#           AAACC"
 # df = obj$vaf_dataframe
 #
 # pdf("./plots/HOMO_PGK.viber_clusters.multipage2.pdf", height=10, width=12)
@@ -71,8 +74,8 @@ plot_vaf_2D = function(dataframe, theta, dim1, dim2, color_palette) {
 #   if (df %>% filter(labels==cluster) %>% nrow > 0) {
 #     muller = plot_mullerplot(obj, highlight=c(cluster), wrap=T, legend.pos="none")
 #     p = plot_vaf(obj, highlight=c(cluster)) %>% patchwork::wrap_plots(guides="collect")
-#     exp = plot_exp_fit(obj, highlight = c(cluster)) + theme(legend.position = "none")
-#     wrapped = patchwork::wrap_plots(p, muller, exp, design=design)
+#     exp1 = plot_exp_fit(obj, highlight=c(cluster)) + theme(legend.position="none")
+#     wrapped = patchwork::wrap_plots(p, muller, exp1, design=design)
 #     print(wrapped + patchwork::plot_annotation(title="VAF of mutations in experiments HOMO PGK across all lineages",
 #                                     subtitle="threshold kept of 7%"))
 #   }

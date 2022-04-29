@@ -1,5 +1,66 @@
 {
     "debugBreakpointsState": {
-        "breakpoints": []
+        "breakpoints": [
+            {
+                "id": 0,
+                "path": "C:/Users/Elena/Desktop/tirocinio/repo/LineaGT/R/plots_clones.R",
+                "line_number": 98,
+                "function_steps": "",
+                "function_name": "plot_exp_fit",
+                "state": 2,
+                "editor_state": 2,
+                "editor_line_number": 98,
+                "is_pending_debug_completion": false,
+                "needs_updated_steps": false,
+                "type": 0,
+                "is_package_breakpoint": true,
+                "package_name": "lineaGT"
+            },
+            {
+                "id": 1,
+                "path": "C:/Users/Elena/Desktop/tirocinio/repo/LineaGT/R/plots_clones.R",
+                "line_number": 97,
+                "function_steps": "",
+                "function_name": "plot_exp_fit",
+                "state": 2,
+                "editor_state": 2,
+                "editor_line_number": 97,
+                "is_pending_debug_completion": false,
+                "needs_updated_steps": false,
+                "type": 0,
+                "is_package_breakpoint": true,
+                "package_name": "lineaGT"
+            },
+            {
+                "id": 2,
+                "path": "C:/Users/Elena/Desktop/tirocinio/repo/LineaGT/R/plots_clones.R",
+                "line_number": 99,
+                "function_steps": "",
+                "function_name": "plot_exp_fit",
+                "state": 2,
+                "editor_state": 2,
+                "editor_line_number": 99,
+                "is_pending_debug_completion": false,
+                "needs_updated_steps": false,
+                "type": 0,
+                "is_package_breakpoint": true,
+                "package_name": "lineaGT"
+            },
+            {
+                "id": 3,
+                "path": "C:/Users/Elena/Desktop/tirocinio/repo/LineaGT/R/plots_clones.R",
+                "line_number": 100,
+                "function_steps": "",
+                "function_name": "plot_exp_fit",
+                "state": 2,
+                "editor_state": 2,
+                "editor_line_number": 100,
+                "is_pending_debug_completion": false,
+                "needs_updated_steps": false,
+                "type": 0,
+                "is_package_breakpoint": true,
+                "package_name": "lineaGT"
+            }
+        ]
     }
 }

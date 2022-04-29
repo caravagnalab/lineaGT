@@ -11,19 +11,15 @@
 
 plot_mullerplot = function(obj, which="ccf", highlight=c(), min_ccf=0, legend.pos="right", wrap=F, viber=F) {
   if (viber) {
-    theta = get_binomial_theta(obj) %>%
-      tidyr::pivot_wider(names_from="lineage", values_from=starts_with("vaf")) %>%
-      dplyr::select(-labels) %>% tibble::column_to_rownames("labels_mut")
+    theta = get_binomial_theta(obj)
     pop_df = get_muller_pop(obj, means=theta)
+    edges_df = get_muller_edges(obj, labels=get_unique_viber_labels(obj))
 
-    edges_df = get_muller_edges(obj, labels=pop_df$Identity %>% unique()) %>% filter(Parent!=Identity)
-
-    obj$vaf_dataframe = obj$vaf_dataframe %>% mutate(labels_mut=paste(labels,labels_viber,sep="."))
-    if (!purrr::is_empty(highlight)) highlight = (obj$vaf_dataframe$labels_mut %>% unique())[grepl(highlight, obj$vaf_dataframe$labels_mut %>% unique())]
-    if (purrr::is_empty(highlight)) highlight = select_relevant_clusters(obj, min_ccf, theta)
-    color_palette = get_colors(list_lab=(obj$vaf_dataframe %>% filter(labels_mut %in% highlight))$labels_mut %>%
-                                 unique())
-    color_palette = highlight_palette(color_palette, highlight)
+    obj$vaf_dataframe = get_vaf_dataframe(obj) %>% mutate(labels_mut=paste(labels,labels_viber,sep="."))
+    if (!purrr::is_empty(highlight))
+      highlight = get_unique_viber_labels(obj)[grepl(highlight, get_unique_viber_labels(obj))] else
+        highlight = select_relevant_clusters(obj, min_ccf, theta)
+    color_palette = highlight_palette(obj$color_palette, highlight)
 
   } else {
     if (purrr::is_empty(highlight)) highlight = select_relevant_clusters(obj, min_ccf)
@@ -34,36 +30,26 @@ plot_mullerplot = function(obj, which="ccf", highlight=c(), min_ccf=0, legend.po
 
   timepoints = obj$dimensions
   lineages = obj$lineages
-  params = obj$params
-  dataset = obj$dataframe
-  means = get_mean(obj)
-
-  # if (purrr::is_empty(highlight)) highlight = select_relevant_clusters(obj, min_ccf)
-  # color_palette = highlight_palette(obj$color_palette, highlight)
-
-  # edges_df = get_muller_edges(obj)
-  # pop_df = get_muller_pop(obj)
   exp_limits = c(min(pop_df$lm_r), max(pop_df$lm_r))
 
   plot_list = list()
   for (ll in lineages) {
     tp = timepoints[grep(pattern=ll, x=timepoints)]
     if (length(tp) != 0) {
-      mean_ll = means[,tp]
       pop_ll = pop_df %>% filter(Lineage==ll)
       mullerdf_ll = ggmuller::get_Muller_df(edges_df, pop_ll)
 
       if (which == "ccf" || which == "")
-        plot_list[[ll]] = mullerplot_util(mullerdf_ll, y="Frequency", fill="Identity",
-                                     color_palette=color_palette, lineage=ll, legend.pos=legend.pos)
+        plot_list[[ll]] = mullerplot_util(mullerdf_ll, y="Frequency", fill="Identity", lineage=ll,
+                                          color_palette=color_palette[highlight], legend.pos=legend.pos)
       if (which == "pop" || which == "")
         plot_list[[ll]] = mullerplot_util(mullerdf_ll %>% ggmuller::add_empty_pop(), y="Population",
-                                     fill="Identity", color_palette=color_palette, lineage=ll,
-                                     legend.pos=legend.pos)
+                                          fill="Identity", color_palette=color_palette[highlight],
+                                          lineage=ll, legend.pos=legend.pos)
       if (which == "fitness")
         plot_list[[ll]] = mullerplot_util(mullerdf_ll, y="Frequency", fill="lm_r",
-                                     color_palette=color_palette, lineage=ll,
-                                     legend.pos=legend.pos, exp_limits=exp_limits)
+                                          color_palette=color_palette[highlight], lineage=ll,
+                                          legend.pos=legend.pos, exp_limits=exp_limits)
     }
   }
 
@@ -75,8 +61,7 @@ plot_mullerplot = function(obj, which="ccf", highlight=c(), min_ccf=0, legend.po
 mullerplot_util = function(mullerdf, y, fill, lineage, color_palette, legend.pos="right", exp_limits=NULL) {
   if (fill=="Identity")
     pl = mullerdf %>% ggplot() +
-      geom_area(aes_string(x="Generation", y=y, group="Group_id",
-                           fill="Identity", colour="Identity"), alpha=.9) +
+      geom_area(aes_string(x="Generation", y=y, group="Group_id", fill="Identity", colour="Identity"), alpha=.9) +
       guides(linetype=FALSE, color=FALSE) +
       xlab("Time") + labs(title=split_to_camelcase(lineage)) +
       my_ggplot_theme(legend.pos=legend.pos) +
@@ -85,8 +70,7 @@ mullerplot_util = function(mullerdf, y, fill, lineage, color_palette, legend.pos
 
   if (fill == "lm_r")
     pl = mullerdf %>% ggplot() +
-      geom_area(aes_string(x="Generation", y=y, group="Group_id",
-                           fill="lm_r"), alpha=.9) +
+      geom_area(aes_string(x="Generation", y=y, group="Group_id", fill="lm_r"), alpha=.9) +
       guides(linetype=FALSE, color=FALSE) +
       xlab("Time") + labs(title=split_to_camelcase(lineage), fill="Exp rate") +
       my_ggplot_theme(legend.pos=legend.pos) +
@@ -107,17 +91,13 @@ mullerplot_util = function(mullerdf, y, fill, lineage, color_palette, legend.pos
 
 plot_exp_fit = function(obj, highlight=c(), min_ccf=0, facet=F, viber=F) {
   if (viber) {
-    theta = get_binomial_theta(obj) %>%
-      tidyr::pivot_wider(names_from="lineage", values_from=starts_with("vaf")) %>%
-      dplyr::select(-labels) %>% tibble::column_to_rownames("labels_mut")
+    theta = get_binomial_theta(obj)
     pop_df = get_muller_pop(obj, means=theta)
 
-    obj$vaf_dataframe = obj$vaf_dataframe %>% mutate(labels_mut=paste(labels,labels_viber,sep="."))
-    if (!purrr::is_empty(highlight)) highlight = (obj$vaf_dataframe$labels_mut %>% unique())[grepl(highlight, obj$vaf_dataframe$labels_mut %>% unique())]
-    print(highlight)
-    if (purrr::is_empty(highlight)) highlight = select_relevant_clusters(obj, min_ccf, theta)
-    color_palette = get_colors(list_lab=(obj$vaf_dataframe %>% filter(labels_mut %in% highlight))$labels_mut %>%
-                                 unique())
+    obj$vaf_dataframe = get_vaf_dataframe(obj) %>% mutate(labels_mut=paste(labels,labels_viber,sep="."))
+    if (purrr::is_empty(highlight)) highlight_c = select_relevant_clusters(obj, min_ccf) else highlight_c = highlight
+    highlight_v = (dataframe %>% filter(labels %in% highlight_c))$labels_mut %>% unique()
+    color_palette = highlight_palette(obj$color_palette, c(highlight_c,highlight_v))
 
   } else {
     if (purrr::is_empty(highlight)) highlight = select_relevant_clusters(obj, min_ccf)
@@ -129,7 +109,7 @@ plot_exp_fit = function(obj, highlight=c(), min_ccf=0, facet=F, viber=F) {
     ggplot(aes(x=Generation, y=Population, color=Identity)) +
     geom_point(alpha=.3) + my_ggplot_theme()
 
-  for (cl in highlight) { p = exp_fit_util(p, pop_df, cl) }
+  for (cl in highlight_c) { p = exp_fit_util(p, pop_df, cl) }
 
   if (facet)
     p = p + scale_color_manual(values=color_palette[highlight]) +
@@ -168,8 +148,6 @@ plot_exp_rate = function(obj, highlight=c(), min_ccf=0) {
   if (purrr::is_empty(highlight)) highlight = select_relevant_clusters(obj, min_ccf)
   color_palette = highlight_palette(obj$color_palette, highlight)
 
-  # color_palette = highlight_palette(obj$color_palette, highlight)
-  # if (purrr::is_empty(highlight)) highlight = get_unique_labels(obj) %>% stringr::str_replace("C_", "")
   highlight = highlight %>% stringr::str_replace("C_", "")
   names(color_palette) = names(color_palette) %>% stringr::str_replace("C_", "")
 

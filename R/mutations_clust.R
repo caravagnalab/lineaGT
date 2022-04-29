@@ -19,21 +19,20 @@ run_viber = function(obj, min_ccf=0, highlight=list()) {
   joined = data.frame()
   fit_all = list()
   for (cluster in clusters_joined) {
-    fit_k = fit_cluster(viber_input, cluster=cluster)
+    fit_k = fit_cluster_viber(viber_input, cluster=cluster)
     joined = rbind(joined, fit_k$df)
     fit_all[[cluster]] = fit_k$fit
   }
-  obj$vaf_dataframe = joined
+  obj$vaf_dataframe = joined %>% mutate(labels_mut=paste(labels, labels_viber, sep="."))
   obj$viber_run = fit_all
+  obj$color_palette = c(obj$color_palette, get_colors(list_lab=get_unique_viber_labels(obj)))
   return(obj)
 }
 
 
-fit_cluster = function(viber_input, cluster) {
-  viber_df_k = list("successes"=viber_input$successes %>% filter(labels==cluster) %>%
-                      dplyr::select(-labels) %>% tidyr::as_tibble(),
-                    "trials"=viber_input$trials %>% filter(labels==cluster) %>%
-                      dplyr::select(-labels) %>% tidyr::as_tibble(),
+fit_cluster_viber = function(viber_input, cluster) {
+  viber_df_k = list("successes"=viber_input$successes %>% filter(labels==cluster) %>% dplyr::select(-labels),
+                    "trials"=viber_input$trials %>% filter(labels==cluster) %>% dplyr::select(-labels),
                     "vaf_df"=viber_input$vaf_df %>% filter(labels==cluster))
   k = viber_df_k$successes %>% nrow
   fit = ""

@@ -47,8 +47,8 @@ get_colors = function(obj=NULL, list_lab=list()) {
 highlight_palette = function(color_palette, highlight=c()) {
   if (purrr::is_empty(highlight)) return(color_palette)
 
-  remove = color_palette[!names(color_palette) %in% highlight] %>% names
-  keep = color_palette[highlight]
+  remove = color_palette[!names(color_palette)%in% highlight] %>% names
+  keep = color_palette[names(color_palette)%in% highlight]
   grey_col = gray(runif(remove %>% length(), 0.6, 0.8))
   names(grey_col) = remove
   return(c(keep, grey_col))
