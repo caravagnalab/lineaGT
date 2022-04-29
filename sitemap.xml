@@ -13,10 +13,13 @@
     <loc>/index.html</loc>
   </url>
   <url>
-    <loc>/reference/index.html</loc>
+    <loc>/reference/filter_dataset.html</loc>
   </url>
   <url>
-    <loc>/reference/mixture_model.html</loc>
+    <loc>/reference/fit.html</loc>
+  </url>
+  <url>
+    <loc>/reference/index.html</loc>
   </url>
   <url>
     <loc>/reference/plot.mvnmm.html</loc>
