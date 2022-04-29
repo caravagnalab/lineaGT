@@ -2,9 +2,13 @@
 #'
 #' @description Function to plot the VAFs of the mutations one timepoint against the other
 #'
-#' @param obj a mvnmm object
-#' @param min_ccf value in [0,1] to show only the clusters with a minimum CCF of min_ccf in at least one timepoint
-#' @param highlight a list of labels ID to show. All the clusters in the list are shown, even if the CCF is lower than min_ccf
+#' @param obj a \code{mvnmm} object.
+#' @param min_ccf value in \code{[0,1]} to show only the clusters with a minimum CCF of
+#' \code{min_ccf} in at least one timepoint.
+#' @param highlight a list of labels ID to show. All the clusters in the list are shown,
+#' even if the CCF is lower than \code{min_ccf}.
+#'
+#' @return list of VAF scatterplots.
 #'
 #' @import ggplot2
 #' @importFrom dplyr select starts_with

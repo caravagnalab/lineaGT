@@ -7,11 +7,16 @@
 plot_vaf(obj, min_ccf = 0, highlight = c())
 }
 \arguments{
-\item{obj}{a mvnmm object}
+\item{obj}{a \code{mvnmm} object.}
 
-\item{min_ccf}{value in [0,1] to show only the clusters with a minimum CCF of min_ccf in at least one timepoint}
+\item{min_ccf}{value in \code{[0,1]} to show only the clusters with a minimum CCF of
+\code{min_ccf} in at least one timepoint.}
 
-\item{highlight}{a list of labels ID to show. All the clusters in the list are shown, even if the CCF is lower than min_ccf}
+\item{highlight}{a list of labels ID to show. All the clusters in the list are shown,
+even if the CCF is lower than \code{min_ccf}.}
+}
+\value{
+list of VAF scatterplots.
 }
 \description{
 Function to plot the VAFs of the mutations one timepoint against the other
