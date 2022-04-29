@@ -95,7 +95,33 @@ get_muller_edges = function(obj, labels=list()) {
 select_relevant_clusters = function(obj, min_ccf, means=list()) {
   pop_df = get_muller_pop(obj, means)
   clusters_keep = (pop_df %>% group_by(Identity) %>%
-                     filter(any(Frequency > min_ccf)))$Identity %>% unique()
+                     filter(any(Frequency > min_ccf), Identity!="P"))$Identity %>% unique()
   return(clusters_keep)
+}
+
+
+reshape_vaf_dataframe_long = function(obj) {
+  vaf = obj$vaf_dataframe %>% mutate(labels_mut=paste(labels,labels_viber,sep=".")) %>%
+    dplyr::select(starts_with("vaf"), mutation, IS, contains("labels"), contains("viber")) %>%
+    tidyr::pivot_longer(cols=starts_with("vaf"), names_to="timepoints_lineage", values_to="vaf") %>%
+    separate(timepoints_lineage, into=c("vv","timepoints","lineage")) %>%
+    mutate(timepoints=paste(vv,timepoints,sep="."),vv=NULL) %>%
+    tidyr::pivot_wider(names_from=timepoints, values_from="vaf")
+
+  try(expr = {vaf = vaf %>% dplyr::select(-"vaf.over")}, silent=T)
+  try(expr = {vaf = vaf %>% dplyr::select(-"vaf.steady")}, silent=T)
+
+  return(vaf)
+}
+
+reshape_theta_long = function(obj) {
+  theta = get_binomial_theta(obj) %>% tibble::rownames_to_column(var="labels_mut") %>%
+    tidyr::pivot_longer(cols=starts_with("vaf"), names_to="timepoints_lineage", values_to="vaf") %>%
+    tidyr::separate(timepoints_lineage, into=c("timepoints","lineage"), sep="_") %>%
+    tidyr::pivot_wider(names_from="timepoints", values_from="vaf") %>%
+    mutate(labels=labels_mut) %>% separate(labels, into=c("labels","else"), sep="[.]") %>%
+    mutate("else"=NULL)
+
+  return(theta)
 }
 

@@ -4,7 +4,7 @@
 \alias{plot_exp_rate}
 \title{Exponential rate}
 \usage{
-plot_exp_rate(obj, highlight = c(), min_ccf = 0)
+plot_exp_rate(obj, highlight = c(), min_ccf = 0, viber = F)
 }
 \description{
 

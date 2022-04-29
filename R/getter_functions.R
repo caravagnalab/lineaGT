@@ -135,3 +135,10 @@ get_dataframe = function(obj) {
 get_vaf_dataframe = function(obj) {
   return(obj$vaf_dataframe)
 }
+
+get_viber_clusters = function(obj, clusters) {
+  if (purrr::is_empty(clusters)) return(get_unique_viber_labels(obj))
+  vaf = get_vaf_dataframe(obj) %>% filter(labels %in% clusters)
+  return(vaf$labels_mut %>% unique())
+}
+

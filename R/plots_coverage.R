@@ -53,7 +53,7 @@ plot_2D = function(obj, dim1, dim2, color_palette, highlight, dens=NULL, facet=F
   if (!is.null(dens)) pl = pl + geom_density_2d(data=dens %>% filter(labels %in% highlight),
                                               aes_string(x=dim1, y=dim2, color="labels"),
                                               inherit.aes=F, contour_var="ndensity", size=.1) +
-      scale_color_manual(values=obj$color_palette)
+      scale_color_manual(values=color_palette)
 
   if (facet) pl = pl + facet_wrap(~labels, nrow=1) + theme(legend.position="none")
   return(pl)

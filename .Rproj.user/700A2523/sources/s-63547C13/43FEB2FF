@@ -1,12 +1,12 @@
 {
-    "id": "6620F514",
-    "path": "C:/Users/Elena/Desktop/tirocinio/repo/LineaGT/R/utils_plots.R",
-    "project_path": "R/utils_plots.R",
+    "id": "43FEB2FF",
+    "path": "C:/Users/Elena/Desktop/tirocinio/repo/LineaGT/R/getter_functions.R",
+    "project_path": "R/getter_functions.R",
     "type": "r_source",
-    "hash": "2271735166",
+    "hash": "604599549",
     "contents": "",
     "dirty": false,
-    "created": 1651181477210.0,
+    "created": 1651226299051.0,
     "source_on_save": false,
     "relative_order": 7,
     "properties": {
@@ -15,11 +15,11 @@
         "Source": "Source"
     },
     "folds": "",
-    "lastKnownWriteTime": 1651227842,
+    "lastKnownWriteTime": 1651226303,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1651227842146,
+    "last_content_update": 1651226303104,
     "read_only": false,
     "read_only_alternatives": []
 }
