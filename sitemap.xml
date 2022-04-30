@@ -1,48 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>/404.html</loc>
+    <loc>https://caravagnalab.github.io/LineaGT/404.html</loc>
   </url>
   <url>
-    <loc>/LICENSE-text.html</loc>
+    <loc>https://caravagnalab.github.io/LineaGT/LICENSE-text.html</loc>
   </url>
   <url>
-    <loc>/authors.html</loc>
+    <loc>https://caravagnalab.github.io/LineaGT/authors.html</loc>
   </url>
   <url>
-    <loc>/index.html</loc>
+    <loc>https://caravagnalab.github.io/LineaGT/index.html</loc>
   </url>
   <url>
-    <loc>/reference/filter_dataset.html</loc>
+    <loc>https://caravagnalab.github.io/LineaGT/reference/filter_dataset.html</loc>
   </url>
   <url>
-    <loc>/reference/fit.html</loc>
+    <loc>https://caravagnalab.github.io/LineaGT/reference/fit.html</loc>
   </url>
   <url>
-    <loc>/reference/index.html</loc>
+    <loc>https://caravagnalab.github.io/LineaGT/reference/index.html</loc>
   </url>
   <url>
-    <loc>/reference/plot.mvnmm.html</loc>
+    <loc>https://caravagnalab.github.io/LineaGT/reference/plot.mvnmm.html</loc>
   </url>
   <url>
-    <loc>/reference/plot_exp_fit.html</loc>
+    <loc>https://caravagnalab.github.io/LineaGT/reference/plot_exp_fit.html</loc>
   </url>
   <url>
-    <loc>/reference/plot_exp_rate.html</loc>
+    <loc>https://caravagnalab.github.io/LineaGT/reference/plot_exp_rate.html</loc>
   </url>
   <url>
-    <loc>/reference/plot_mullerplot.html</loc>
+    <loc>https://caravagnalab.github.io/LineaGT/reference/plot_mullerplot.html</loc>
   </url>
   <url>
-    <loc>/reference/plot_scatter_density.html</loc>
+    <loc>https://caravagnalab.github.io/LineaGT/reference/plot_scatter_density.html</loc>
   </url>
   <url>
-    <loc>/reference/plot_vaf.html</loc>
+    <loc>https://caravagnalab.github.io/LineaGT/reference/plot_vaf.html</loc>
   </url>
   <url>
-    <loc>/reference/print.mvnmm.html</loc>
+    <loc>https://caravagnalab.github.io/LineaGT/reference/print.mvnmm.html</loc>
   </url>
   <url>
-    <loc>/reference/run_viber.html</loc>
+    <loc>https://caravagnalab.github.io/LineaGT/reference/run_viber.html</loc>
   </url>
 </urlset>

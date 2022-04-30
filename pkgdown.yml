@@ -2,5 +2,8 @@ pandoc: 2.7.3
 pkgdown: 2.0.3
 pkgdown_sha: ~
 articles: {}
-last_built: 2022-04-29T17:27Z
+last_built: 2022-04-30T09:47Z
+urls:
+  reference: https://caravagnalab.github.io/LineaGT/reference
+  article: https://caravagnalab.github.io/LineaGT/articles
 
