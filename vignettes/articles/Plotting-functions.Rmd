@@ -1,0 +1,14 @@
+---
+title: "Plotting functions"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(lineaGT)
+```
