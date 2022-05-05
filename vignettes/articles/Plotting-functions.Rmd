@@ -12,3 +12,46 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(lineaGT)
 ```
+
+Scatterplot
+```{r}
+plots = plot_scatter_density(x_fit)
+plots$`cov_early.L2:cov_early.L1` # to visualize a single plot
+```
+
+
+Marginal distributions
+```{r}
+plot_marginal(x_fit)
+```
+
+
+Mullerplot
+```{r}
+plot_mullerplot(x_fit, which="frac", wrap=T)
+```
+```{r}
+plot_mullerplot(x_fit, which="pop", wrap=T)
+```
+
+```{r}
+plot_mullerplot(x_fit, which="fitness", wrap=T)
+```
+
+Exponential Fit
+```{r}
+plot_exp_fit(x_fit)
+```
+
+
+```{r}
+plot_exp_rate(x_fit)
+```
+
+
+VAF scatterplot
+```{r}
+
+```
+
+
