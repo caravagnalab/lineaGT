@@ -18,24 +18,11 @@
 #' @export plot_mullerplot
 
 
-plot_mullerplot = function(x, which="frac", highlight=c(), min_frac=0, legend.pos="right", wrap=F, viber=F) {
-  if (viber) {
-    theta = get_binomial_theta(x)
-    pop_df = get_muller_pop(x, means=theta)
-    edges_df = get_muller_edges(x, labels=get_unique_viber_labels(x))
-
-    x$vaf_dataframe = get_vaf_dataframe(x) %>% mutate(labels_mut=paste(labels,labels_viber,sep="."))
-    if (purrr::is_empty(highlight)) highlight = select_relevant_clusters(x, min_frac)
-    highlight_v = get_viber_clusters(x, highlight)
-    color_palette = highlight_palette(x$color_palette, c(highlight, highlight_v))
-
-
-  } else {
-    if (purrr::is_empty(highlight)) highlight = select_relevant_clusters(x, min_frac)
-    color_palette = highlight_palette(x$color_palette, highlight)
-    pop_df = get_muller_pop(x)
-    edges_df = get_muller_edges(x)
-  }
+plot_mullerplot = function(x, which="frac", highlight=c(), min_frac=0, legend.pos="right", wrap=F, mutations=F) {
+  if (purrr::is_empty(highlight)) highlight = select_relevant_clusters(x, min_frac)
+  color_palette = highlight_palette(x$color_palette, highlight)
+  pop_df = get_muller_pop(x)
+  edges_df = get_muller_edges(x)
 
   timepoints = x$dimensions
   lineages = x$lineages
@@ -50,14 +37,14 @@ plot_mullerplot = function(x, which="frac", highlight=c(), min_frac=0, legend.po
 
       if (which == "frac" || which == "")
         plot_list[[ll]] = mullerplot_util(mullerdf_ll, y="Frequency", fill="Identity", lineage=ll,
-                                          color_palette=color_palette, legend.pos=legend.pos)
+                                          highlight=highlight, color_palette=color_palette, legend.pos=legend.pos)
       if (which == "pop" || which == "")
         plot_list[[ll]] = mullerplot_util(mullerdf_ll %>% ggmuller::add_empty_pop(), y="Population",
-                                          fill="Identity", color_palette=color_palette,
+                                          highlight=highlight, fill="Identity", color_palette=color_palette,
                                           lineage=ll, legend.pos=legend.pos)
       if (which == "fitness")
         plot_list[[ll]] = mullerplot_util(mullerdf_ll, y="Frequency", fill="lm_r",
-                                          color_palette=color_palette, lineage=ll,
+                                          highlight=highlight, color_palette=color_palette, lineage=ll,
                                           legend.pos=legend.pos, exp_limits=exp_limits)
     }
   }
@@ -67,15 +54,17 @@ plot_mullerplot = function(x, which="frac", highlight=c(), min_frac=0, legend.po
 }
 
 
-mullerplot_util = function(mullerdf, y, fill, lineage, color_palette, legend.pos="right", exp_limits=NULL) {
+mullerplot_util = function(mullerdf, y, fill, lineage, color_palette, highlight,
+                           legend.pos="right", exp_limits=NULL) {
   if (fill=="Identity")
     pl = mullerdf %>% ggplot() +
       geom_area(aes_string(x="Generation", y=y, group="Group_id", fill="Identity", colour="Identity"), alpha=.9) +
       guides(linetype="none", color="none") +
-      xlab("Time") + labs(title=split_to_camelcase(lineage)) +
-      my_ggplot_theme(legend.pos=legend.pos) +
-      scale_fill_manual(name="Clusters", values=color_palette, na.value="transparent") +
-      scale_color_manual(values=color_palette, na.value="transparent")
+      scale_fill_manual(name="Clusters", values=color_palette, na.value="transparent", breaks=highlight) +
+      scale_color_manual(values=color_palette, na.value="transparent", breaks=highlight) +
+      xlab("Time") +
+      labs(title=split_to_camelcase(lineage)) +
+      my_ggplot_theme(legend.pos=legend.pos)
 
   if (fill == "lm_r")
     pl = mullerdf %>% ggplot() +

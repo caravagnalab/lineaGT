@@ -45,7 +45,9 @@ vaf_df_from_file = function(vaf_file) {
   vaf_df = vaf_df %>%
     tidyr::pivot_longer(cols=starts_with("dp.ref.alt"), names_to="timepoint", values_to="dp:ref:alt") %>%
     mutate(timepoint=stringr::str_replace_all(timepoint, "dp.ref.alt_", "")) %>%
+    filter(!timepoint %in% c("over","steady")) %>%
     separate("dp:ref:alt", into=c("dp", "ref", "alt"), sep=":") %>%
+    mutate(ref=as.integer(ref), alt=as.integer(alt), dp=ref+alt) %>%
     tidyr::pivot_wider(values_from=c("dp","ref","alt"), names_from="timepoint", values_fn=as.integer) %>%
     update_trials()
 

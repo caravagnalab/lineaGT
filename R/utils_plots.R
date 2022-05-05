@@ -57,33 +57,25 @@ highlight_palette = function(color_palette, highlight=c()) {
 
 
 get_muller_pop = function(x, means=list()) {
-  if (purrr::is_empty(means)) {
-    means = get_mean(x)
-    labels = get_labels(x)
-    timepoints = x$dimensions
-    dataframe = get_dataframe(x)
-  } else {
-    labels = get_labels(x)
-    timepoints = x$dimensions
-    dataframe = x$dataframe
-  }
+  if (purrr::is_empty(means)) means = get_mean(x)
 
   pop_df = means %>% as.data.frame() %>%
-    tibble::rownames_to_column() %>%
-    reshape2::melt() %>%
-    tidyr::separate(variable, into=c("else", "Generation", "Lineage"), sep="\\.|\\_") %>%
-    mutate("else"=NULL, Identity=rowname, rowname=NULL, Population=value, value=NULL) %>%
+    tibble::rownames_to_column(var="Identity") %>%
+    tidyr::pivot_longer(cols=c(starts_with("cov"), starts_with("vaf")), names_to="timepoints_lineage", values_to="Population") %>%
+    # reshape2::melt() %>%
+    tidyr::separate(timepoints_lineage, into=c("else", "Generation", "Lineage"), sep="\\.|\\_") %>%
+    mutate("else"=NULL, Population=ifelse(Population==0, 0.001, Population)) %>%
     group_by(Generation, Lineage) %>%
     mutate(Frequency=Population/sum(Population)) %>%
     dplyr::ungroup()
 
-  pop_df = rbind(pop_df, list("Identity"=rep("P", x$T), "Generation"=colnames(means),
-                              "Population"=rep(1, x$T), "Lineage"=rep(x$lineages, 3),
-                              "Frequency"=rep(1, x$T))) %>%
+  pop_df = rbind(pop_df, list("Identity"=rep("P", x$`T`), "Generation"=colnames(means),
+                              "Population"=rep(1, x$`T`), "Lineage"=rep(x$lineages, 3),
+                              "Frequency"=rep(1, x$`T`))) %>%
     mutate(Generation=dplyr::case_when(grepl("early", Generation) ~ "60",
                                        grepl("mid", Generation) ~ "140",
                                        grepl("late", Generation) ~ "280")) %>%
-    mutate(Generation=as.integer(Generation)) %>%
+    mutate(Generation=as.numeric(Generation)) %>%
     group_by(Identity, Lineage) %>%
     mutate(lm_a=coef(lm(log1p(Population)~Generation))[1],
            lm_r=coef(lm(log1p(Population)~Generation))[2]) %>% ungroup()

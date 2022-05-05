@@ -4,16 +4,16 @@
 \alias{plot_vaf}
 \title{VAF scatterplot}
 \usage{
-plot_vaf(x, min_ccf = 0, highlight = c())
+plot_vaf(x, min_frac = 0, highlight = c())
 }
 \arguments{
 \item{x}{a \code{mvnmm} object.}
 
-\item{min_ccf}{value in \code{[0,1]} to show only the clusters with a minimum CCF of
-\code{min_ccf} in at least one timepoint.}
-
 \item{highlight}{a list of labels ID to show. All the clusters in the list are shown,
-even if the CCF is lower than \code{min_ccf}.}
+even if the CCF is lower than \code{min_frac}.}
+
+\item{min_fracc}{value in \code{[0,1]} to show only the clusters with a minimum CCF of
+\code{min_frac} in at least one timepoint.}
 }
 \value{
 list of VAF scatterplots.
