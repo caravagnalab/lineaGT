@@ -42,40 +42,43 @@ fit = function(dataset, lineages, columns=list(), IS_values=list(), k_interval=c
 
   for (k in as.integer(k_interval[1]):as.integer(k_interval[2])) {
     for (run in 1:n_runs) {
-      obj_k = selection_util(k, dataset, lineages, columns_k, IS_k, run, steps, covariance, lr, random_state)
+      x_k = single_fit(k, dataset, lineages, columns, IS_values, run, steps, covariance, lr, random_state)
 
-      kk = obj_k$K
-      n_iter = obj_k$n_iter
-      ic[paste(kk, run,sep=":"),] = list("BIC"=obj_k$BIC, "AIC"=obj_k$AIC, "ICL"=obj_k$ICL, "NLL"=obj_k$NLL)
-      losses[paste(kk, run, sep=":"),1:n_iter] = obj_k$losses
-      grads[paste(kk, run, "mean", sep=":"), 1:n_iter] = obj_k$mean_grad
-      grads[paste(kk, run, "sigma", sep=":"), 1:n_iter] = obj_k$sigma_grad
-      grads[paste(kk, run, "weights", sep=":"), 1:n_iter] = obj_k$weights_grad
+      kk = x_k$K
+      n_iter = x_k$n_iter
+
+      ic[paste(kk, run,sep=":"),] = x_k$IC
+      losses[paste(kk, run, sep=":"),1:n_iter] = x_k$losses
+      grads[paste(kk, run, "mean", sep=":"), 1:n_iter] = x_k$gradients$mean
+      grads[paste(kk, run, "sigma", sep=":"), 1:n_iter] = x_k$gradients$sigma
+      grads[paste(kk, run, "weights", sep=":"), 1:n_iter] = x_k$gradients$weights
     }
     gc()
   }
   selection = list("ic"=ic, "losses"=losses, "grads"=grads)
-  return(selection)
+
+  best_k = get_best_k(selection, method="BIC")
+  x = single_fit(best_k, dataset, lineages, columns, IS_values, steps=steps, lr=lr)
+  x$runs = selection
+
+  return(x)
 }
 
 
-single_fit = function(k, df, lineages, columns_k, IS_k, run=NULL, steps=500, covariance="diag", lr=0.001, random_state=25) {
+single_fit = function(k, df, lineages, columns=list(), IS=list(), run=NULL, steps=500,
+                      covariance="diag", lr=0.001, random_state=25) {
   print(paste("RUN", run, "- K =", k))
-  obj_k = mixture_model(k, df, lineages=lineages, columns=columns_k, IS_values=IS_k)
-  obj_k = run_inference(obj_k, steps=as.integer(steps), covariance=covariance, lr=as.numeric(lr), random_state=random_state)
-  obj_k = classifier(obj_k)
+  x = initialize_object(k, df, lineages=lineages, columns=columns, IS_values=IS)
+  x = run_inference(x, steps=as.integer(steps), covariance=covariance, lr=as.numeric(lr),
+                    random_state=random_state)
+  x = classifier(x)
 
-  obj_k$BIC = obj_k$py_model$compute_ic(method="BIC")$numpy()
-  obj_k$AIC = obj_k$py_model$compute_ic(method="AIC")$numpy()
-  obj_k$ICL = obj_k$py_model$compute_ic(method="ICL")$numpy()
-  obj_k$NLL = obj_k$py_model$nll$numpy()
+  x$IC = compute_IC(x$py_model)
 
-  obj_k$losses = obj_k$py_model$losses_grad_train$losses
-  obj_k$mean_grad = obj_k$py_model$losses_grad_train$gradients$mean_param
-  obj_k$sigma_grad = obj_k$py_model$losses_grad_train$gradients$sigma_vector_param
-  obj_k$weights_grad = obj_k$py_model$losses_grad_train$gradients$weights_param
+  x$losses = load_losses(x$py_model)
+  x$gradients = load_params_gradients(x$py_model)
 
-  obj_k$n_iter = obj_k$py_model$losses_grad_train$losses %>% length
+  x$n_iter = x$py_model$losses_grad_train$losses %>% length
 
-  return(obj_k)
+  return(x)
 }

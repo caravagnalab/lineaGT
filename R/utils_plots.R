@@ -6,18 +6,18 @@ get_pairs = function(dataset, columns) {
 }
 
 # To compute the Gaussian multivariate density given a fitted object
-compute_density = function(obj) {
-  mean = get_mean(obj)
-  sigma = get_covariance_Sigma(obj)
+compute_density = function(x) {
+  mean = get_mean(x)
+  sigma = get_covariance_Sigma(x)
 
   density = data.frame()
-  for (cl in get_unique_labels(obj)) {
+  for (cl in get_unique_labels(x)) {
     dd = as.data.frame(MASS::mvrnorm(n=1000, mu=mean[cl,], Sigma=sigma[[cl]]))
-    colnames(dd) = obj$dimensions
+    colnames(dd) = x$dimensions
     dd$labels = cl
     density = rbind(density, dd)
   }
-  density = density %>% mutate(labels=factor(labels, levels=get_unique_labels(obj)))
+  density = density %>% mutate(labels=factor(labels, levels=get_unique_labels(x)))
   return(density)
 }
 
@@ -28,12 +28,12 @@ split_to_camelcase = function(txt) {
 }
 
 
-get_colors = function(obj=NULL, list_lab=list()) {
+get_colors = function(x=NULL, list_lab=list()) {
   if (purrr::is_empty(list_lab)) {
-    N = obj$K
+    N = x$K
     colss = Polychrome::createPalette(N, c("#856de3", "#9e461c"), target="normal", range=c(15, 80), M=100000)
     colss = colss[1:N]
-    try({ names(colss) = obj$params$labels %>% levels() }, silent=T) }
+    try({ names(colss) = x$params$labels %>% levels() }, silent=T) }
   else {
     N = list_lab %>% length()
     colss = Polychrome::createPalette(N, c("#856de3", "#9e461c"), target="normal", range=c(15, 80), M=100000)
@@ -56,52 +56,57 @@ highlight_palette = function(color_palette, highlight=c()) {
 
 
 
-get_muller_pop = function(obj, means=list()) {
+get_muller_pop = function(x, means=list()) {
   if (purrr::is_empty(means)) {
-    means = get_mean(obj)
-    labels = obj$vaf_dataframe$labels_viber %>% levels
-    timepoints = obj$dimensions
-    dataframe = obj$vaf_dataframe
+    means = get_mean(x)
+    labels = get_labels(x)
+    timepoints = x$dimensions
+    dataframe = get_dataframe(x)
   } else {
-    labels = get_labels(obj)
-    timepoints = obj$dimensions
-    dataframe = obj$dataframe
+    labels = get_labels(x)
+    timepoints = x$dimensions
+    dataframe = x$dataframe
   }
 
-  pop_df = means %>% as.data.frame() %>% tibble::rownames_to_column() %>% reshape2::melt() %>%
+  pop_df = means %>% as.data.frame() %>%
+    tibble::rownames_to_column() %>%
+    reshape2::melt() %>%
     tidyr::separate(variable, into=c("else", "Generation", "Lineage"), sep="\\.|\\_") %>%
     mutate("else"=NULL, Identity=rowname, rowname=NULL, Population=value, value=NULL) %>%
-    group_by(Generation, Lineage) %>% mutate(Frequency=Population/sum(Population)) %>% dplyr::ungroup()
+    group_by(Generation, Lineage) %>%
+    mutate(Frequency=Population/sum(Population)) %>%
+    dplyr::ungroup()
 
-  pop_df = rbind(pop_df, list("Identity"=rep("P", obj$T), "Generation"=colnames(means),
-                              "Population"=rep(1, obj$T), "Lineage"=rep(obj$lineages, 3),
-                              "Frequency"=rep(1, obj$T))) %>%
+  pop_df = rbind(pop_df, list("Identity"=rep("P", x$T), "Generation"=colnames(means),
+                              "Population"=rep(1, x$T), "Lineage"=rep(x$lineages, 3),
+                              "Frequency"=rep(1, x$T))) %>%
     mutate(Generation=dplyr::case_when(grepl("early", Generation) ~ "60",
                                        grepl("mid", Generation) ~ "140",
                                        grepl("late", Generation) ~ "280")) %>%
     mutate(Generation=as.integer(Generation)) %>%
-    group_by(Identity, Lineage) %>% mutate(lm_a=coef(lm(log1p(Population)~Generation))[1],
-                                           lm_r=coef(lm(log1p(Population)~Generation))[2]) %>% ungroup()
+    group_by(Identity, Lineage) %>%
+    mutate(lm_a=coef(lm(log1p(Population)~Generation))[1],
+           lm_r=coef(lm(log1p(Population)~Generation))[2]) %>% ungroup()
   return(pop_df)
 }
 
 
-get_muller_edges = function(obj, labels=list()) {
-  if (purrr::is_empty(labels)) return(data.frame("Parent"="P", "Identity"=get_unique_labels(obj)))
+get_muller_edges = function(x, labels=list()) {
+  if (purrr::is_empty(labels)) return(data.frame("Parent"="P", "Identity"=get_unique_labels(x)))
   return(data.frame("Parent"="P", "Identity"=labels))
 }
 
 
-select_relevant_clusters = function(obj, min_ccf, means=list()) {
-  pop_df = get_muller_pop(obj, means)
+select_relevant_clusters = function(x, min_ccf, means=list()) {
+  pop_df = get_muller_pop(x, means)
   clusters_keep = (pop_df %>% group_by(Identity) %>%
                      filter(any(Frequency > min_ccf), Identity!="P"))$Identity %>% unique()
   return(clusters_keep)
 }
 
 
-reshape_vaf_dataframe_long = function(obj) {
-  vaf = obj$vaf_dataframe %>% mutate(labels_mut=paste(labels,labels_viber,sep=".")) %>%
+reshape_vaf_dataframe_long = function(x) {
+  vaf = x$vaf_dataframe %>% mutate(labels_mut=paste(labels,labels_viber,sep=".")) %>%
     dplyr::select(starts_with("vaf"), mutation, IS, contains("labels"), contains("viber")) %>%
     tidyr::pivot_longer(cols=starts_with("vaf"), names_to="timepoints_lineage", values_to="vaf") %>%
     separate(timepoints_lineage, into=c("vv","timepoints","lineage")) %>%
@@ -114,8 +119,8 @@ reshape_vaf_dataframe_long = function(obj) {
   return(vaf)
 }
 
-reshape_theta_long = function(obj) {
-  theta = get_binomial_theta(obj) %>% tibble::rownames_to_column(var="labels_mut") %>%
+reshape_theta_long = function(x) {
+  theta = get_binomial_theta(x) %>% tibble::rownames_to_column(var="labels_mut") %>%
     tidyr::pivot_longer(cols=starts_with("vaf"), names_to="timepoints_lineage", values_to="vaf") %>%
     tidyr::separate(timepoints_lineage, into=c("timepoints","lineage"), sep="_") %>%
     tidyr::pivot_wider(names_from="timepoints", values_from="vaf") %>%

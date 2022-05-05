@@ -2,19 +2,22 @@
 #'
 #' @description add
 #'
-#' @param obj mvnmm object.
+#' @param x mvnmm object.
 #' @param vaf_df a VAF dataframe, with required columns mutation,dp,ref,alt of depth, reference and alternative reads
+#' @param min_frac numeric value in \code{[0,1]} representing the minimum abundance to consider a clone in the inference.
 #' @return mvnmm object with added the VAF dataframe annotated with the found clusters and the VIBER fit for each cluster
 #'
 #' @export run_viber
 
 
-run_viber = function(obj, min_ccf=0, highlight=list()) {
-  vaf_df = obj$vaf_dataframe
+run_viber = function(x, vaf_df, min_frac=0, highlight=list()) {
+  x = add_vaf(x, vaf_df)
+
+  try(expr = { vaf_df = vaf_df %>% filter(mutation %in% x$keep_mut) }, silent = T)
   viber_input = get_input_viber(vaf_df)
 
   if (purrr::is_empty(highlight)) highlight = viber_input$vaf_df$labels %>% unique() %>% droplevels()
-  clusters_joined = intersect(select_relevant_clusters(obj, min_ccf), highlight)
+  clusters_joined = intersect(select_relevant_clusters(x, min_frac), highlight)
 
   joined = data.frame()
   fit_all = list()
@@ -23,10 +26,11 @@ run_viber = function(obj, min_ccf=0, highlight=list()) {
     joined = rbind(joined, fit_k$df)
     fit_all[[cluster]] = fit_k$fit
   }
-  obj$vaf_dataframe = joined %>% mutate(labels_mut=paste(labels, labels_viber, sep="."))
-  obj$viber_run = fit_all
-  obj$color_palette = c(obj$color_palette, get_colors(list_lab=get_unique_viber_labels(obj)))
-  return(obj)
+  x$viber_run = fit_all
+  x$vaf_all = x$vaf_dataframe
+  x$vaf_dataframe = joined %>% mutate(labels_mut=paste(labels, labels_viber, sep="."))
+  x$color_palette = c(x$color_palette, get_colors(list_lab=get_unique_viber_labels(x)))
+  return(x)
 }
 
 
@@ -44,7 +48,8 @@ fit_cluster_viber = function(viber_input, cluster) {
     viber_df_k$vaf_df$labels_viber = labels
     viber_df_k$vaf_df$pi_viber = fit$pi_k[labels] %>% as.vector() }, silent = T)
 
-  if (fit == "") { viber_df_k$vaf_df$labels_viber = ""; viber_df_k$vaf_df$pi_viber = 0 }
+  try(expr = {if (fit == "") { viber_df_k$vaf_df$labels_viber = ""; viber_df_k$vaf_df$pi_viber = 0} },
+      silent = T)
 
   return(list("df"=viber_df_k$vaf_df, "fit"=fit))
 }

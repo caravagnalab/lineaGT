@@ -1,79 +1,5 @@
-get_object = function(py_model) {
-  obj = list()
-  obj$dataframe = get_dataset(py_model)
-  obj$params = get_params(py_model)
-  obj$K = py_model$params$K
-  obj$N = py_model$params$N
-  obj$`T` = py_model$params$`T`
-  obj$dimensions = py_model$dimensions
-  obj$lineages = py_model$lineages
-  obj$py_model = py_model
-  obj$color_palette = get_colors(obj=obj)
-
-  class(obj) = "mvnmm"
-
-  return(obj)
-}
-
-
-
-get_params = function(py_model) {
-  params = list()
-  params$mean = get_mean(py_model)
-  params$weights = get_weights(py_model)
-  params$sigma = get_sigma(py_model)
-  params$Sigma = get_covariance_Sigma(py_model)
-  params$assignments = get_z_assignments(py_model)
-  params$probabilites = get_z_probs(py_model)
-  params$labels = get_labels(py_model)
-  return(params)
-}
-
-
-get_dataset = function(py_model) {
-  dataset = py_model$dataset$detach()$numpy() %>% data.frame() %>% dplyr::mutate_all(as.integer)
-
-  try(expr = {
-    colnames(dataset) = py_model$dimensions
-    dataset$IS = py_model$IS
-    try(expr = {
-      labels = get_labels(py_model)
-      dataset$labels = labels }, silent = T)
-
-    try(expr = {
-      labels_init = get_labels(py_model, initial_lab=T)
-      dataset$labels_init = labels_init }, silent = T)
-  }, silent = T)
-
-  return(dataset %>% tidyr::as_tibble())
-}
-
-
-update_params = function(obj) {
-  obj$params = get_params(obj$py_model)
-  obj$K = obj$py_model$params$K
-  obj$N = obj$py_model$params$N
-  obj$`T` = obj$py_model$params$`T`
-  return(obj)
-}
-
-
-update_dataframe = function(obj) {
-  obj$dataframe = get_dataset(obj$py_model)
-  return(obj)
-}
-
-
-add_vaf = function(obj, vaf_df) {
-  obj$vaf_dataframe = vaf_df
-  return(obj)
-}
-
-
-
-
-get_best_k = function(mod_sel, method="BIC") {
-  best = get_ic_df(mod_sel) %>%
+get_best_k = function(selection, method="BIC") {
+  best = get_ic_df(selection) %>%
     group_by(K, variable) %>%
     dplyr::summarise(value_best=min(value))
 
@@ -85,8 +11,8 @@ get_best_k = function(mod_sel, method="BIC") {
 }
 
 
-get_ic_df = function(mod_sel) {
-  ic_df = mod_sel$ic %>% rownames_to_column() %>%
+get_ic_df = function(selection) {
+  ic_df = selection$ic %>% rownames_to_column() %>%
     reshape2::melt(id=c("rowname")) %>%
     separate("rowname", into=c("K", "run")) %>%
     mutate(K=as.integer(K)) %>%
@@ -95,3 +21,27 @@ get_ic_df = function(mod_sel) {
   return(ic_df)
 }
 
+
+
+compute_IC = function(py_model) {
+  IC = list()
+  IC$BIC = py_model$compute_ic(method="BIC")$numpy()
+  IC$AIC = py_model$compute_ic(method="AIC")$numpy()
+  IC$ICL = py_model$compute_ic(method="ICL")$numpy()
+  IC$NLL = py_model$nll$numpy()
+  return(IC)
+}
+
+
+load_losses = function(py_model) {
+  return(py_model$losses_grad_train$losses)
+}
+
+
+load_params_gradients = function(py_model) {
+  gradients = list()
+  gradients$mean = py_model$losses_grad_train$gradients$mean_param
+  gradients$sigma = py_model$losses_grad_train$gradients$sigma_vector_param
+  gradients$weights = py_model$losses_grad_train$gradients$weights_param
+  return(gradients)
+}

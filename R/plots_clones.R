@@ -1,38 +1,44 @@
 #' Muller plot
 #'
-#' @description
+#' @description Function to visualize the mullerplot for the fitted object.
+#'
+#' @param x a mvnmm object.
+#' @param which string among \code{"frac","pop","fitness"} determining whether to plot the coverage
+#' normalized in \code{[0,1]}, as absolute clone abundance, or with each clone colored by the growth rate,
+#' computed assuming a exponential growth.
+#' @param highlight a vector of clusters IDs to highlight in the plot.
+#' @param min_frac min_frac numeric value in \code{[0,1]} representing the minimum abundance to highlight a clone.
+#' @param legend.pos position of the legend. If set to \code{"none"}, the legend is not shown.
+#' @param wrap Boolean. If set to \code{TRUE}, a single plot with the mullerplots for each lineage will be returned.
 #'
 #' @import ggplot2
 #' @import ggmuller
 #' @importFrom patchwork wrap_plots
 #'
-#' @export
+#' @export plot_mullerplot
 
 
-plot_mullerplot = function(obj, which="ccf", highlight=c(), min_ccf=0, legend.pos="right", wrap=F, viber=F) {
+plot_mullerplot = function(x, which="frac", highlight=c(), min_frac=0, legend.pos="right", wrap=F, viber=F) {
   if (viber) {
-    theta = get_binomial_theta(obj)
-    pop_df = get_muller_pop(obj, means=theta)
-    edges_df = get_muller_edges(obj, labels=get_unique_viber_labels(obj))
+    theta = get_binomial_theta(x)
+    pop_df = get_muller_pop(x, means=theta)
+    edges_df = get_muller_edges(x, labels=get_unique_viber_labels(x))
 
-    obj$vaf_dataframe = get_vaf_dataframe(obj) %>% mutate(labels_mut=paste(labels,labels_viber,sep="."))
-    if (purrr::is_empty(highlight)) highlight = select_relevant_clusters(obj, min_ccf)
-    highlight_v = get_viber_clusters(obj, highlight)
-    color_palette = highlight_palette(obj$color_palette, c(highlight, highlight_v))
-    # if (!purrr::is_empty(highlight))
-    #   highlight = get_viber_clusters(obj, highlight) else
-    #     highlight = select_relevant_clusters(obj, min_ccf, theta)
-    # color_palette = highlight_palette(obj$color_palette, highlight)
+    x$vaf_dataframe = get_vaf_dataframe(x) %>% mutate(labels_mut=paste(labels,labels_viber,sep="."))
+    if (purrr::is_empty(highlight)) highlight = select_relevant_clusters(x, min_frac)
+    highlight_v = get_viber_clusters(x, highlight)
+    color_palette = highlight_palette(x$color_palette, c(highlight, highlight_v))
+
 
   } else {
-    if (purrr::is_empty(highlight)) highlight = select_relevant_clusters(obj, min_ccf)
-    color_palette = highlight_palette(obj$color_palette, highlight)
-    pop_df = get_muller_pop(obj)
-    edges_df = get_muller_edges(obj)
+    if (purrr::is_empty(highlight)) highlight = select_relevant_clusters(x, min_frac)
+    color_palette = highlight_palette(x$color_palette, highlight)
+    pop_df = get_muller_pop(x)
+    edges_df = get_muller_edges(x)
   }
 
-  timepoints = obj$dimensions
-  lineages = obj$lineages
+  timepoints = x$dimensions
+  lineages = x$lineages
   exp_limits = c(min(pop_df$lm_r), max(pop_df$lm_r))
 
   plot_list = list()
@@ -42,7 +48,7 @@ plot_mullerplot = function(obj, which="ccf", highlight=c(), min_ccf=0, legend.po
       pop_ll = pop_df %>% filter(Lineage==ll)
       mullerdf_ll = ggmuller::get_Muller_df(edges_df, pop_ll)
 
-      if (which == "ccf" || which == "")
+      if (which == "frac" || which == "")
         plot_list[[ll]] = mullerplot_util(mullerdf_ll, y="Frequency", fill="Identity", lineage=ll,
                                           color_palette=color_palette, legend.pos=legend.pos)
       if (which == "pop" || which == "")
@@ -85,28 +91,34 @@ mullerplot_util = function(mullerdf, y, fill, lineage, color_palette, legend.pos
 
 #' Exponential fitting
 #'
-#' @description
+#' @description Function to visualize the growht of each clone and lineage.
+#'
+#' @param x a mvnmm object.
+#' @param highlight a vector of clusters IDs to highlight in the plot.
+#' @param min_frac min_frac numeric value in \code{[0,1]} representing the minimum abundance to highlight a clone.
+#' @param facet Boolean. If set to \code{TRUE}, the plot will be faceted against the clusters.
+#' @param mutations Boolean. If set to \code{TRUE}, the growth will be visualize for each cluster of mutations.
 #'
 #' @import ggplot2
 #'
-#' @export
+#' @export plot_exp_fit
 
 
-plot_exp_fit = function(obj, highlight=c(), min_ccf=0, facet=F, viber=F) {
-  if (viber) {
-    theta = get_binomial_theta(obj)
-    pop_df = get_muller_pop(obj, means=theta)
+plot_exp_fit = function(x, highlight=c(), min_frac=0, facet=F, mutations=F) {
+  if (mutations) {
+    theta = get_binomial_theta(x)
+    pop_df = get_muller_pop(x, means=theta)
 
-    obj$vaf_dataframe = get_vaf_dataframe(obj) %>% mutate(labels_mut=paste(labels, labels_viber, sep="."))
+    x$vaf_dataframe = get_vaf_dataframe(x) %>% mutate(labels_mut=paste(labels, labels_viber, sep="."))
     if (!purrr::is_empty(highlight))
-      highlight = get_viber_clusters(obj, highlight) else
-        highlight = select_relevant_clusters(obj, min_ccf, theta)
-    color_palette = highlight_palette(obj$color_palette, highlight)
+      highlight = get_viber_clusters(x, highlight) else
+        highlight = select_relevant_clusters(x, min_frac, theta)
+    color_palette = highlight_palette(x$color_palette, highlight)
 
   } else {
-    if (purrr::is_empty(highlight)) highlight = select_relevant_clusters(obj, min_ccf)
-    color_palette = highlight_palette(obj$color_palette, highlight)
-    pop_df = get_muller_pop(obj)
+    if (purrr::is_empty(highlight)) highlight = select_relevant_clusters(x, min_frac)
+    color_palette = highlight_palette(x$color_palette, highlight)
+    pop_df = get_muller_pop(x)
   }
 
   p = pop_df %>% filter(Identity %in% highlight) %>%
@@ -117,7 +129,7 @@ plot_exp_fit = function(obj, highlight=c(), min_ccf=0, facet=F, viber=F) {
 
   if (facet)
     p = p + scale_color_manual(values=color_palette[highlight]) +
-    facet_wrap(Identity~Lineage, nrow=obj$K) + xlab("Time") + labs(color="Clusters") else
+    facet_wrap(Identity~Lineage, nrow=x$K) + xlab("Time") + labs(color="Clusters") else
       p = p + scale_color_manual(values=color_palette[highlight]) +
     facet_wrap(~Lineage) + xlab("Time") + labs(color="Clusters")
   return(p)
@@ -141,33 +153,39 @@ exp_fit_util = function(p, pop_df, cl) {
 
 #' Exponential rate
 #'
-#' @description
+#' @description Function to visualize the growth coefficients for each clone and lineage.
+#'
+#' @param x a mvnmm object.
+#' @param highlight a vector of clusters IDs to highlight in the plot.
+#' @param min_frac min_frac numeric value in \code{[0,1]} representing the minimum abundance to highlight a clone.
+#' @param facet Boolean. If set to \code{TRUE}, the plot will be faceted against the clusters.
+#' @param mutations Boolean. If set to \code{TRUE}, the growth will be visualize for each cluster of mutations.
 #'
 #' @import ggplot2
 #'
-#' @export
+#' @export plot_exp_rate
 
 
-plot_exp_rate = function(obj, highlight=c(), min_ccf=0, viber=F) {
-  if (viber) {
-    obj$vaf_dataframe = get_vaf_dataframe(obj) %>% mutate(labels_mut=paste(labels, labels_viber, sep="."))
+plot_exp_rate = function(x, highlight=c(), min_frac=0, mutations=F) {
+  if (mutations) {
+    x$vaf_dataframe = get_vaf_dataframe(x) %>% mutate(labels_mut=paste(labels, labels_viber, sep="."))
     if (!purrr::is_empty(highlight))
-      highlight = get_viber_clusters(obj, highlight) else
-        highlight = select_relevant_clusters(obj, min_ccf, theta)
-    color_palette = highlight_palette(obj$color_palette, highlight)
+      highlight = get_viber_clusters(x, highlight) else
+        highlight = select_relevant_clusters(x, min_frac, theta)
+    color_palette = highlight_palette(x$color_palette, highlight)
 
-    mean = get_binomial_theta(obj)
+    mean = get_binomial_theta(x)
 
   } else {
-    if (purrr::is_empty(highlight)) highlight = select_relevant_clusters(obj, min_ccf)
-    color_palette = highlight_palette(obj$color_palette, highlight)
-    mean = get_mean(obj)
+    if (purrr::is_empty(highlight)) highlight = select_relevant_clusters(x, min_frac)
+    color_palette = highlight_palette(x$color_palette, highlight)
+    mean = get_mean(x)
   }
 
   highlight = highlight %>% stringr::str_replace("C_||C", "")
   names(color_palette) = names(color_palette) %>% stringr::str_replace("C_||C", "")
 
-  p = get_muller_pop(obj, means=mean) %>% mutate(Identity=Identity %>% stringr::str_replace("C_||C","")) %>%
+  p = get_muller_pop(x, means=mean) %>% mutate(Identity=Identity %>% stringr::str_replace("C_||C","")) %>%
     filter(Identity%in%highlight) %>%
     dplyr::arrange(lm_r) %>%
     ggplot(aes(x=Identity, y=lm_r, ymax=lm_r, ymin=0, color=Identity)) +

@@ -10,6 +10,6 @@
 #' @exportS3Method print mvnmm
 #' @export print.mvnmm
 
-print.mvnmm = function() {
-
+print.mvnmm = function(x) {
+  return()
 }

@@ -1,11 +1,32 @@
+# As input a mvnmm object with already a viber_run performed
+get_binomial_theta = function(x) {
+  viber_fits = x$viber_run
+  theta = data.frame()
+  for(cluster in viber_fits %>% names()) {
+    if (class(viber_fits[[cluster]]) != "character") {
+      df_k = viber_fits[[cluster]]$theta_k %>% t %>% as.data.frame() %>%
+        dplyr::rename_with( ~ paste0("vaf.", .x)) %>% tibble::rownames_to_column(var="v_cluster") %>%
+        mutate(labels_mut=paste(cluster, v_cluster, sep="."), v_cluster=NULL, labels=cluster)
+      theta = rbind(theta, df_k)
+    }
+  }
+  theta = theta %>% reshape2::melt() %>% mutate(value=value*100) %>%
+    tidyr::separate(variable, into=c("timepoint", "lineage"), sep="_") %>%
+    tidyr::pivot_wider(names_from="timepoint", values_from="value") %>%
+    tidyr::pivot_wider(names_from="lineage", values_from=starts_with("vaf")) %>%
+    dplyr::select(-labels) %>% tibble::column_to_rownames("labels_mut")
+  return(theta)
+}
+
+
+
 # Functions used to obtain and reshape some datasets
 #
 # NOTE: get_vaf_df returns a dataset with mutation,IS,lineage,timepoints,dp,ref,alt,vaf,... columns
 # usage:
 # vaf_df = vaf_df_from_file(vaf_file)
-# vaf_df = annotate_vaf_df(vaf_df, obj, min_ccf=0.07)
-# obj = add_vaf(obj, vaf_df)
-
+# vaf_df = annotate_vaf_df(vaf_df, x, min_frac=0.07)
+# x = add_vaf(x, vaf_df)
 
 vaf_df_from_file = function(vaf_file) {
   ## input is the file with the vaf, having a column per timepoint named dp.ref.alt
@@ -48,11 +69,11 @@ update_trials = function(vaf_df) {
 }
 
 
-annotate_vaf_df = function(vaf_df, obj, min_ccf=0) {
-  lineages = obj$lineages
-  highlight = select_relevant_clusters(obj, min_ccf=min_ccf)
+annotate_vaf_df = function(vaf_df, x, min_frac=0) {
+  lineages = x$lineages
+  highlight = select_relevant_clusters(x, min_frac=min_frac)
 
-  dataframe = obj$dataframe %>% filter(labels %in% highlight) %>%
+  dataframe = x$dataframe %>% filter(labels %in% highlight) %>%
     tidyr::pivot_longer(cols=starts_with("cov"), names_to="cov_timepoints_lineage",
                         values_to="cov", values_transform=list(cov=as.integer)) %>%
     separate(cov_timepoints_lineage, into=c("cc", "timepoints", "lineage")) %>%
@@ -81,28 +102,6 @@ get_input_viber = function(vaf_df) {
     rename_with(.fn=~str_replace_all(.x,"alt_",""))
 
   return(list("successes"=successes, "trials"=trials, "vaf_df"=vaf_df_wide))
-}
-
-
-
-# As input a mvnmm object with already a viber_run performed
-get_binomial_theta = function(obj) {
-  viber_fits = obj$viber_run
-  theta = data.frame()
-  for(cluster in viber_fits %>% names()) {
-    if (class(viber_fits[[cluster]]) != "character") {
-      df_k = viber_fits[[cluster]]$theta_k %>% t %>% as.data.frame() %>%
-        dplyr::rename_with( ~ paste0("vaf.", .x)) %>% tibble::rownames_to_column(var="v_cluster") %>%
-        mutate(labels_mut=paste(cluster, v_cluster, sep="."), v_cluster=NULL, labels=cluster)
-      theta = rbind(theta, df_k)
-    }
-  }
-  theta = theta %>% reshape2::melt() %>% mutate(value=value*100) %>%
-    tidyr::separate(variable, into=c("timepoint", "lineage"), sep="_") %>%
-    tidyr::pivot_wider(names_from="timepoint", values_from="value") %>%
-    tidyr::pivot_wider(names_from="lineage", values_from=starts_with("vaf")) %>%
-    dplyr::select(-labels) %>% tibble::column_to_rownames("labels_mut")
-  return(theta)
 }
 
 

@@ -18,13 +18,13 @@
 #'
 #' @export filter_dataset
 
-filter_dataset = function(dataset, columns, IS, min_cov=50, min_ccf=0.05, k_interval=c(5,30),
+filter_dataset = function(dataset, columns=list(), IS=list(), min_cov=50, min_ccf=0.05, k_interval=c(5,30),
                           metric="calinski_harabasz_score", random_state=25) {
   py_pkg = reticulate::import("pylineaGT")
-  obj = initialize_object(K=as.integer(1), dataset=dataset, lineages=list(), columns=columns, IS_values=IS)
-  obj$py_model$filter_dataset(min_cov=as.integer(min_cov), min_ccf=as.numeric(min_ccf), metric=metric,
+  x = initialize_object(K=as.integer(1), dataset=dataset, lineages=list(), columns=columns, IS_values=IS)
+  x$py_model$filter_dataset(min_cov=as.integer(min_cov), min_ccf=as.numeric(min_ccf), metric=metric,
                               k_interval=as.integer(k_interval), random_state=as.integer(random_state))
-  return(get_dataset(obj$py_model))
+  return(get_python_dataframe(x$py_model))
 }
 
 
@@ -38,15 +38,16 @@ initialize_object = function(K, dataset, lineages, columns=list(), IS_values=lis
 }
 
 
-run_inference = function(obj, steps=500, covariance="diag", lr=0.005, random_state=25) {
-  obj$py_model$fit(steps=as.integer(steps), cov_type=covariance, lr=as.numeric(lr), random_state=as.integer(random_state))
-  return(update_params(obj))
+run_inference = function(x, steps=500, covariance="diag", lr=0.005, random_state=25) {
+  x$py_model$fit(steps=as.integer(steps), cov_type=covariance, lr=as.numeric(lr),
+                 random_state=as.integer(random_state), convergence=TRUE)
+  return(update_params(x))
 }
 
 
-classifier = function(obj) {
-  obj$py_model$classifier()
-  return(get_object(obj$py_model))
+classifier = function(x) {
+  x$py_model$classifier()
+  return(get_object(x$py_model))
 }
 
 
