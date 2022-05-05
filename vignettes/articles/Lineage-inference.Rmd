@@ -11,14 +11,14 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(lineaGT)
+library(magrittr)
 ```
 
 
 ```{r}
 x_fit = data_filt %>% dplyr::select(starts_with("cov")) %>% 
-  fit(lineages=list("L1","L2","L3","L4"), IS_values=data_filt$IS, steps=500, n_runs=2, k_interval=c(10,15))
+  fit(lineages=list("L1","L2","L3","L4"), IS_values=data_filt$IS, steps=500, n_runs=2, k_interval=c(10,12))
 ```
-
 
 
 ```{r}

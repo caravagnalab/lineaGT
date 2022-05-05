@@ -11,11 +11,12 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(lineaGT)
+library(magrittr)
 ```
 
 The dataset can be filtered calling the `filter_dataset()` function.
 
-```{r setup}
+```{r}
 data_filt = data %>% dplyr::select(starts_with("cov")) %>% 
   filter_dataset(IS=data$IS)
 ```
