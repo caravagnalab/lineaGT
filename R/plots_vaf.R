@@ -3,10 +3,10 @@
 #' @description Function to plot the VAFs of the mutations one timepoint against the other
 #'
 #' @param x a \code{mvnmm} object.
-#' @param min_ccf value in \code{[0,1]} to show only the clusters with a minimum CCF of
-#' \code{min_ccf} in at least one timepoint.
+#' @param min_fracc value in \code{[0,1]} to show only the clusters with a minimum CCF of
+#' \code{min_frac} in at least one timepoint.
 #' @param highlight a list of labels ID to show. All the clusters in the list are shown,
-#' even if the CCF is lower than \code{min_ccf}.
+#' even if the CCF is lower than \code{min_frac}.
 #'
 #' @return list of VAF scatterplots.
 #'
@@ -17,10 +17,10 @@
 #' @export plot_vaf
 
 
-plot_vaf = function(x, min_ccf=0, highlight=c()) {
+plot_vaf = function(x, min_frac=0, highlight=c()) {
   dataframe = reshape_vaf_dataframe_long(x)
 
-  if (purrr::is_empty(highlight)) highlight = select_relevant_clusters(x, min_ccf)
+  if (purrr::is_empty(highlight)) highlight = select_relevant_clusters(x, min_frac)
   highlight_v = get_viber_clusters(x, highlight)
   color_palette = highlight_palette(x$color_palette, c(highlight, highlight_v))
 
@@ -71,28 +71,3 @@ plot_vaf_2D = function(dataframe,
   return(pl)
 }
 
-
-# clusters = select_relevant_clusters(x, min_ccf=0.07)
-# design = "BBAAA
-#           BBAAA
-#           BBAAA
-#           CCDD#
-#           CCDD#"
-# df = x$vaf_dataframe
-#
-# pdf("./plots/HOMO_PGK.viber_clusters.multipage3.pdf", height=10, width=12)
-# for (cluster in clusters) {
-#   print(cluster)
-#   # cluster="C_4"
-#   if (df %>% filter(labels==cluster) %>% nrow > 0) {
-#     muller = plot_mullerplot(x, highlight=c(cluster), wrap=T, legend.pos="none")
-#     p = plot_vaf(x, highlight=c(cluster)) %>% patchwork::wrap_plots(guides="collect")
-#     exp1 = plot_exp_fit(x, highlight=c(cluster)) + theme(legend.position="none")
-#     exp2 = plot_exp_fit(x, highlight=c(cluster), viber=T) + theme(legend.position="none")
-#     wrapped = patchwork::wrap_plots(p, muller, exp1, exp2, design=design)
-#     print(wrapped + patchwork::plot_annotation(title="VAF of mutations in experiments HOMO PGK across all lineages",
-#                                     subtitle="threshold kept of 7%"))
-#     ggsave("./plots/HOMO_PGK.viber_clusters.c4.pdf", height=10, width=12)
-#   }
-# }
-# dev.off()
