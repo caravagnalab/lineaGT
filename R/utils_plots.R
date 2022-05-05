@@ -97,10 +97,10 @@ get_muller_edges = function(x, labels=list()) {
 }
 
 
-select_relevant_clusters = function(x, min_ccf, means=list()) {
+select_relevant_clusters = function(x, min_frac, means=list()) {
   pop_df = get_muller_pop(x, means)
   clusters_keep = (pop_df %>% group_by(Identity) %>%
-                     filter(any(Frequency > min_ccf), Identity!="P"))$Identity %>% unique()
+                     filter(any(Frequency > min_frac), Identity!="P"))$Identity %>% unique()
   return(clusters_keep)
 }
 

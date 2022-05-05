@@ -62,7 +62,9 @@ update_trials = function(vaf_df) {
     tidyr::pivot_longer(cols=c(starts_with("dp")), names_to=c("timepoints"), values_to="dp",
                         values_transform=list(dp=as.integer)) %>%
     group_by(lineage, mutation, IS) %>%
-    mutate(dp=ifelse(dp==0, mean(dp), dp)) %>% dplyr::ungroup() %>%
+    mutate(dp=ifelse(dp==0, ceiling(mean(dp)), dp)) %>%
+    # mutate(dp=ifelse(dp==0, 1, dp)) %>%
+    dplyr::ungroup() %>%
     tidyr::pivot_wider(values_from="dp", names_from="timepoints")
 
   return(vaf_df_new)
@@ -95,9 +97,12 @@ get_input_viber = function(vaf_df) {
   vaf_df_wide = vaf_df %>%
     tidyr::pivot_wider(values_from=c(starts_with("dp"), starts_with("alt"), starts_with("ref"),
                                      starts_with("vaf"), starts_with("cov")),
-                       names_from=lineage, values_fn=as.numeric)
+                       names_from=lineage, values_fn=as.numeric) %>%
+    filter(dplyr::if_all(starts_with("dp"), ~ .!=0))
+
   trials = vaf_df_wide %>% dplyr::select(starts_with("dp"), labels) %>%
     rename_with(.fn=~str_replace_all(.x,"dp_",""))
+
   successes = vaf_df_wide %>% dplyr::select(starts_with("alt"), labels) %>%
     rename_with(.fn=~str_replace_all(.x,"alt_",""))
 

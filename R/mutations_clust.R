@@ -13,10 +13,13 @@
 run_viber = function(x, vaf_df, min_frac=0, highlight=list()) {
   x = add_vaf(x, vaf_df)
 
-  try(expr = { vaf_df = vaf_df %>% filter(mutation %in% x$keep_mut) }, silent = T)
   viber_input = get_input_viber(vaf_df)
+  x$keep_mut = viber_input$vaf_df$mutation %>% unique()
+  x$vaf_all = x$vaf_dataframe
+  vaf_df = vaf_df %>% filter(mutation %in% x$keep_mut)
 
   if (purrr::is_empty(highlight)) highlight = viber_input$vaf_df$labels %>% unique() %>% droplevels()
+  print(highlight)
   clusters_joined = intersect(select_relevant_clusters(x, min_frac), highlight)
 
   joined = data.frame()
@@ -27,7 +30,6 @@ run_viber = function(x, vaf_df, min_frac=0, highlight=list()) {
     fit_all[[cluster]] = fit_k$fit
   }
   x$viber_run = fit_all
-  x$vaf_all = x$vaf_dataframe
   x$vaf_dataframe = joined %>% mutate(labels_mut=paste(labels, labels_viber, sep="."))
   x$color_palette = c(x$color_palette, get_colors(list_lab=get_unique_viber_labels(x)))
   return(x)

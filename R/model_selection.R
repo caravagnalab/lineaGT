@@ -52,8 +52,9 @@ fit = function(dataset, lineages, columns=list(), IS_values=list(), k_interval=c
       grads[paste(kk, run, "mean", sep=":"), 1:n_iter] = x_k$gradients$mean
       grads[paste(kk, run, "sigma", sep=":"), 1:n_iter] = x_k$gradients$sigma
       grads[paste(kk, run, "weights", sep=":"), 1:n_iter] = x_k$gradients$weights
+
+      gc()
     }
-    gc()
   }
   selection = list("ic"=ic, "losses"=losses, "grads"=grads)
 
