@@ -4,8 +4,19 @@
 \alias{plot_exp_fit}
 \title{Exponential fitting}
 \usage{
-plot_exp_fit(obj, highlight = c(), min_ccf = 0, facet = F, viber = F)
+plot_exp_fit(x, highlight = c(), min_frac = 0, facet = F, mutations = F)
+}
+\arguments{
+\item{x}{a mvnmm object.}
+
+\item{highlight}{a vector of clusters IDs to highlight in the plot.}
+
+\item{min_frac}{min_frac numeric value in \code{[0,1]} representing the minimum abundance to highlight a clone.}
+
+\item{facet}{Boolean. If set to \code{TRUE}, the plot will be faceted against the clusters.}
+
+\item{mutations}{Boolean. If set to \code{TRUE}, the growth will be visualize for each cluster of mutations.}
 }
 \description{
-
+Function to visualize the growht of each clone and lineage.
 }

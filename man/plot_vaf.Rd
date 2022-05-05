@@ -4,10 +4,10 @@
 \alias{plot_vaf}
 \title{VAF scatterplot}
 \usage{
-plot_vaf(obj, min_ccf = 0, highlight = c())
+plot_vaf(x, min_ccf = 0, highlight = c())
 }
 \arguments{
-\item{obj}{a \code{mvnmm} object.}
+\item{x}{a \code{mvnmm} object.}
 
 \item{min_ccf}{value in \code{[0,1]} to show only the clusters with a minimum CCF of
 \code{min_ccf} in at least one timepoint.}

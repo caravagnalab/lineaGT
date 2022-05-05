@@ -5,15 +5,30 @@
 \title{Muller plot}
 \usage{
 plot_mullerplot(
-  obj,
-  which = "ccf",
+  x,
+  which = "frac",
   highlight = c(),
-  min_ccf = 0,
+  min_frac = 0,
   legend.pos = "right",
   wrap = F,
   viber = F
 )
 }
-\description{
+\arguments{
+\item{x}{a mvnmm object.}
 
+\item{which}{string among \code{"frac","pop","fitness"} determining whether to plot the coverage
+normalized in \code{[0,1]}, as absolute clone abundance, or with each clone colored by the growth rate,
+computed assuming a exponential growth.}
+
+\item{highlight}{a vector of clusters IDs to highlight in the plot.}
+
+\item{min_frac}{min_frac numeric value in \code{[0,1]} representing the minimum abundance to highlight a clone.}
+
+\item{legend.pos}{position of the legend. If set to \code{"none"}, the legend is not shown.}
+
+\item{wrap}{Boolean. If set to \code{TRUE}, a single plot with the mullerplots for each lineage will be returned.}
+}
+\description{
+Function to visualize the mullerplot for the fitted object.
 }

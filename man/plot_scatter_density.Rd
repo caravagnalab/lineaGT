@@ -2,16 +2,18 @@
 % Please edit documentation in R/plots_coverage.R
 \name{plot_scatter_density}
 \alias{plot_scatter_density}
-\title{Plot scatter and density}
+\title{2D scatterplot and density}
 \usage{
-plot_scatter_density(obj, plot_density = T, facet = FALSE, highlight = c())
+plot_scatter_density(x, plot_density = T, facet = FALSE, highlight = c())
 }
 \arguments{
-\item{obj}{a mvnmm object.}
+\item{x}{a mvnmm object.}
 
 \item{plot_density}{a Boolean. If set to FALSE, the Gaussian density will not be displayed.}
 
 \item{facet}{a Boolean. If set to TRUE, the plot will be faceted on the labels.}
+
+\item{highlight}{a vector of clusters IDs to highlight in the plot.}
 }
 \value{
 a list of plots, one for each timepoints combination.

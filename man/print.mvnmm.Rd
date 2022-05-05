@@ -4,7 +4,7 @@
 \alias{print.mvnmm}
 \title{Print method}
 \usage{
-\method{print}{mvnmm}()
+\method{print}{mvnmm}(x)
 }
 \arguments{
 \item{x}{An object of class mvnmm}

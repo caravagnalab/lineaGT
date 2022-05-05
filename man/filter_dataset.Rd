@@ -6,8 +6,8 @@
 \usage{
 filter_dataset(
   dataset,
-  columns,
-  IS,
+  columns = list(),
+  IS = list(),
   min_cov = 50,
   min_ccf = 0.05,
   k_interval = c(5, 30),
