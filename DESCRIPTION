@@ -1,10 +1,18 @@
 Package: lineaGT
 Type: Package
-Title: LineaGT
+Title: lineaGT
 Version: 0.1.0
 Author: Elena Buscaroli
 Maintainer: Elena Buscaroli <ele.buscaroli@gmail.com>
-Description: Multi-lineage inference from vector integration sites and somatic mutations during gene therapy
+Authors@R: c(
+    person("Elena", "Buscaroli", role=c("aut", "cre"), email="ele.buscaroli@gmail.com"),
+    person("Giulio", "Caravagna", role=c("aut"), email="gcaravagn@gmail.com")
+    )
+Description: This package provides algorithms for multi-lineage inference from 
+    vector integration sites and somatic mutations during gene therapy. The package
+    acts as an interface, implemented through reticulate, to the pyLineaGT Python 
+    package that provides the main inference algorithms; this package also provides
+    visualisation and data input/output functions
 License: GNU
 Encoding: UTF-8
 LazyData: true
@@ -35,7 +43,7 @@ Remotes:
     caravagn/VIBER,
     caravagn/easypar
 RoxygenNote: 7.1.2
-URL: https://github.com/caravagnalab/LineaGT,
-    https://caravagnalab.github.io/LineaGT/
+URL: https://github.com/caravagnalab/lineaGT,
+    https://caravagnalab.github.io/lineaGT/
 Suggests: 
     rmarkdown
