@@ -4,12 +4,12 @@
 \alias{run_viber}
 \title{Functions to run VIBER for mutations clustering}
 \usage{
-run_viber(x, vaf_df, min_frac = 0, highlight = list())
+run_viber(x, vaf.df, min_frac = 0, highlight = list())
 }
 \arguments{
 \item{x}{mvnmm object.}
 
-\item{vaf_df}{a VAF dataframe, with required columns mutation,dp,ref,alt of depth, reference and alternative reads}
+\item{vaf.df}{a VAF dataframe, with required columns mutation,dp,ref,alt of depth, reference and alternative reads}
 
 \item{min_frac}{numeric value in \code{[0,1]} representing the minimum abundance to consider a clone in the inference.}
 }

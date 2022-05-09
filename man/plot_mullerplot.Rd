@@ -11,7 +11,7 @@ plot_mullerplot(
   min_frac = 0,
   legend.pos = "right",
   wrap = F,
-  viber = F
+  mutations = F
 )
 }
 \arguments{
