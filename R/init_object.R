@@ -1,13 +1,18 @@
-get_object = function(py_model) {
+get_object = function(py_model, timepoints=list(), lineages=list()) {
   x = list()
-  x$dataframe = get_python_dataframe(py_model)
+  x$cov.dataframe = get_python_dataframe(py_model)
   x$params = get_python_params(py_model)
+
   x$K = py_model$params$K
   x$N = py_model$params$N
   x$`T` = py_model$params$`T`
+
   x$dimensions = py_model$dimensions
-  x$lineages = py_model$lineages
+  x$timepoints = timepoints
+  x$lineages = lineages
+
   x$py_model = py_model
+
   x$color_palette = get_colors(x=x)
 
   class(x) = "mvnmm"
@@ -33,7 +38,7 @@ get_python_dataframe = function(py_model) {
       dataset$labels_init = labels_init }, silent = T)
   }, silent = T)
 
-  return(dataset %>% tidyr::as_tibble())
+  return(dataset %>% wide_to_long_input())
 }
 
 
@@ -43,7 +48,7 @@ get_python_params = function(py_model) {
   params$weights = get_weights(py_model)
   params$sigma = get_sigma(py_model)
   params$Sigma = get_covariance_Sigma(py_model)
-  params$assignments = get_z_assignments(py_model)
+  # params$assignments = get_z_assignments(py_model)
   params$probabilites = get_z_probs(py_model)
   params$labels = get_labels(py_model)
   return(params)
@@ -51,7 +56,7 @@ get_python_params = function(py_model) {
 
 
 update_params = function(x) {
-  x$params = get_params(x$py_model)
+  x$params = get_params(py_model=x$py_model)
   x$K = x$py_model$params$K
   x$N = x$py_model$params$N
   x$`T` = x$py_model$params$`T`
@@ -60,13 +65,23 @@ update_params = function(x) {
 
 
 update_dataframe = function(x) {
-  x$dataframe = get_dataset(x$py_model)
+  x$cov.dataframe = get_dataset(x$py_model)
   return(x)
 }
 
 
+#' Adding the VAF dataset to the current object.
+#'
+#' @description
+#'
+#' @param x a mvnmm object.
+#' @param vaf_df a matrix-like dataset, containing the VAF of the mutations.
+#' @return a mvnmm object.
+#'
+#' @export add_vaf
+
 add_vaf = function(x, vaf_df) {
-  x$vaf_dataframe = vaf_df
+  x$vaf.dataframe = vaf_df
   return(x)
 }
 

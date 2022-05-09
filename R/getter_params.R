@@ -1,9 +1,9 @@
-get_params = function(x) {
-  try(expr = { params = x$params; if (!purrr::is_empty(params)) return(params) }, silent = T)
+get_params = function(x=NULL, py_model=NULL) {
+  if (!is.null(x)) return(x$params)
 
-  py_model = get_model(x)
-  return(get_python_params(py_model))
+  if(!is.null(py_model)) return(get_python_params(py_model))
 }
+
 
 
 get_mean = function(x) {
@@ -22,6 +22,7 @@ get_mean = function(x) {
 }
 
 
+
 get_weights = function(x) {
   py_model = get_model(x)
   tryCatch(
@@ -34,6 +35,7 @@ get_weights = function(x) {
 
   try(expr = { weights = x$params$weights; if (!purrr::is_empty(weights)) return(weights) }, silent = T)
 }
+
 
 
 get_sigma = function(x) {
@@ -49,6 +51,7 @@ get_sigma = function(x) {
 
   try(expr = { sigma = x$params$sigma; if (!purrr::is_empty(sigma)) return(sigma) }, silent = T)
 }
+
 
 
 get_covariance_Sigma = function(x) {
@@ -69,6 +72,7 @@ get_covariance_Sigma = function(x) {
 }
 
 
+
 get_z_probs = function(x) {
   py_model = get_model(x)
   tryCatch(
@@ -84,6 +88,7 @@ get_z_probs = function(x) {
 }
 
 
+
 get_z_assignments = function(x) {
   py_model = get_model(x)
   tryCatch(
@@ -97,6 +102,7 @@ get_z_assignments = function(x) {
 
   try(expr = { assignm = x$params$assignments; if (!purrr::is_empty(assignm)) return(assignm) }, silent = T)
 }
+
 
 
 get_labels = function(x, initial_lab=F) {
@@ -121,6 +127,7 @@ get_labels = function(x, initial_lab=F) {
 }
 
 
+
 get_unique_labels = function(x) {
   try(expr = { labels = x$params$labels %>% levels(); if (!purrr::is_empty(labels)) return(labels) }, silent = T)
 
@@ -133,7 +140,8 @@ get_unique_labels = function(x) {
 }
 
 
+
 get_unique_viber_labels = function(x) {
-  labels = x$vaf_dataframe$labels_mut %>% unique()
+  labels = x$vaf.dataframe$labels_mut %>% unique()
   return(labels)
 }

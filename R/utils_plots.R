@@ -98,7 +98,7 @@ select_relevant_clusters = function(x, min_frac, means=list()) {
 
 
 reshape_vaf_dataframe_long = function(x) {
-  vaf = x$vaf_dataframe %>% mutate(labels_mut=paste(labels,labels_viber,sep=".")) %>%
+  vaf = x %>% get_vaf_dataframe() %>% mutate(labels_mut=paste(labels,labels_viber,sep=".")) %>%
     dplyr::select(starts_with("vaf"), mutation, IS, contains("labels"), contains("viber")) %>%
     tidyr::pivot_longer(cols=starts_with("vaf"), names_to="timepoints_lineage", values_to="vaf") %>%
     separate(timepoints_lineage, into=c("vv","timepoints","lineage")) %>%

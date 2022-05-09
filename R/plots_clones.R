@@ -98,7 +98,7 @@ plot_exp_fit = function(x, highlight=c(), min_frac=0, facet=F, mutations=F) {
     theta = get_binomial_theta(x)
     pop_df = get_muller_pop(x, means=theta)
 
-    x$vaf_dataframe = get_vaf_dataframe(x) %>% mutate(labels_mut=paste(labels, labels_viber, sep="."))
+    # x$vaf_dataframe = get_vaf_dataframe(x) %>% mutate(labels_mut=paste(labels, labels_viber, sep="."))
     if (!purrr::is_empty(highlight))
       highlight = get_viber_clusters(x, highlight) else
         highlight = select_relevant_clusters(x, min_frac, theta)
@@ -157,7 +157,7 @@ exp_fit_util = function(p, pop_df, cl) {
 
 plot_exp_rate = function(x, highlight=c(), min_frac=0, mutations=F) {
   if (mutations) {
-    x$vaf_dataframe = get_vaf_dataframe(x) %>% mutate(labels_mut=paste(labels, labels_viber, sep="."))
+    # x$vaf_dataframe = get_vaf_dataframe(x) %>% mutate(labels_mut=paste(labels, labels_viber, sep="."))
     if (!purrr::is_empty(highlight))
       highlight = get_viber_clusters(x, highlight) else
         highlight = select_relevant_clusters(x, min_frac, theta)

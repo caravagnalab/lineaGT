@@ -1,3 +1,27 @@
+long_to_wide_input = function(dataset) {
+  ## transforms the input dataset from long to wide format
+  ## input columns are: "coverage", "timepoints", "lineage", "IS"
+
+  return(
+    dataset %>%
+      tidyr::pivot_wider(names_from=c("timepoints","lineage"), names_prefix="cov.", names_sep=".",
+                         values_from="coverage"))
+
+}
+
+
+
+wide_to_long_input = function(dataset) {
+  return(
+    dataset %>%
+      tidyr::pivot_longer(cols=starts_with("cov"), names_to="else.time.lineage", values_to="coverage") %>%
+      separate(else.time.lineage, into=c("else","timepoints","lineage")) %>%
+      mutate("else"=NULL)
+  )
+}
+
+
+
 get_best_k = function(selection, method="BIC") {
   best = get_ic_df(selection) %>%
     group_by(K, variable) %>%
