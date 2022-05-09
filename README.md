@@ -1,4 +1,9 @@
 
+<!-- badges: start -->
+
+[![R-CMD-check](https://github.com/caravagnalab/LineaGT/workflows/R-CMD-check/badge.svg)](https://github.com/caravagnalab/LineaGT/actions)
+<!-- badges: end -->
+
 # lineaGT <a href="https://caravagnalab.github.io/LineaGT/"><img src="man/figures/logo.jpg" align="right" height="46" /></a>
 
 This package implements algorithm to determine lineage inference for
