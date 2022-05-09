@@ -10,7 +10,9 @@ knitr::opts_chunk$set(
 ```
 
 ```{r include=FALSE}
-reticulate::py_install("pylineaGT", pip=TRUE)
+library(reticulate)
+conda_create("r-reticulate")
+conda_install("r-reticulate", "pylineaGT", pip=TRUE)
 ```
 
 ```{r setup}
