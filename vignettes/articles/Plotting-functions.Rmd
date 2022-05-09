@@ -13,43 +13,43 @@ knitr::opts_chunk$set(
 library(lineaGT)
 ```
 
-Scatterplot
+## Scatterplot
 ```{r}
 plots = plot_scatter_density(x_fit)
 plots$`cov_early.L2:cov_early.L1` # to visualize a single plot
 ```
 
 
-Marginal distributions
+## Marginal distributions
 ```{r}
 plot_marginal(x_fit)
 ```
 
 
-Mullerplot
-```{r}
+## Mullerplot
+```{r warning=FALSE}
 plot_mullerplot(x_fit, which="frac", wrap=T)
 ```
-```{r}
+```{r warning=FALSE}
 plot_mullerplot(x_fit, which="pop", wrap=T)
 ```
 
-```{r}
+```{r warning=FALSE}
 plot_mullerplot(x_fit, which="fitness", wrap=T)
 ```
 
-Exponential Fit
-```{r}
+## Clonal Growth
+```{r warning=FALSE}
 plot_exp_fit(x_fit)
 ```
 
 
-```{r}
+```{r warning=FALSE}
 plot_exp_rate(x_fit)
 ```
 
 
-VAF scatterplot
+## VAF scatterplot
 ```{r}
 
 ```

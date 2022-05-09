@@ -17,7 +17,8 @@ library(magrittr)
 The dataset can be filtered calling the `filter_dataset()` function.
 
 ```{r}
-data_filt = data %>% dplyr::select(starts_with("cov")) %>% 
-  filter_dataset(IS=data$IS)
+data_filt = data %>% filter_dataset()
+
+data_filt
 ```
 
