@@ -62,7 +62,6 @@ get_muller_pop = function(x, means=list()) {
   pop_df = means %>% as.data.frame() %>%
     tibble::rownames_to_column(var="Identity") %>%
     tidyr::pivot_longer(cols=c(starts_with("cov"), starts_with("vaf")), names_to="timepoints_lineage", values_to="Population") %>%
-    # reshape2::melt() %>%
     tidyr::separate(timepoints_lineage, into=c("else", "Generation", "Lineage"), sep="\\.|\\_") %>%
     mutate("else"=NULL, Population=ifelse(Population==0, 0.001, Population)) %>%
     group_by(Generation, Lineage) %>%

@@ -24,8 +24,8 @@ plot_mullerplot = function(x, which="frac", highlight=c(), min_frac=0, legend.po
   pop_df = get_muller_pop(x)
   edges_df = get_muller_edges(x)
 
-  timepoints = x$dimensions
-  lineages = x$lineages
+  timepoints = x %>% get_dimensions()
+  lineages = x %>% get_lineages()
   exp_limits = c(min(pop_df$lm_r), max(pop_df$lm_r))
 
   plot_list = list()
@@ -157,7 +157,6 @@ exp_fit_util = function(p, pop_df, cl) {
 
 plot_exp_rate = function(x, highlight=c(), min_frac=0, mutations=F) {
   if (mutations) {
-    # x$vaf_dataframe = get_vaf_dataframe(x) %>% mutate(labels_mut=paste(labels, labels_viber, sep="."))
     if (!purrr::is_empty(highlight))
       highlight = get_viber_clusters(x, highlight) else
         highlight = select_relevant_clusters(x, min_frac, theta)

@@ -51,3 +51,16 @@ get_model = function(x) {
   if ("pylineaGT.mvnmm.MVNMixtureModel" %in% class(x)) return(x)
 }
 
+
+
+get_dimensions = function(x) {
+  return(x$dimensions)
+}
+
+get_lineages = function(x) {
+  return(x$lineages)
+}
+
+get_timepoints = function(x) {
+  return(x$timepoints)
+}
