@@ -25,11 +25,8 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v1
         with:
-          extra-packages: pkgdown, local::.
+          extra-packages: pkgdown
           needs: website
-
-      - name: Install package
-        run: R CMD INSTALL .
 
       - name: Build and deploy pkgdown site
         if: contains(env.isPush, 'true')

@@ -21,13 +21,14 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
+knitr::opts_chunk$set(warning = FALSE)
 library(lineaGT)
 library(magrittr)
 ```
 
 The dataset can be filtered calling the `filter_dataset()` function.
 
-```{r}
+```{r dataset_filtering}
 data_filt = data %>% filter_dataset()
 
 data_filt
