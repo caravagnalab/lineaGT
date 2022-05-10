@@ -1,4 +1,5 @@
-docs
+docs*
 plots
 .Rproj.user
 .Rhistory
+inst/doc

@@ -48,6 +48,4 @@ URL: https://github.com/caravagnalab/lineaGT,
 Suggests: 
     knitr, 
     rmarkdown
-VignetteBuilder: 
-    knitr,
-    rmarkdown
+VignetteBuilder: knitr

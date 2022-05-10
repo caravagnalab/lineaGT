@@ -15,37 +15,34 @@ library(lineaGT)
 
 ## Scatterplot
 ```{r}
-plots = plot_scatter_density(x_fit)
-plots$`cov_early.L2:cov_early.L1` # to visualize a single plot
+# plots = plot_scatter_density(x_fit)
+# plots$`cov_early.L2:cov_early.L1` # to visualize a single plot
 ```
 
 
 ## Marginal distributions
 ```{r}
-plot_marginal(x_fit)
+# plot_marginal(x_fit)
 ```
 
 
 ## Mullerplot
 ```{r warning=FALSE}
-plot_mullerplot(x_fit, which="frac", wrap=T)
+# plot_mullerplot(x_fit, which="frac", wrap=T)
 ```
 ```{r warning=FALSE}
-plot_mullerplot(x_fit, which="pop", wrap=T)
+# plot_mullerplot(x_fit, which="pop", wrap=T)
 ```
-
 ```{r warning=FALSE}
-plot_mullerplot(x_fit, which="fitness", wrap=T)
+# plot_mullerplot(x_fit, which="fitness", wrap=T)
 ```
 
 ## Clonal Growth
 ```{r warning=FALSE}
-plot_exp_fit(x_fit)
+# plot_exp_fit(x_fit)
 ```
-
-
 ```{r warning=FALSE}
-plot_exp_rate(x_fit)
+# plot_exp_rate(x_fit)
 ```
 
 
