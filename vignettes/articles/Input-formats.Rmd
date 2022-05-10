@@ -1,5 +1,10 @@
 ---
 title: "Input formats"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Input formats}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r, include = FALSE}
@@ -10,9 +15,9 @@ knitr::opts_chunk$set(
 ```
 
 ```{r include=FALSE}
-library(reticulate)
-conda_create("r-reticulate")
-conda_install("r-reticulate", "pylineaGT", pip=TRUE)
+# library(reticulate)
+# conda_create("r-reticulate")
+# conda_install("r-reticulate", "pylineaGT", pip=TRUE)
 ```
 
 ```{r setup}

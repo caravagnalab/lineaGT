@@ -17,6 +17,8 @@
 #' @return a dataset of the same shape as the input one, with filtered observations.
 #'
 #' @importFrom reticulate import
+#' @importFrom magrittr %>%
+#' @importFrom dplyr select starts_with
 #'
 #' @export filter_dataset
 
