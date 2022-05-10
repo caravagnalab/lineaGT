@@ -42,10 +42,10 @@ Imports:
 Remotes:
     caravagn/VIBER,
     caravagn/easypar
-RoxygenNote: 7.1.2
-URL: https://github.com/caravagnalab/lineaGT,
-    https://caravagnalab.github.io/lineaGT/
 Suggests: 
     knitr, 
     rmarkdown
 VignetteBuilder: knitr
+RoxygenNote: 7.1.2
+URL: https://github.com/caravagnalab/lineaGT,
+    https://caravagnalab.github.io/lineaGT/
