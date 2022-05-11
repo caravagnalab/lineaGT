@@ -68,12 +68,20 @@ get_muller_pop = function(x, means=list()) {
     mutate(Frequency=Population/sum(Population)) %>%
     dplyr::ungroup()
 
-  pop_df = rbind(pop_df, list("Identity"=rep("P", x$`T`), "Generation"=colnames(means),
-                              "Population"=rep(1, x$`T`), "Lineage"=rep(x$lineages, 3),
-                              "Frequency"=rep(1, x$`T`))) %>%
+  pop_df = rbind(pop_df, list("Identity"=rep("P", x$`T`+x$lineages %>% length()),
+                              "Generation"=c(x$dimensions,rep("init", x$lineages %>% length())),
+                              "Population"=rep(1, x$`T`+x$lineages %>% length()),
+                              "Lineage"=rep(x$lineages, 3+1),
+                              "Frequency"=rep(1, x$`T`+x$lineages %>% length())))
+  pop_df = rbind(pop_df, list("Identity"=rep(x %>% get_unique_labels(), x$lineages %>% length()),
+                       "Generation"=rep("init", x$K*(x$lineages %>% length())),
+                       "Population"=rep(1, x$K*(x$lineages %>% length())),
+                       "Lineage"=rep(x$lineages, each=x$K),
+                       "Frequency"=rep(1/x$K, x$K*(x$lineages %>% length())))) %>%
     mutate(Generation=dplyr::case_when(grepl("early", Generation) ~ "60",
                                        grepl("mid", Generation) ~ "140",
-                                       grepl("late", Generation) ~ "280")) %>%
+                                       grepl("late", Generation) ~ "280",
+                                       grepl("init", Generation) ~ "1")) %>%
     mutate(Generation=as.numeric(Generation)) %>%
     group_by(Identity, Lineage) %>%
     mutate(lm_a=coef(lm(log1p(Population)~Generation))[1],
