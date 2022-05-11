@@ -11,6 +11,8 @@ fit(
   n_runs = 3,
   steps = 500,
   lr = 0.005,
+  p = 0.01,
+  convergence = TRUE,
   covariance = "diag",
   min_frac = 0,
   random_state = 25

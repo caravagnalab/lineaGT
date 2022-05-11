@@ -5,8 +5,8 @@ long_to_wide_input = function(dataset) {
   return(
     dataset %>%
       tidyr::pivot_wider(names_from=c("timepoints","lineage"), names_prefix="cov.", names_sep=".",
-                         values_from="coverage"))
-
+                         values_from="coverage", values_fill=0)
+    )
 }
 
 

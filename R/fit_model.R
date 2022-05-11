@@ -37,6 +37,8 @@ fit = function(cov.df,
                n_runs=3,
                steps=500,
                lr=0.005,
+               p=0.01,
+               convergence=TRUE,
                covariance="diag",
                min_frac=0,
                random_state=25) {
@@ -47,7 +49,7 @@ fit = function(cov.df,
 
   for (k in as.integer(k_interval[1]):as.integer(k_interval[2])) {
     for (run in 1:n_runs) {
-      x_k = single_fit(k, cov.df, run, steps, covariance, lr, random_state)
+      x_k = single_fit(k, cov.df, run, steps, covariance, lr, p, convergence, random_state)
 
       kk = x_k$K
       n_iter = x_k$n_iter

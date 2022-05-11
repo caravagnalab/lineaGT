@@ -1,5 +1,6 @@
 # Function to perform a single run of the model
-single_fit = function(k, df, run=NULL, steps=500, covariance="diag", lr=0.001, random_state=25) {
+single_fit = function(k, df, run=NULL, steps=500, covariance="diag", lr=0.001,
+                      p=0.01, convergence=TRUE, random_state=25) {
 
   print(paste("RUN", run, "- K =", k))
 
@@ -8,6 +9,8 @@ single_fit = function(k, df, run=NULL, steps=500, covariance="diag", lr=0.001, r
                     steps=as.integer(steps),
                     covariance=covariance,
                     lr=as.numeric(lr),
+                    p=as.numeric(p),
+                    convergence=convergence,
                     random_state=random_state)
   x = classifier(x)
 
@@ -44,10 +47,13 @@ initialize_object = function(K, dataset) {
 }
 
 
-run_inference = function(x, steps=500, covariance="diag", lr=0.005, random_state=25) {
+run_inference = function(x, steps=500, covariance="diag", lr=0.005,
+                         p=0.01, convergence=TRUE, random_state=25) {
   x$py_model$fit(steps=as.integer(steps),
                  cov_type=covariance,
                  lr=as.numeric(lr),
+                 p=as.numeric(p),
+                 convergence=convergence,
                  random_state=as.integer(random_state),
                  convergence=TRUE)
   return(update_params(x))
