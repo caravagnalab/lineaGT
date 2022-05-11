@@ -118,14 +118,14 @@ reshape_vaf_dataframe_long = function(x) {
   return(vaf)
 }
 
-reshape_theta_long = function(x) {
-  theta = get_binomial_theta(x) %>% tibble::rownames_to_column(var="labels_mut") %>%
-    tidyr::pivot_longer(cols=starts_with("vaf"), names_to="timepoints_lineage", values_to="vaf") %>%
-    tidyr::separate(timepoints_lineage, into=c("timepoints","lineage"), sep="_") %>%
-    tidyr::pivot_wider(names_from="timepoints", values_from="vaf") %>%
-    mutate(labels=labels_mut) %>% separate(labels, into=c("labels","else"), sep="[.]") %>%
-    mutate("else"=NULL)
-
-  return(theta)
-}
-
+# reshape_theta_long = function(x) {
+#   theta = get_binomial_theta(x) %>%
+#     tidyr::pivot_longer(cols=starts_with("vaf"), names_to="timepoints_lineage", values_to="vaf") %>%
+#     tidyr::separate(timepoints_lineage, into=c("timepoints","lineage"), sep="_") %>%
+#     tidyr::pivot_wider(names_from="timepoints", values_from="vaf") %>%
+#     mutate(labels=labels_mut) %>% separate(labels, into=c("labels","else"), sep="[.]") %>%
+#     mutate("else"=NULL)
+#
+#   return(theta)
+# }
+#

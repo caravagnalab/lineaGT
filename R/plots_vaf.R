@@ -18,14 +18,17 @@
 
 
 plot_vaf = function(x, min_frac=0, highlight=c()) {
-  dataframe = reshape_vaf_dataframe_long(x)
+  dataframe = x %>% get_vaf_dataframe() %>%
+    dplyr::select(-contains("ref"), -contains("dp"), -contains("alt"), -contains("theta")) %>%
+    tidyr::pivot_wider(names_from=c("timepoints"), names_sep=".", values_from=c("vaf"), names_prefix="vaf.")
 
   if (purrr::is_empty(highlight)) highlight = select_relevant_clusters(x, min_frac)
   highlight_v = get_viber_clusters(x, highlight)
   color_palette = highlight_palette(x$color_palette, c(highlight, highlight_v))
 
   combinations = get_pairs(dataframe, columns=dataframe %>% dplyr::select(dplyr::starts_with("vaf")) %>% colnames)
-  theta = reshape_theta_long(x)
+  theta = x %>% get_binomial_theta() %>%
+    tidyr::pivot_wider(names_from=c("timepoints"), values_from=c("theta"), names_prefix="vaf.", names_sep=".")
 
   p = list()
   for (t1_t2 in combinations$pair_name) {
@@ -40,33 +43,20 @@ plot_vaf = function(x, min_frac=0, highlight=c()) {
 
 
 
-plot_vaf_2D = function(dataframe,
-                       theta,
-                       dim1,
-                       dim2,
-                       color_palette) {
+plot_vaf_2D = function(dataframe, theta, dim1, dim2, color_palette) {
   pl = dataframe %>%
-    dplyr::select(starts_with("vaf"),
-                  labels,
-                  lineage,
-                  labels_mut,
-                  mutation,
-                  pi_viber) %>%
+    dplyr::select(starts_with("vaf"), labels, lineage, labels_mut, mutation, pi_viber) %>%
     ggplot() +
-    geom_point(aes_string(x = dim1, y = dim2, color = "labels_mut"), alpha =
-                            .5) +
-    geom_point(
-      data = theta,
-      aes_string(x = dim1, y = dim2, color = "labels_mut"),
-      shape = 15,
-      inherit.aes = F
-    ) +
+    geom_point(aes_string(x=dim1, y=dim2, color="labels_mut"), alpha=.5, size=.7) +
+    geom_point(data=theta, aes_string(x=dim1, y=dim2, color="labels_mut"), shape=15, inherit.aes=F, size=1.5) +
     facet_grid(lineage ~ labels) +
-    scale_color_manual(values = color_palette) +
-    my_ggplot_theme() +
+    scale_color_manual(values=color_palette) +
     xlab(split_to_camelcase(dim1)) +
     ylab(split_to_camelcase(dim2)) +
-    ylim(0, 100) + xlim(0, 100) + labs(color = "Clusters")
+    ylim(0, 100) +
+    xlim(0, 100) +
+    labs(color = "Clusters") +
+    my_ggplot_theme()
 
   return(pl)
 }

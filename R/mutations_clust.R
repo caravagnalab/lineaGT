@@ -41,23 +41,25 @@ fit_cluster_viber = function(viber_input, cluster) {
                     "trials"=viber_input$trials %>% filter(labels==cluster) %>% dplyr::select(-labels),
                     "vaf.df"=viber_input$vaf.df %>% filter(labels==cluster))
   k = viber_df_k$successes %>% nrow
-  fit = list()
+  fit_viber = list()
   try(expr = {
-    fit = VIBER::variational_fit(viber_df_k$successes, viber_df_k$trials, K=k)
-    fit = VIBER::choose_clusters(fit, binomial_cutoff=0, dimensions_cutoff=0, pi_cutoff=0.01)
+    fit_viber = VIBER::variational_fit(viber_df_k$successes, viber_df_k$trials, K=k)
+    if (fit_viber$K * 0.01 < 1) pi_cutoff = 0.005 else pi_cutoff = 0.01
+    fit_viber = VIBER::choose_clusters(fit_viber, binomial_cutoff=0,
+                                       dimensions_cutoff=0, pi_cutoff=pi_cutoff, re_assign=T)
 
-    labels = fit$labels$cluster.Binomial
+    labels = fit_viber$labels$cluster.Binomial
     viber_df_k$vaf.df$labels_viber = labels
-    viber_df_k$vaf.df$pi_viber = fit$pi_k[labels] %>% as.vector() }, silent = T)
+    viber_df_k$vaf.df$pi_viber = fit_viber$pi_k[labels] %>% as.vector() }, silent = T)
 
   try(expr = {
-    if (purrr::is_empty(fit)) {
+    if (purrr::is_empty(fit_viber)) {
       viber_df_k$vaf.df$labels_viber = "N"
       viber_df_k$vaf.df$pi_viber = 0
     }
   }, silent = T )
 
-  return(list("df"=viber_df_k$vaf.df, "fit"=fit))
+  return(list("df"=viber_df_k$vaf.df, "fit"=fit_viber))
 }
 
 

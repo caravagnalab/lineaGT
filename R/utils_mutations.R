@@ -106,7 +106,8 @@ wide_to_long_muts = function(vaf.df) {
 long_to_wide_muts = function(vaf.df) {
   return(
     vaf.df %>%
-      dplyr::select(alt, dp, vaf, timepoints, lineage, IS, mutation, starts_with("labels")) %>%
+      dplyr::select(alt, dp, vaf, timepoints, lineage, IS, mutation,
+                    dplyr::starts_with("labels"), dplyr::contains("pi")) %>%
       tidyr::pivot_wider(names_from=c("timepoints","lineage"), names_sep=".",
                          values_from=c("alt","dp","vaf"))
   )
