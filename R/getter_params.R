@@ -14,7 +14,6 @@ get_mean = function(x) {
       mean = py_model$params$mean$detach()$numpy()
       colnames(mean) = py_model$dimensions
       rownames(mean) = clusters_sort
-      print("Done")
       return(mean) },
     error = function(e) return(list()) )
 
@@ -59,7 +58,7 @@ get_covariance_Sigma = function(x) {
   tryCatch(
     expr = {
       covar = list()
-      for (k in 0:(py_model$params$K-1)) {
+      for (k in 0:(x$K-1)) {
         name = paste("C_", k, sep="")
         covar[[name]] = py_model$params$sigma[k]$detach()$numpy()
         covar[[name]] = covar[[name]] %*% t(covar[[name]])

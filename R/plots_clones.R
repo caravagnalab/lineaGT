@@ -36,16 +36,30 @@ plot_mullerplot = function(x, which="frac", highlight=c(), min_frac=0, legend.po
       mullerdf_ll = ggmuller::get_Muller_df(edges_df, pop_ll)
 
       if (which == "frac" || which == "")
-        plot_list[[ll]] = mullerplot_util(mullerdf_ll, y="Frequency", fill="Identity", lineage=ll,
-                                          highlight=highlight, color_palette=color_palette, legend.pos=legend.pos)
+        plot_list[[ll]] = mullerplot_util(mullerdf_ll,
+                                          y="Frequency",
+                                          fill="Identity",
+                                          lineage=ll,
+                                          highlight=highlight,
+                                          color_palette=color_palette,
+                                          legend.pos=legend.pos)
       if (which == "pop" || which == "")
-        plot_list[[ll]] = mullerplot_util(mullerdf_ll %>% ggmuller::add_empty_pop(), y="Population",
-                                          highlight=highlight, fill="Identity", color_palette=color_palette,
-                                          lineage=ll, legend.pos=legend.pos)
+        plot_list[[ll]] = mullerplot_util(mullerdf_ll %>% ggmuller::add_empty_pop(),
+                                          y="Population",
+                                          highlight=highlight,
+                                          fill="Identity",
+                                          color_palette=color_palette,
+                                          lineage=ll,
+                                          legend.pos=legend.pos)
       if (which == "fitness")
-        plot_list[[ll]] = mullerplot_util(mullerdf_ll, y="Frequency", fill="lm_r",
-                                          highlight=highlight, color_palette=color_palette, lineage=ll,
-                                          legend.pos=legend.pos, exp_limits=exp_limits)
+        plot_list[[ll]] = mullerplot_util(mullerdf_ll,
+                                          y="Frequency",
+                                          fill="lm_r",
+                                          highlight=highlight,
+                                          color_palette=color_palette,
+                                          lineage=ll,
+                                          legend.pos=legend.pos,
+                                          exp_limits=exp_limits)
     }
   }
 

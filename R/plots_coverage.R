@@ -42,7 +42,7 @@ plot_2D = function(x, dim1, dim2, color_palette, highlight, dens=NULL, facet=F, 
     geom_point(data=x %>% get_dataframe() %>% long_to_wide_input(),
                aes_string(x=dim1, y=dim2, color="labels"),
                alpha=.4, size=.8) +
-    scale_color_manual(values=color_palette) +
+    scale_color_manual(values=color_palette, breaks=highlight) +
     labs(color="Clusters") +
     xlab(split_to_camelcase(dim1)) +
     ylab(split_to_camelcase(dim2)) +
@@ -83,7 +83,7 @@ plot_marginal = function(x, highlight=c(), binwidth=5) {
 
   p = dd %>% ggplot() +
     geom_histogram(aes(x=coverage, fill=labels), position="identity", alpha=.7, binwidth=binwidth) +
-    scale_fill_manual(values=color_palette[highlight]) +
+    scale_fill_manual(values=color_palette, breaks=highlight) +
     facet_grid(timepoints ~ labels) +
     ylab("Counts") +
     xlab("Coverage") +
