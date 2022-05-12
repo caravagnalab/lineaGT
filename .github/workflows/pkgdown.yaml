@@ -29,6 +29,7 @@ jobs:
           needs: website
 
       - name: Deploy package
+        if: contains(env.isPush, 'true')
         run: |
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
