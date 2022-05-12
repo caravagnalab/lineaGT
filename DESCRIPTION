@@ -47,4 +47,5 @@ Suggests:
     rmarkdown
 VignetteBuilder: knitr
 RoxygenNote: 7.1.2
-URL: https://github.com/caravagnalab/lineaGT
+URL: https://github.com/caravagnalab/lineaGT,
+    https://caravagnalab.github.io/lineaGT/
