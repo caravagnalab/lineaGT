@@ -23,8 +23,8 @@ library(magrittr)
 The dataset can be filtered calling the `filter_dataset()` function.
 
 ```{r dataset_filtering}
-data_filt = data %>% filter_dataset()
+# data_filt = data %>% filter_dataset()
 
-data_filt
+# data_filt
 ```
 
