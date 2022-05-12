@@ -10,12 +10,12 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  warning = FALSE
 )
 ```
 
 ```{r setup}
-knitr::opts_chunk$set(warning = FALSE)
 library(lineaGT)
 library(magrittr)
 ```
@@ -23,8 +23,8 @@ library(magrittr)
 The dataset can be filtered calling the `filter_dataset()` function.
 
 ```{r dataset_filtering}
-# data_filt = data %>% filter_dataset()
+data_filt = data %>% filter_dataset()
 
-# data_filt
+data_filt
 ```
 
