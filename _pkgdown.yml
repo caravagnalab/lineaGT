@@ -1,3 +1,6 @@
+destination: docs
+
 template:
   bootstrap: 5
-url: caravagnalab.github.io/lineaGT/
+
+url: caravagnalab.github.io/lineaGT
