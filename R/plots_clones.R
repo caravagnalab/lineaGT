@@ -12,7 +12,7 @@
 #' @param wrap Boolean. If set to \code{TRUE}, a single plot with the mullerplots for each lineage will be returned.
 #'
 #' @examples
-#' plot_mullerplot(x, wrap=T)
+#' if (FALSE) plot_mullerplot(x, wrap=T)
 #'
 #' @import ggplot2
 #' @import ggmuller
@@ -107,7 +107,7 @@ mullerplot_util = function(mullerdf, y, fill, lineage, color_palette, highlight,
 #' @param mutations Boolean. If set to \code{TRUE}, the growth will be visualize for each cluster of mutations.
 #'
 #' @examples
-#' plot_exp_fit(x)
+#' if (FALSE) plot_exp_fit(x)
 #'
 #' @import ggplot2
 #'
@@ -171,7 +171,7 @@ exp_fit_util = function(p, pop_df, cl) {
 #' @param mutations Boolean. If set to \code{TRUE}, the growth will be visualize for each cluster of mutations.
 #'
 #' @examples
-#' plot_exp_rate(x)
+#' if (FALSE) plot_exp_rate(x)
 #'
 #' @import ggplot2
 #'
