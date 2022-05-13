@@ -30,10 +30,10 @@ jobs:
           extra-packages: pkgdown
           needs: website
           
-#       - uses: actions/setup-python@v1
-#         with:
-#           python-version: '3.8'
-          
+      - uses: actions/setup-python@v1
+        with:
+          python-version: '3.8'
+         
 #       - name: Setup r-reticulate env
 #         run: |
 #           reticulate::virtualenv_create("r-reticulate", Sys.which("python"))
