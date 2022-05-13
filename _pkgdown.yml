@@ -4,3 +4,42 @@ template:
   bootstrap: 5
 
 url: caravagnalab.github.io/lineaGT
+
+reference:
+- title: Fit function
+  desc: Main function to perform the fit of the model.
+  contents:
+  - fit
+
+- title: Getter functions
+  desc:  Functions to extract the main elements of the fitted object.
+  contents:
+  - get_lineages
+  - get_dimensions
+  - get_timepoints
+  - get_cov_dataframe
+  - get_vaf_dataframe
+  - get_labels
+  - get_unique_labels
+  - get_unique_muts_labels
+  - get_mean
+  - get_sigma
+  - get_covariance_Sigma
+  - get_weights
+  - get_z_probs
+
+- title: Visualization functions
+  desc: Functions to visualize the fit results.
+  contents:
+  - plot_scatter_density
+  - plot_marginal
+  - plot_mullerplot
+  - plot_exp_fit
+  - plot_exp_rate
+  - plot_vaf
+
+- title: S3 object methods
+  desc: Print and plot methods for the fitted object.
+  contents:
+  - print.mvnmm
+  - plot.mvnmm

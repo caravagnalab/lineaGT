@@ -9,7 +9,7 @@
 #' @return a list of plots, one for each timepoints combination.
 #'
 #' @examples
-#' plots = plot_scatter_density(x)
+#' if (FALSE) plots = plot_scatter_density(x)
 #'
 #' @import ggplot2
 #' @importFrom purrr is_empty map
@@ -74,6 +74,9 @@ plot_2D = function(x, dim1, dim2, color_palette, highlight, dens=NULL, facet=F, 
 #' @param binwidth numeric value representing the histogram binwidth.
 #'
 #' @import ggplot2
+#'
+#' @examples
+#' if (FALSE) plot_marginal(x)
 #'
 #' @export plot_marginal
 

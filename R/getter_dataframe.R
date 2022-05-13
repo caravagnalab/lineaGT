@@ -6,7 +6,7 @@
 #' @return the coverage dataset used to fit the model.
 #'
 #' @examples
-#' get_cov_dataframe(x)
+#' if (FALSE) get_cov_dataframe(x)
 #'
 #' @export get_cov_dataframe
 
@@ -49,7 +49,7 @@ get_model = function(x) {
 #' @return vector of model dimensions.
 #'
 #' @examples
-#' get_dimensions(x)
+#' if (FALSE) get_dimensions(x)
 #'
 #' @export get_dimensions
 
@@ -65,7 +65,7 @@ get_dimensions = function(x) {
 #' @return vector of data lineages.
 #'
 #' @examples
-#' get_lineages(x)
+#' if (FALSE) get_lineages(x)
 #'
 #' @export get_lineages
 
