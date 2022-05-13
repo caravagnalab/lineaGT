@@ -1,13 +1,13 @@
-#' Retrieve the object dataframe.
+#' Retrieve the coverage dataframe.
 #'
-#' @description
+#' @description Function to retrieve the coverage dataframe used to initialize the object.
 #'
 #' @param x a mvnmm object.
-#' @return the dataset used to fit the model.
+#' @return the coverage dataset used to fit the model.
 #'
-#' @export get_dataframe
+#' @export get_cov_dataframe
 
-get_dataframe = function(x) {
+get_cov_dataframe = function(x) {
   try(expr = { dataframe = x$cov.dataframe; if (!purrr::is_empty(dataframe)) return(dataframe) }, silent = T)
 
   py_model = get_model(x)
@@ -15,34 +15,17 @@ get_dataframe = function(x) {
 }
 
 
-#' Retrieve the object VAF dataframe.
+#' Retrieve the mutations dataframe.
 #'
-#' @description
+#' @description Function to retrieve the mutations dataframe used to initialize the object.
 #'
 #' @param x a mvnmm object.
-#' @return the VAF dataset.
+#' @return the mutations dataset.
 #'
 #' @export get_vaf_dataframe
-
+#'
 get_vaf_dataframe = function(x) {
   return(x$vaf.dataframe)
-}
-
-
-#' Retrieve the unique labels of mutation clusters, given the coverage labels.
-#'
-#' @description
-#'
-#' @param x a mvnmm object.
-#' @param clusters a vector-like variable, with the coverage labels.
-#' @return vector of mutations labels.
-#'
-#' @export get_viber_clusters
-
-get_viber_clusters = function(x, clusters) {
-  if (purrr::is_empty(clusters)) return(get_unique_viber_labels(x))
-  vaf = get_vaf_dataframe(x) %>% filter(labels %in% clusters)
-  return(vaf$labels_mut %>% unique())
 }
 
 
@@ -52,14 +35,50 @@ get_model = function(x) {
 }
 
 
+#' Extract the model dimensions.
+#'
+#' @description Returns a vector with the dimensions of the model.
+#'
+#' @param x a mvnmm object.
+#' @return vector of model dimensions.
+#'
+#' @examples
+#' get_dimensions(x)
+#'
+#' @export get_dimensions
 
 get_dimensions = function(x) {
   return(x$dimensions)
 }
 
+#' Extract the data lineages.
+#'
+#' @description Returns a vector with the lineages of the input data.
+#'
+#' @param x a mvnmm object.
+#' @return vector of data lineages.
+#'
+#' @examples
+#' get_lineages(x)
+#'
+#' @export get_lineages
+
 get_lineages = function(x) {
   return(x$lineages)
 }
+
+
+#' Extract the data timepoints.
+#'
+#' @description Returns a vector with the timepoints of the input data.
+#'
+#' @param x a mvnmm object.
+#' @return vector of data timepoints.
+#'
+#' @examples
+#' get_timepoints(x)
+#'
+#' @export get_timepoints
 
 get_timepoints = function(x) {
   return(x$timepoints)

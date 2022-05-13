@@ -20,3 +20,7 @@ plot_exp_rate(x, highlight = c(), min_frac = 0, mutations = F)
 \description{
 Function to visualize the growth coefficients for each clone and lineage.
 }
+\examples{
+plot_exp_rate(x)
+
+}

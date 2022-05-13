@@ -1,15 +1,3 @@
-#' Functions to run VIBER for mutations clustering
-#'
-#' @description add
-#'
-#' @param x mvnmm object.
-#' @param vaf.df a VAF dataframe, with required columns mutation,dp,ref,alt of depth, reference and alternative reads
-#' @param min_frac numeric value in \code{[0,1]} representing the minimum abundance to consider a clone in the inference.
-#' @return mvnmm object with added the VAF dataframe annotated with the found clusters and the VIBER fit for each cluster
-#'
-#' @export run_viber
-
-
 run_viber = function(x, vaf.df, min_frac=0, highlight=list()) {
   x = add_vaf(x, vaf.df)
   viber_input = get_input_viber(vaf.df, x)
@@ -31,7 +19,7 @@ run_viber = function(x, vaf.df, min_frac=0, highlight=list()) {
     mutate(labels_mut=paste(labels, labels_viber, sep=".")) %>%
     wide_to_long_muts()
   x$vaf.dataframe = dplyr::inner_join(vaf.df, theta, by=c("labels_mut","labels", "timepoints","lineage"))
-  x$color_palette = c(x$color_palette, get_colors(list_lab=get_unique_viber_labels(x)))
+  x$color_palette = c(x$color_palette, get_colors(list_lab=get_unique_muts_labels(x)))
   return(x)
 }
 

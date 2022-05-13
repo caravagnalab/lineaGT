@@ -11,12 +11,14 @@
 #' @param legend.pos position of the legend. If set to \code{"none"}, the legend is not shown.
 #' @param wrap Boolean. If set to \code{TRUE}, a single plot with the mullerplots for each lineage will be returned.
 #'
+#' @examples
+#' plot_mullerplot(x, wrap=T)
+#'
 #' @import ggplot2
 #' @import ggmuller
 #' @importFrom patchwork wrap_plots
 #'
 #' @export plot_mullerplot
-
 
 plot_mullerplot = function(x, which="frac", highlight=c(), min_frac=0, legend.pos="right", wrap=F, mutations=F) {
   if (purrr::is_empty(highlight)) highlight = select_relevant_clusters(x, min_frac)
@@ -104,6 +106,9 @@ mullerplot_util = function(mullerdf, y, fill, lineage, color_palette, highlight,
 #' @param facet Boolean. If set to \code{TRUE}, the plot will be faceted against the clusters.
 #' @param mutations Boolean. If set to \code{TRUE}, the growth will be visualize for each cluster of mutations.
 #'
+#' @examples
+#' plot_exp_fit(x)
+#'
 #' @import ggplot2
 #'
 #' @export plot_exp_fit
@@ -114,9 +119,8 @@ plot_exp_fit = function(x, highlight=c(), min_frac=0, facet=F, mutations=F) {
     theta = get_binomial_theta(x)
     pop_df = get_muller_pop(x, means=theta)
 
-    # x$vaf_dataframe = get_vaf_dataframe(x) %>% mutate(labels_mut=paste(labels, labels_viber, sep="."))
     if (!purrr::is_empty(highlight))
-      highlight = get_viber_clusters(x, highlight) else
+      highlight = get_unique_muts_labels(x, highlight) else
         highlight = select_relevant_clusters(x, min_frac, theta)
     color_palette = highlight_palette(x$color_palette, highlight)
 
@@ -166,6 +170,9 @@ exp_fit_util = function(p, pop_df, cl) {
 #' @param facet Boolean. If set to \code{TRUE}, the plot will be faceted against the clusters.
 #' @param mutations Boolean. If set to \code{TRUE}, the growth will be visualize for each cluster of mutations.
 #'
+#' @examples
+#' plot_exp_rate(x)
+#'
 #' @import ggplot2
 #'
 #' @export plot_exp_rate
@@ -174,7 +181,7 @@ exp_fit_util = function(p, pop_df, cl) {
 plot_exp_rate = function(x, highlight=c(), min_frac=0, mutations=F) {
   if (mutations) {
     if (!purrr::is_empty(highlight))
-      highlight = get_viber_clusters(x, highlight) else
+      highlight = get_unique_muts_labels(x, highlight) else
         highlight = select_relevant_clusters(x, min_frac, theta)
     color_palette = highlight_palette(x$color_palette, highlight)
 

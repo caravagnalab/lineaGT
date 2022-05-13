@@ -64,22 +64,6 @@ update_params = function(x) {
 }
 
 
-update_dataframe = function(x) {
-  x$cov.dataframe = get_dataset(x$py_model)
-  return(x)
-}
-
-
-#' Adding the VAF dataset to the current object.
-#'
-#' @description
-#'
-#' @param x a mvnmm object.
-#' @param vaf_df a matrix-like dataset, containing the VAF of the mutations.
-#' @return a mvnmm object.
-#'
-#' @export add_vaf
-
 add_vaf = function(x, vaf_df) {
   x$vaf.dataframe = vaf_df
   return(x)

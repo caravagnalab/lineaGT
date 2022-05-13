@@ -21,3 +21,7 @@ a list of plots, one for each timepoints combination.
 \description{
 Function to plot the scatterplots of the coverage, one timepoint against the other, together with the Gaussian density.
 }
+\examples{
+plots = plot_scatter_density(x)
+
+}

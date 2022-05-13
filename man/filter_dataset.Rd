@@ -5,7 +5,7 @@
 \title{Filters the input dataset.}
 \usage{
 filter_dataset(
-  dataset,
+  cov.df,
   min_cov = 50,
   min_frac = 0.05,
   k_interval = c(5, 30),
@@ -14,8 +14,8 @@ filter_dataset(
 )
 }
 \arguments{
-\item{dataset}{Input dataset. It has to be of shape \code{NxT}, where \code{N} is the number of
-observations and \code{T} is the dimensionality of the dataset.}
+\item{cov.df}{Input coverage dataset. It must have at least the columns \code{coverage}, \code{timepoints},
+\code{lineage}, \code{IS}, with the coverage values, timepoint, lineage and IS, respectively.}
 
 \item{min_cov}{add}
 
@@ -26,13 +26,6 @@ observations and \code{T} is the dimensionality of the dataset.}
 \item{metric}{add}
 
 \item{random_state}{add}
-
-\item{columns}{List of columns to be selected from the dataset. If not specified,
-all columns will be considered.}
-
-\item{IS_values}{List of Insertion Sites identifier. It must be a list of length \code{N}, hence
-for each observation a value is needed. If not specified, a general identifier \code{IS.1,...IS.N}
-will be generated.}
 }
 \value{
 a dataset of the same shape as the input one, with filtered observations.

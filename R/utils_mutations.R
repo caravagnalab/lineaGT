@@ -19,33 +19,6 @@ get_binomial_theta = function(x) {
 }
 
 
-
-# Functions used to obtain and reshape some datasets
-# works with our vaf files
-vaf_df_from_file = function(vaf_file) {
-  vaf_df = read.csv(vaf_file)
-  try(expr = { vaf_df = vaf_df  %>%
-    dplyr::rename_with(.cols=all_of(dplyr::starts_with("dp_")),
-                       .fn=~paste0("cov_", str_replace_all(.x,"dp_",""))) }, silent = T)
-
-  vaf_df = vaf_df %>%
-    tidyr::pivot_longer(cols=starts_with("dp.ref.alt"), names_to="timepoint", values_to="dp:ref:alt") %>%
-    mutate(timepoint=stringr::str_replace_all(timepoint, "dp.ref.alt_", "")) %>%
-    filter(!timepoint %in% c("over","steady")) %>%
-    separate("dp:ref:alt", into=c("dp", "ref", "alt"), sep=":") %>%
-    mutate(ref=as.integer(ref), alt=as.integer(alt), dp=ref+alt) %>%
-    tidyr::pivot_wider(values_from=c("dp","ref","alt"), names_from="timepoint", values_fn=as.integer)
-
-  vaf_df = vaf_df %>%
-    dplyr::select(-starts_with("cov")) %>%
-    tidyr::pivot_longer(cols=c(starts_with("alt"),starts_with("dp"),starts_with("vaf"),starts_with("ref"))) %>%
-    separate(name, into=c("type","timepoints")) %>%
-    tidyr::pivot_wider(names_from = "type", values_from = "value")
-
-  return(vaf_df)
-}
-
-
 check_dp = function(vaf.df, x) {
   # vaf_df is the dataframe from vaf_df_from_file
   # returns a dataframe with same structure but dp_early/mid/late equals the
@@ -65,7 +38,7 @@ annotate_vaf_df = function(vaf.df, x, min_frac=0) {
   ll = x$lineages
   tp = x$timepoints
   highlight = select_relevant_clusters(x, min_frac=min_frac)
-  dataframe = x %>% get_dataframe() %>% filter(labels %in% highlight)
+  dataframe = x %>% get_cov_dataframe() %>% filter(labels %in% highlight)
   IS_keep = dataframe$IS %>% unique()
 
   vaf.df_filt = vaf.df %>%
@@ -90,25 +63,27 @@ get_input_viber = function(vaf.df, x) {
 }
 
 
+# Functions used to obtain and reshape some datasets
+# works with our vaf files
+vaf_df_from_file = function(vaf_file) {
+  vaf_df = read.csv(vaf_file)
+  try(expr = { vaf_df = vaf_df  %>%
+    dplyr::rename_with(.cols=all_of(dplyr::starts_with("dp_")),
+                       .fn=~paste0("cov_", str_replace_all(.x,"dp_",""))) }, silent = T)
 
-wide_to_long_muts = function(vaf.df) {
-  return(
-    vaf.df %>%
-      tidyr::pivot_longer(cols=c(starts_with("alt"), starts_with("dp"), starts_with("vaf")),
-                          names_to="type.timepoints.lineage") %>%
-      separate(type.timepoints.lineage, into=c("type", "timepoints", "lineage")) %>%
-      tidyr::pivot_wider(names_from="type", values_from="value")
-  )
-}
+  vaf_df = vaf_df %>%
+    tidyr::pivot_longer(cols=starts_with("dp.ref.alt"), names_to="timepoint", values_to="dp:ref:alt") %>%
+    mutate(timepoint=stringr::str_replace_all(timepoint, "dp.ref.alt_", "")) %>%
+    filter(!timepoint %in% c("over","steady")) %>%
+    separate("dp:ref:alt", into=c("dp", "ref", "alt"), sep=":") %>%
+    mutate(ref=as.integer(ref), alt=as.integer(alt), dp=ref+alt) %>%
+    tidyr::pivot_wider(values_from=c("dp","ref","alt"), names_from="timepoint", values_fn=as.integer)
 
+  vaf_df = vaf_df %>%
+    dplyr::select(-starts_with("cov")) %>%
+    tidyr::pivot_longer(cols=c(starts_with("alt"),starts_with("dp"),starts_with("vaf"),starts_with("ref"))) %>%
+    separate(name, into=c("type","timepoints")) %>%
+    tidyr::pivot_wider(names_from = "type", values_from = "value")
 
-
-long_to_wide_muts = function(vaf.df) {
-  return(
-    vaf.df %>%
-      dplyr::select(alt, dp, vaf, timepoints, lineage, IS, mutation,
-                    dplyr::starts_with("labels"), dplyr::contains("pi")) %>%
-      tidyr::pivot_wider(names_from=c("timepoints","lineage"), names_sep=".",
-                         values_from=c("alt","dp","vaf"))
-  )
+  return(vaf_df)
 }

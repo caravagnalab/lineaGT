@@ -2,7 +2,7 @@
 % Please edit documentation in R/getter_dataframe.R
 \name{get_vaf_dataframe}
 \alias{get_vaf_dataframe}
-\title{Retrieve the object VAF dataframe.}
+\title{Retrieve the mutations dataframe.}
 \usage{
 get_vaf_dataframe(x)
 }
@@ -10,8 +10,8 @@ get_vaf_dataframe(x)
 \item{x}{a mvnmm object.}
 }
 \value{
-the VAF dataset.
+the mutations dataset.
 }
 \description{
-
+Function to retrieve the mutations dataframe used to initialize the object.
 }

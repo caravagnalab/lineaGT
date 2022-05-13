@@ -21,3 +21,7 @@ list of VAF scatterplots.
 \description{
 Function to plot the VAFs of the mutations one timepoint against the other
 }
+\examples{
+plot_vaf(x, min_frac=0.1)
+
+}

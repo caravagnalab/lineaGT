@@ -10,6 +10,9 @@
 #'
 #' @return list of VAF scatterplots.
 #'
+#' @examples
+#' plot_vaf(x, min_frac=0.1)
+#'
 #' @import ggplot2
 #' @importFrom dplyr select starts_with
 #' @importFrom purrr is_empty
@@ -23,10 +26,12 @@ plot_vaf = function(x, min_frac=0, highlight=c()) {
     tidyr::pivot_wider(names_from=c("timepoints"), names_sep=".", values_from=c("vaf"), names_prefix="vaf.")
 
   if (purrr::is_empty(highlight)) highlight = select_relevant_clusters(x, min_frac)
-  highlight_v = get_viber_clusters(x, highlight)
+  highlight_v = get_unique_muts_labels(x, highlight)
   color_palette = highlight_palette(x$color_palette, c(highlight, highlight_v))
 
-  combinations = get_pairs(dataframe, columns=dataframe %>% dplyr::select(dplyr::starts_with("vaf")) %>% colnames)
+  combinations = get_pairs(dataframe, columns=dataframe %>%
+                             dplyr::select(dplyr::starts_with("vaf")) %>%
+                             colnames)
   theta = x %>% get_binomial_theta() %>%
     tidyr::pivot_wider(names_from=c("timepoints"), values_from=c("theta"), names_prefix="vaf.", names_sep=".")
 

@@ -12,7 +12,7 @@
 
 
 plot.mvnmm = function(x, ...) {
-
+  plot_mullerplot(x, wrap=T)
 }
 
 my_ggplot_theme = function(cex=1, legend.pos="right") {

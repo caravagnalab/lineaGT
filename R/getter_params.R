@@ -5,6 +5,18 @@ get_params = function(x=NULL, py_model=NULL) {
 }
 
 
+#' Extract the estimated mean parameters.
+#'
+#' @description Returns a dataframe \code{KxT} with the estimated mean paramaters \code{mu_kt} per
+#' clone \code{k} and dimension \code{t}.
+#'
+#' @param x a mvnmm object.
+#' @return dataframe of mean parameters.
+#'
+#' @examples
+#' get_mean(x)
+#'
+#' @export get_mean
 
 get_mean = function(x) {
   py_model = get_model(x)
@@ -21,6 +33,17 @@ get_mean = function(x) {
 }
 
 
+#' Extract the estimated mixing proportions.
+#'
+#' @description Returns a list of dimension \code{K} with the estimated mixing proportions.
+#'
+#' @param x a mvnmm object.
+#' @return list of estimated mixing proportions.
+#'
+#' @examples
+#' get_weights(x)
+#'
+#' @export get_weights
 
 get_weights = function(x) {
   py_model = get_model(x)
@@ -36,6 +59,18 @@ get_weights = function(x) {
 }
 
 
+#' Extract the estimated variance parameters.
+#'
+#' @description Returns a dataframe \code{KxT} with the estimated variance paramaters \code{sigma_kt} per
+#' clone \code{k} and dimension \code{t}.
+#'
+#' @param x a mvnmm object.
+#' @return dataframe of variance parameters.
+#'
+#' @examples
+#' get_sigma(x)
+#'
+#' @export get_sigma
 
 get_sigma = function(x) {
   py_model = get_model(x)
@@ -52,6 +87,18 @@ get_sigma = function(x) {
 }
 
 
+#' Extract the estimated covariance matrices.
+#'
+#' @description Returns a list with \code{K} dataframes, each of dimension \code{TxT}, corresponding
+#' to the covariance matrices estimated for each clone \code{k}
+#'
+#' @param x a mvnmm object.
+#' @return list of the estimated covariance matrices.
+#'
+#' @examples
+#' get_covariance_Sigma(x)
+#'
+#' @export get_covariance_Sigma
 
 get_covariance_Sigma = function(x) {
   py_model = get_model(x)
@@ -71,6 +118,18 @@ get_covariance_Sigma = function(x) {
 }
 
 
+#' Extract the estimated posterior probabilities.
+#'
+#' @description Returns a dataframe of shape \code{NxK} with the posterior distribution \code{p(k|n)}
+#' for each observation \code{n} to belong to cluster \code{k}.
+#'
+#' @param x a mvnmm object.
+#' @return dataframe of posterior distributions.
+#'
+#' @examples
+#' get_z_probs(x)
+#'
+#' @export get_z_probs
 
 get_z_probs = function(x) {
   py_model = get_model(x)
@@ -88,21 +147,33 @@ get_z_probs = function(x) {
 
 
 
-get_z_assignments = function(x) {
-  py_model = get_model(x)
-  tryCatch(
-    expr = {
-      clusters_sort = get_unique_labels(py_model)
-      assignments = py_model$params$z_assignments$detach()$numpy()
-      colnames(assignments) = clusters_sort
-      rownames(assignments) = py_model$IS
-      return(assignments) },
-    error = function(e) return(list()) )
+# get_z_assignments = function(x) {
+#   py_model = get_model(x)
+#   tryCatch(
+#     expr = {
+#       clusters_sort = get_unique_labels(py_model)
+#       assignments = py_model$params$z_assignments$detach()$numpy()
+#       colnames(assignments) = clusters_sort
+#       rownames(assignments) = py_model$IS
+#       return(assignments) },
+#     error = function(e) return(list()) )
+#
+#   try(expr = { assignm = x$params$assignments; if (!purrr::is_empty(assignm)) return(assignm) }, silent = T)
+# }
 
-  try(expr = { assignm = x$params$assignments; if (!purrr::is_empty(assignm)) return(assignm) }, silent = T)
-}
 
-
+#' Extract the observations labels.
+#'
+#' @description Returns a list with \code{N} elements, corresponding to the labels for each
+#' observation.
+#'
+#' @param x a mvnmm object.
+#' @return list of observations labels.
+#'
+#' @examples
+#' get_labels(x)
+#'
+#' @export get_labels
 
 get_labels = function(x, initial_lab=F) {
   py_model = get_model(x)
@@ -126,6 +197,17 @@ get_labels = function(x, initial_lab=F) {
 }
 
 
+#' Extract the list of unique observations labels.
+#'
+#' @description Returns a list with \code{K} elements, corresponding to the unique labels.
+#'
+#' @param x a mvnmm object.
+#' @return list of unique labels.
+#'
+#' @examples
+#' get_unique_labels(x)
+#'
+#' @export get_unique_labels
 
 get_unique_labels = function(x) {
   try(expr = { labels = x$params$labels %>% levels(); if (!purrr::is_empty(labels)) return(labels) }, silent = T)
@@ -139,8 +221,30 @@ get_unique_labels = function(x) {
 }
 
 
+#' Retrieve the list of unique labels of mutation clusters.
+#'
+#' @description Function to retrieve the list of unique labels of mutations clusters,
+#' of the form \code{C_c1.Cm1}, where \code{c1} is the clone identifier and \code{m1}
+#' is the subclone identifier.
+#'
+#' @param x a mvnmm object.
+#' @param clusters a vector-like variable, with the identifiers of the clones we want
+#' to retrieve the subclone labels from. If empty, all the labels will be returned.
+#' @return vector of mutations labels.
+#'
+#' @examples
+#' get_unique_muts_labels(x, c("C_0"))
+#'
+#' @export get_unique_muts_labels
 
-get_unique_viber_labels = function(x) {
-  labels = x$vaf.dataframe$labels_mut %>% unique()
+get_unique_muts_labels = function(x, clusters=c()) {
+  if (purrr::is_empty(clusters)) return(get_unique_muts_labels_all(x))
+  vaf = get_vaf_dataframe(x) %>% filter(labels %in% clusters)
+  return(vaf$labels_mut %>% unique())
+}
+
+
+get_unique_muts_labels_all = function(x) {
+  labels = (x %>% get_vaf_dataframe())$labels_mut %>% unique()
   return(labels)
 }

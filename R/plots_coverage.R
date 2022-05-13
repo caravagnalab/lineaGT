@@ -8,6 +8,9 @@
 #'
 #' @return a list of plots, one for each timepoints combination.
 #'
+#' @examples
+#' plots = plot_scatter_density(x)
+#'
 #' @import ggplot2
 #' @importFrom purrr is_empty map
 #' @importFrom dplyr select all_of
@@ -15,7 +18,7 @@
 
 
 plot_scatter_density = function(x, plot_density=T, facet=FALSE, highlight=c()) {
-  dataset = x %>% get_dataframe() %>% long_to_wide_input()
+  dataset = x %>% get_cov_dataframe() %>% long_to_wide_input()
 
   color_palette = highlight_palette(x$color_palette, highlight)
   if (purrr::is_empty(highlight)) highlight = get_unique_labels(x)
@@ -39,7 +42,7 @@ plot_2D = function(x, dim1, dim2, color_palette, highlight, dens=NULL, facet=F, 
   inputs = eval(substitute(alist(...))) %>% purrr::map(as.list)
 
   pl = ggplot2::ggplot() +
-    geom_point(data=x %>% get_dataframe() %>% long_to_wide_input(),
+    geom_point(data=x %>% get_cov_dataframe() %>% long_to_wide_input(),
                aes_string(x=dim1, y=dim2, color="labels"),
                alpha=.4, size=.8) +
     scale_color_manual(values=color_palette, breaks=highlight) +
@@ -79,7 +82,7 @@ plot_marginal = function(x, highlight=c(), binwidth=5) {
   color_palette = highlight_palette(x$color_palette, highlight)
   if (purrr::is_empty(highlight)) highlight = get_unique_labels(x)
 
-  dd = x %>% get_dataframe() %>% filter(labels %in% highlight)
+  dd = x %>% get_cov_dataframe() %>% filter(labels %in% highlight)
 
   p = dd %>% ggplot() +
     geom_histogram(aes(x=coverage, fill=labels), position="identity", alpha=.7, binwidth=binwidth) +
