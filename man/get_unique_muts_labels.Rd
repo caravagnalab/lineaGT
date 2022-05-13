@@ -21,6 +21,6 @@ of the form \code{C_c1.Cm1}, where \code{c1} is the clone identifier and \code{m
 is the subclone identifier.
 }
 \examples{
-get_unique_muts_labels(x, c("C_0"))
+if(FALSE) get_unique_muts_labels(x, c("C_0"))
 
 }

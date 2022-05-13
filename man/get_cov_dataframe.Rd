@@ -15,3 +15,7 @@ the coverage dataset used to fit the model.
 \description{
 Function to retrieve the coverage dataframe used to initialize the object.
 }
+\examples{
+get_cov_dataframe(x)
+
+}

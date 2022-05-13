@@ -16,6 +16,6 @@ vector of data timepoints.
 Returns a vector with the timepoints of the input data.
 }
 \examples{
-get_timepoints(x)
+if (FALSE) get_timepoints(x)
 
 }

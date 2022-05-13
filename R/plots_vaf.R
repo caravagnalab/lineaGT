@@ -11,7 +11,7 @@
 #' @return list of VAF scatterplots.
 #'
 #' @examples
-#' plot_vaf(x, min_frac=0.1)
+#' if (FALSE) plot_vaf(x, min_frac=0.1)
 #'
 #' @import ggplot2
 #' @importFrom dplyr select starts_with

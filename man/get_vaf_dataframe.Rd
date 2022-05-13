@@ -15,3 +15,7 @@ the mutations dataset.
 \description{
 Function to retrieve the mutations dataframe used to initialize the object.
 }
+\examples{
+if (FALSE) get_vaf_dataframe(x)
+
+}

@@ -233,7 +233,7 @@ get_unique_labels = function(x) {
 #' @return vector of mutations labels.
 #'
 #' @examples
-#' get_unique_muts_labels(x, c("C_0"))
+#' if(FALSE) get_unique_muts_labels(x, c("C_0"))
 #'
 #' @export get_unique_muts_labels
 

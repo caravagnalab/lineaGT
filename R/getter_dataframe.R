@@ -5,6 +5,9 @@
 #' @param x a mvnmm object.
 #' @return the coverage dataset used to fit the model.
 #'
+#' @examples
+#' get_cov_dataframe(x)
+#'
 #' @export get_cov_dataframe
 
 get_cov_dataframe = function(x) {
@@ -21,6 +24,9 @@ get_cov_dataframe = function(x) {
 #'
 #' @param x a mvnmm object.
 #' @return the mutations dataset.
+#'
+#' @examples
+#' if (FALSE) get_vaf_dataframe(x)
 #'
 #' @export get_vaf_dataframe
 #'
@@ -76,7 +82,7 @@ get_lineages = function(x) {
 #' @return vector of data timepoints.
 #'
 #' @examples
-#' get_timepoints(x)
+#' if (FALSE) get_timepoints(x)
 #'
 #' @export get_timepoints
 
