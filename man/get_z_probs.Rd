@@ -17,6 +17,6 @@ Returns a dataframe of shape \code{NxK} with the posterior distribution \code{p(
 for each observation \code{n} to belong to cluster \code{k}.
 }
 \examples{
-get_z_probs(x)
+if (FALSE) get_z_probs(x)
 
 }

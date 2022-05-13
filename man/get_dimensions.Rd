@@ -16,6 +16,6 @@ vector of model dimensions.
 Returns a vector with the dimensions of the model.
 }
 \examples{
-get_dimensions(x)
+if (FALSE) get_dimensions(x)
 
 }

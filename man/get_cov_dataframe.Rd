@@ -16,6 +16,6 @@ the coverage dataset used to fit the model.
 Function to retrieve the coverage dataframe used to initialize the object.
 }
 \examples{
-get_cov_dataframe(x)
+if (FALSE) get_cov_dataframe(x)
 
 }

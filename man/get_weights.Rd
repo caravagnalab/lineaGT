@@ -16,6 +16,6 @@ list of estimated mixing proportions.
 Returns a list of dimension \code{K} with the estimated mixing proportions.
 }
 \examples{
-get_weights(x)
+if (FALSE) get_weights(x)
 
 }

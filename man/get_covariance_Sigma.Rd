@@ -17,6 +17,6 @@ Returns a list with \code{K} dataframes, each of dimension \code{TxT}, correspon
 to the covariance matrices estimated for each clone \code{k}
 }
 \examples{
-get_covariance_Sigma(x)
+if (FALSE) get_covariance_Sigma(x)
 
 }

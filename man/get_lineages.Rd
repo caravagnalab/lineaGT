@@ -16,6 +16,6 @@ vector of data lineages.
 Returns a vector with the lineages of the input data.
 }
 \examples{
-get_lineages(x)
+if (FALSE) get_lineages(x)
 
 }

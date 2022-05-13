@@ -16,6 +16,6 @@ list of unique labels.
 Returns a list with \code{K} elements, corresponding to the unique labels.
 }
 \examples{
-get_unique_labels(x)
+if (FALSE) get_unique_labels(x)
 
 }

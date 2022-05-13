@@ -21,6 +21,6 @@ plot_exp_fit(x, highlight = c(), min_frac = 0, facet = F, mutations = F)
 Function to visualize the growht of each clone and lineage.
 }
 \examples{
-plot_exp_fit(x)
+if (FALSE) plot_exp_fit(x)
 
 }

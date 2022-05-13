@@ -33,6 +33,6 @@ computed assuming a exponential growth.}
 Function to visualize the mullerplot for the fitted object.
 }
 \examples{
-plot_mullerplot(x, wrap=T)
+if (FALSE) plot_mullerplot(x, wrap=T)
 
 }

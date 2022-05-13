@@ -14,7 +14,7 @@ get_params = function(x=NULL, py_model=NULL) {
 #' @return dataframe of mean parameters.
 #'
 #' @examples
-#' get_mean(x)
+#' if (FALSE) get_mean(x)
 #'
 #' @export get_mean
 
@@ -41,7 +41,7 @@ get_mean = function(x) {
 #' @return list of estimated mixing proportions.
 #'
 #' @examples
-#' get_weights(x)
+#' if (FALSE) get_weights(x)
 #'
 #' @export get_weights
 
@@ -68,7 +68,7 @@ get_weights = function(x) {
 #' @return dataframe of variance parameters.
 #'
 #' @examples
-#' get_sigma(x)
+#' if (FALSE) get_sigma(x)
 #'
 #' @export get_sigma
 
@@ -96,7 +96,7 @@ get_sigma = function(x) {
 #' @return list of the estimated covariance matrices.
 #'
 #' @examples
-#' get_covariance_Sigma(x)
+#' if (FALSE) get_covariance_Sigma(x)
 #'
 #' @export get_covariance_Sigma
 
@@ -127,7 +127,7 @@ get_covariance_Sigma = function(x) {
 #' @return dataframe of posterior distributions.
 #'
 #' @examples
-#' get_z_probs(x)
+#' if (FALSE) get_z_probs(x)
 #'
 #' @export get_z_probs
 
@@ -171,7 +171,7 @@ get_z_probs = function(x) {
 #' @return list of observations labels.
 #'
 #' @examples
-#' get_labels(x)
+#' if (FALSE) get_labels(x)
 #'
 #' @export get_labels
 
@@ -205,7 +205,7 @@ get_labels = function(x, initial_lab=F) {
 #' @return list of unique labels.
 #'
 #' @examples
-#' get_unique_labels(x)
+#' if (FALSE) get_unique_labels(x)
 #'
 #' @export get_unique_labels
 

@@ -17,6 +17,6 @@ Returns a dataframe \code{KxT} with the estimated mean paramaters \code{mu_kt} p
 clone \code{k} and dimension \code{t}.
 }
 \examples{
-get_mean(x)
+if (FALSE) get_mean(x)
 
 }

@@ -17,6 +17,6 @@ Returns a dataframe \code{KxT} with the estimated variance paramaters \code{sigm
 clone \code{k} and dimension \code{t}.
 }
 \examples{
-get_sigma(x)
+if (FALSE) get_sigma(x)
 
 }

@@ -16,3 +16,7 @@ plot_marginal(x, highlight = c(), binwidth = 5)
 \description{
 Function to plot the marginal distribution of the coverage, for each timepoint, colored by cluster.
 }
+\examples{
+if (FALSE) plot_marginal(x)
+
+}

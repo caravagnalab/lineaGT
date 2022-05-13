@@ -17,6 +17,6 @@ Returns a list with \code{N} elements, corresponding to the labels for each
 observation.
 }
 \examples{
-get_labels(x)
+if (FALSE) get_labels(x)
 
 }
