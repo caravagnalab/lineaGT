@@ -28,22 +28,49 @@
     <loc>caravagnalab.github.io/lineaGT/index.html</loc>
   </url>
   <url>
-    <loc>caravagnalab.github.io/lineaGT/reference/add_vaf.html</loc>
-  </url>
-  <url>
     <loc>caravagnalab.github.io/lineaGT/reference/filter_dataset.html</loc>
   </url>
   <url>
     <loc>caravagnalab.github.io/lineaGT/reference/fit.html</loc>
   </url>
   <url>
-    <loc>caravagnalab.github.io/lineaGT/reference/get_dataframe.html</loc>
+    <loc>caravagnalab.github.io/lineaGT/reference/get_cov_dataframe.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/get_covariance_Sigma.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/get_dimensions.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/get_labels.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/get_lineages.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/get_mean.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/get_sigma.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/get_timepoints.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/get_unique_labels.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/get_unique_muts_labels.html</loc>
   </url>
   <url>
     <loc>caravagnalab.github.io/lineaGT/reference/get_vaf_dataframe.html</loc>
   </url>
   <url>
-    <loc>caravagnalab.github.io/lineaGT/reference/get_viber_clusters.html</loc>
+    <loc>caravagnalab.github.io/lineaGT/reference/get_weights.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/get_z_probs.html</loc>
   </url>
   <url>
     <loc>caravagnalab.github.io/lineaGT/reference/index.html</loc>
@@ -71,8 +98,5 @@
   </url>
   <url>
     <loc>caravagnalab.github.io/lineaGT/reference/print.mvnmm.html</loc>
-  </url>
-  <url>
-    <loc>caravagnalab.github.io/lineaGT/reference/run_viber.html</loc>
   </url>
 </urlset>
