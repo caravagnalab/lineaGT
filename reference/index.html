@@ -50,9 +50,9 @@
     </div>
 
     <div class="section level2">
-      <h2 id="all-functions">All functions<a class="anchor" aria-label="anchor" href="#all-functions"></a></h2>
+      <h2 id="fit-function">Fit function<a class="anchor" aria-label="anchor" href="#fit-function"></a></h2>
       
-      
+      <p class="section-desc"></p><p>Main function to perform the fit of the model.</p>
 
       
     </div><div id="" class="section level2">
@@ -62,24 +62,30 @@
 
       <dl><dt>
           
-          <code><a href="filter_dataset.html">filter_dataset()</a></code> 
-        </dt>
-        <dd>Filters the input dataset.</dd>
-      </dl><dl><dt>
-          
           <code><a href="fit.html">fit()</a></code> 
         </dt>
         <dd>Creates an object of class <code>mvnmm</code>.</dd>
       </dl><dl><dt>
           
-          <code><a href="get_cov_dataframe.html">get_cov_dataframe()</a></code> 
+          <code><a href="filter_dataset.html">filter_dataset()</a></code> 
         </dt>
-        <dd>Retrieve the coverage dataframe.</dd>
-      </dl><dl><dt>
+        <dd>Filters the input dataset.</dd>
+      </dl></div><div class="section level2">
+      <h2 id="getter-functions">Getter functions<a class="anchor" aria-label="anchor" href="#getter-functions"></a></h2>
+      
+      <p class="section-desc"></p><p>Functions to extract the main elements of the fitted object.</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
           
-          <code><a href="get_covariance_Sigma.html">get_covariance_Sigma()</a></code> 
+          <code><a href="get_lineages.html">get_lineages()</a></code> 
         </dt>
-        <dd>Extract the estimated covariance matrices.</dd>
+        <dd>Extract the data lineages.</dd>
       </dl><dl><dt>
           
           <code><a href="get_dimensions.html">get_dimensions()</a></code> 
@@ -87,29 +93,24 @@
         <dd>Extract the model dimensions.</dd>
       </dl><dl><dt>
           
-          <code><a href="get_labels.html">get_labels()</a></code> 
-        </dt>
-        <dd>Extract the observations labels.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="get_lineages.html">get_lineages()</a></code> 
-        </dt>
-        <dd>Extract the data lineages.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="get_mean.html">get_mean()</a></code> 
-        </dt>
-        <dd>Extract the estimated mean parameters.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="get_sigma.html">get_sigma()</a></code> 
-        </dt>
-        <dd>Extract the estimated variance parameters.</dd>
-      </dl><dl><dt>
-          
           <code><a href="get_timepoints.html">get_timepoints()</a></code> 
         </dt>
         <dd>Extract the data timepoints.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="get_cov_dataframe.html">get_cov_dataframe()</a></code> 
+        </dt>
+        <dd>Retrieve the coverage dataframe.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="get_vaf_dataframe.html">get_vaf_dataframe()</a></code> 
+        </dt>
+        <dd>Retrieve the mutations dataframe.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="get_labels.html">get_labels()</a></code> 
+        </dt>
+        <dd>Extract the observations labels.</dd>
       </dl><dl><dt>
           
           <code><a href="get_unique_labels.html">get_unique_labels()</a></code> 
@@ -122,9 +123,19 @@
         <dd>Retrieve the list of unique labels of mutation clusters.</dd>
       </dl><dl><dt>
           
-          <code><a href="get_vaf_dataframe.html">get_vaf_dataframe()</a></code> 
+          <code><a href="get_mean.html">get_mean()</a></code> 
         </dt>
-        <dd>Retrieve the mutations dataframe.</dd>
+        <dd>Extract the estimated mean parameters.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="get_sigma.html">get_sigma()</a></code> 
+        </dt>
+        <dd>Extract the estimated variance parameters.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="get_covariance_Sigma.html">get_covariance_Sigma()</a></code> 
+        </dt>
+        <dd>Extract the estimated covariance matrices.</dd>
       </dl><dl><dt>
           
           <code><a href="get_weights.html">get_weights()</a></code> 
@@ -135,21 +146,22 @@
           <code><a href="get_z_probs.html">get_z_probs()</a></code> 
         </dt>
         <dd>Extract the estimated posterior probabilities.</dd>
-      </dl><dl><dt>
+      </dl></div><div class="section level2">
+      <h2 id="visualization-functions">Visualization functions<a class="anchor" aria-label="anchor" href="#visualization-functions"></a></h2>
+      
+      <p class="section-desc"></p><p>Functions to visualize the fit results.</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
           
-          <code><a href="plot.mvnmm.html">plot(<i>&lt;mvnmm&gt;</i>)</a></code> 
+          <code><a href="plot_scatter_density.html">plot_scatter_density()</a></code> 
         </dt>
-        <dd>2D scatter and density plot</dd>
-      </dl><dl><dt>
-          
-          <code><a href="plot_exp_fit.html">plot_exp_fit()</a></code> 
-        </dt>
-        <dd>Exponential fitting</dd>
-      </dl><dl><dt>
-          
-          <code><a href="plot_exp_rate.html">plot_exp_rate()</a></code> 
-        </dt>
-        <dd>Exponential rate</dd>
+        <dd>2D scatterplot and density</dd>
       </dl><dl><dt>
           
           <code><a href="plot_marginal.html">plot_marginal()</a></code> 
@@ -162,21 +174,43 @@
         <dd>Muller plot</dd>
       </dl><dl><dt>
           
-          <code><a href="plot_scatter_density.html">plot_scatter_density()</a></code> 
+          <code><a href="plot_exp_fit.html">plot_exp_fit()</a></code> 
         </dt>
-        <dd>2D scatterplot and density</dd>
+        <dd>Exponential fitting</dd>
+      </dl><dl><dt>
+          
+          <code><a href="plot_exp_rate.html">plot_exp_rate()</a></code> 
+        </dt>
+        <dd>Exponential rate</dd>
       </dl><dl><dt>
           
           <code><a href="plot_vaf.html">plot_vaf()</a></code> 
         </dt>
         <dd>VAF scatterplot</dd>
-      </dl><dl><dt>
+      </dl></div><div class="section level2">
+      <h2 id="s-object-methods">S3 object methods<a class="anchor" aria-label="anchor" href="#s-object-methods"></a></h2>
+      
+      <p class="section-desc"></p><p>Print and plot methods for the fitted object.</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
           
           <code><a href="print.mvnmm.html">print(<i>&lt;mvnmm&gt;</i>)</a></code> 
         </dt>
         <dd>Print method</dd>
+      </dl><dl><dt>
+          
+          <code><a href="plot.mvnmm.html">plot(<i>&lt;mvnmm&gt;</i>)</a></code> 
+        </dt>
+        <dd>2D scatter and density plot</dd>
       </dl></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
