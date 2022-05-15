@@ -14,7 +14,7 @@ get_binomial_theta = function(x) {
     theta %>%
       tidyr::pivot_longer(cols=starts_with("v."), names_to="v.timepoints.lineage", values_to="theta") %>%
       separate(v.timepoints.lineage, into=c("else","timepoints","lineage")) %>%
-      mutate("else"=NULL)
+      mutate("else"=NULL, theta=theta*100)
   )
 }
 
