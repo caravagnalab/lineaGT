@@ -10,6 +10,7 @@ reference:
   desc: Main function to perform the fit of the model.
   contents:
   - fit
+  - filter_dataset
 
 - title: Getter functions
   desc:  Functions to extract the main elements of the fitted object.
