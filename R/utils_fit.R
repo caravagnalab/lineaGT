@@ -33,7 +33,7 @@ initialize_object = function(K, dataset) {
   if (!is.null(dataset$timepoints %>% levels())) timepoints = dataset$timepoints %>% levels()
   else timepoints = dataset$timepoints %>% unique()
 
-  df = long_to_wide_input(dataset)
+  df = long_to_wide_cov(dataset)
   columns = df %>% dplyr::select(dplyr::starts_with("cov")) %>% colnames()
   IS = df$IS
 

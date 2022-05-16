@@ -38,7 +38,7 @@ get_python_dataframe = function(py_model) {
       dataset$labels_init = labels_init }, silent = T)
   }, silent = T)
 
-  return(dataset %>% wide_to_long_input())
+  return(dataset %>% wide_to_long_cov())
 }
 
 

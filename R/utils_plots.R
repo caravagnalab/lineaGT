@@ -5,6 +5,7 @@ get_pairs = function(dataset, columns) {
   return(comb)
 }
 
+
 # To compute the Gaussian multivariate density given a fitted object
 compute_density = function(x) {
   mean = get_mean(x)
@@ -81,7 +82,7 @@ get_muller_pop = function(x, means=list()) {
     mutate(Generation=dplyr::case_when(grepl("early", Generation) ~ "60",
                                        grepl("mid", Generation) ~ "140",
                                        grepl("late", Generation) ~ "280",
-                                       grepl("init", Generation) ~ "1")) %>%
+                                       grepl("init", Generation) ~ "0")) %>%
     mutate(Generation=as.numeric(Generation)) %>%
     group_by(Identity, Lineage) %>%
     mutate(lm_a=coef(lm(log1p(Population)~Generation))[1],

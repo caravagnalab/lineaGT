@@ -1,4 +1,5 @@
-long_to_wide_input = function(dataset) {
+
+long_to_wide_cov = function(dataset) {
   ## transforms the input dataset from long to wide format
   ## input columns are: "coverage", "timepoints", "lineage", "IS"
 
@@ -21,7 +22,7 @@ long_to_wide_muts = function(vaf.df) {
 }
 
 
-wide_to_long_input = function(dataset) {
+wide_to_long_cov = function(dataset) {
   return(
     dataset %>%
       tidyr::pivot_longer(cols=starts_with("cov"), names_to="else.time.lineage", values_to="coverage") %>%
