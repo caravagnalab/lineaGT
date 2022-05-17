@@ -19,7 +19,7 @@ LazyData: true
 Config/reticulate:
   list(
     packages = list(
-      list(package="pylineaGT", pip=TRUE)
+      list(package = "pylineaGT", pip = TRUE)
     )
   )
 Imports:
