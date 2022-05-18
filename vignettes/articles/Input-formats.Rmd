@@ -21,7 +21,7 @@ library(magrittr)
 ```
 
 ```{r message=FALSE, warning=FALSE}
-# lineaGT::configure_environment()
+lineaGT::configure_environment()
 ```
 
 The dataset can be filtered calling the `filter_dataset()` function.
