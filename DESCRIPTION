@@ -16,12 +16,6 @@ Description: This package provides algorithms for multi-lineage inference from
 License: GNU
 Encoding: UTF-8
 LazyData: true
-Config/reticulate:
-  list(
-    packages = list(
-      list(package = "pylineaGT", pip = TRUE)
-    )
-  )
 Imports:
     reticulate,
     tidyr,

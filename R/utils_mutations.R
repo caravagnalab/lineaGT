@@ -26,9 +26,9 @@ check_dp = function(vaf.df, x) {
   # mean coverage for the corresponding cluster when 0 again
   return(
     vaf.df %>%
-      group_by(lineage, mutation, IS) %>%
-      mutate(dp=ifelse(dp==0, ceiling(mean(dp)), dp)) %>%
-      ungroup() %>%
+      # group_by(lineage, mutation, IS) %>%
+      # mutate(dp=ifelse(dp==0, ceiling(mean(dp)), dp)) %>%
+      # ungroup() %>%
       mutate(dp=ifelse(dp==0, ceiling(get_mean(x)[labels,paste("cov",timepoints,lineage,sep=".")]), dp))
   )
 }
@@ -49,7 +49,7 @@ annotate_vaf_df = function(vaf.df, x, min_frac=0) {
 }
 
 
-# Function to get from a vaf dataframe obtained by get_vaf_df() the input for a VIBER run
+# Function to get from a vaf dataframe obtained by vaf_df_from_file() the input for a VIBER run
 get_input_viber = function(vaf.df, x) {
   vaf.df_wide = check_dp(vaf.df, x) %>% long_to_wide_muts()
 

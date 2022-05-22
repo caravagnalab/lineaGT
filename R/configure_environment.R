@@ -8,18 +8,30 @@
 #' @param env_name name of the \code{conda} environment to use, if available.
 #'
 #' @importFrom reticulate import conda_create conda_install install_miniconda miniconda_path
-#'
 #' @export configure_environment
 
-configure_environment = function(env_name="r-reticulate") {
-  tryCatch(expr = { reticulate::conda_install(env_name, "pylineaGT", pip=TRUE) },
-           error = function(e) {
-             tryCatch(expr = {
-               reticulate::conda_create("r-reticulate")
-               },
-               error = function (e) { reticulate::install_miniconda(path=reticulate::miniconda_path(), update=TRUE, force=TRUE) },
-               finally = reticulate::conda_install("r-reticulate", "pylineaGT", pip=TRUE)
-             )
-             }
-           )
+configure_environment = function(env_name="lineagt_env") {
+  tryCatch(
+    # try to import the python package
+    expr = { reticulate::import("pylineaGT") },
+    error = function(e) {
+      tryCatch(
+        # try to install the package in the already created environment
+        expr = { reticulate::conda_install(env_name, "pylineaGT", pip=TRUE) },
+        error = function(e) {
+          # try to create the virtual environment
+          tryCatch(expr = { reticulate::conda_create("lineagt_env") },
+                   error = function (e) {
+                     # install miniconda and the virtual environment
+                     reticulate::install_miniconda()
+                     reticulate::conda_create("lineagt_env") },
+                   # install the python package
+                   finally = reticulate::conda_install("lineagt_env", "pylineaGT", pip=TRUE)
+          )
+          }
+      )
+      }
+    )
+
+  reticulate::use_condaenv("lineagt_env", required=TRUE)
 }
