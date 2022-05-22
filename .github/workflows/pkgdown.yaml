@@ -29,17 +29,10 @@ jobs:
         with:
           extra-packages: pkgdown
           needs: website
-          
-      - uses: actions/setup-python@v1
-        with:
-          python-version: '3.8'
          
-#       - name: Setup r-reticulate env
-#         run: |
-#           reticulate::virtualenv_create("r-reticulate", Sys.which("python"))
-#           reticulate::virtualenv_install("r-reticulate", "pylineaGT", pip=TRUE)
-#         shell: Rscript {0}
-
+      - name: Install package
+        run: R CMD INSTALL .
+        
       - name: Build and deploy pkgdown site
         if: contains(env.isPush, 'true')
         run: |
