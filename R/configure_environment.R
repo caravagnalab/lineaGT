@@ -11,6 +11,8 @@
 #' @export configure_environment
 
 configure_environment = function(env_name="lineagt-env") {
+  Sys.unsetenv("RETICULATE_PYTHON")
+  
   tryCatch(
     # try to import the python package
     expr = { reticulate::import("pylineaGT") },
