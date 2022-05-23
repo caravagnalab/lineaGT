@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-lineaGT::configure_environment()
+# lineaGT::configure_environment()
 library(lineaGT)
 library(magrittr)
 ```
