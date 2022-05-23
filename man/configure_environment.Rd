@@ -4,7 +4,7 @@
 \alias{configure_environment}
 \title{Configure the reticulate environment}
 \usage{
-configure_environment(env_name = "lineagt-env")
+configure_environment()
 }
 \arguments{
 \item{env_name}{name of the \code{conda} environment to use, if available.}
