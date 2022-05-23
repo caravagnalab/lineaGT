@@ -47,9 +47,11 @@ fit = function(cov.df,
   losses = data.frame(matrix(nrow=0, ncol=steps)); colnames(losses) = paste("iter_", 1:steps, sep="")
   grads = data.frame(matrix(nrow=0, ncol=steps)); colnames(grads) = paste("iter_", 1:steps, sep="")
 
+  py_pkg = reticulate::import("pylineaGT")
+
   for (k in as.integer(k_interval[1]):as.integer(k_interval[2])) {
     for (run in 1:n_runs) {
-      x_k = single_fit(k, cov.df, run, steps, covariance, lr, p, convergence, random_state)
+      x_k = single_fit(k, cov.df, run, steps, covariance, lr, p, convergence, random_state, py_pkg)
 
       kk = x_k$K
       n_iter = x_k$n_iter
@@ -59,20 +61,44 @@ fit = function(cov.df,
       grads[paste(kk, run, "mean", sep=":"), 1:n_iter] = x_k$gradients$mean
       grads[paste(kk, run, "sigma", sep=":"), 1:n_iter] = x_k$gradients$sigma
       grads[paste(kk, run, "weights", sep=":"), 1:n_iter] = x_k$gradients$weights
-
-      gc()
     }
+
   }
+
   selection = list("ic"=ic, "losses"=losses, "grads"=grads)
 
   best_k = get_best_k(selection, method="BIC")
-  x = single_fit(best_k, cov.df, steps=steps, lr=lr)
+  x = single_fit(best_k, cov.df, steps=steps, lr=lr, py_pkg)
   x$runs = selection
 
-  vaf.df = annotate_vaf_df(vaf.df=vaf.df, x=x, min_frac=min_frac)
   x = run_viber(x, vaf.df, min_frac=min_frac)
 
   return(x)
 }
+
+
+
+
+
+# exp = "homo_ltr"
+# for (exp in c("homo_ltr", "homo_pgk", "wt_ltr", "wt_pgk")) {
+#   cov.df.csv = paste("../LineaGT_data/murine/",
+#                      toupper(exp), "/", toupper(exp), ".cov.csv", sep="")
+#   cov.df = cov.df.csv %>% read.csv() %>%
+#     tidyr::pivot_longer(cols=starts_with("cov"), names_to="timepoints", values_to="coverage") %>%
+#     separate(timepoints, into=c("else","timepoints"), sep="_") %>% mutate("else"=NULL)
+#
+#   vaf.df.csv = paste("../LineaGT_data/murine/",
+#                      toupper(exp), "/", toupper(exp), ".vaf.csv", sep="")
+#   vaf.df = vaf.df.csv %>% lineaGT:::vaf_df_from_file()
+#
+#   experiment_list = cov.df$experiment %>% unique()
+#
+#   for (exp_id in experiment_list) {
+#     cov.df.e = cov.df %>% filter(experiment == exp_id) %>% lineaGT::filter_dataset()
+#     vaf.df.e = vaf.df %>% filter(experiment == exp_id)
+#     x.e = lineaGT::fit(cov.df.e, vaf.df.e, k_interval=c(10,20), n_runs=1)
+#   }
+# }
 
 

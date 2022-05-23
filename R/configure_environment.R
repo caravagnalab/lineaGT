@@ -63,28 +63,3 @@ using_lineagt_conda_env = function() {
   grepl("lineagt-env", config$python)
 }
 
-
-
-# configure_environment = function(env_name="lineagt-env") {
-#   tryCatch(
-#     # try to import the python package
-#     expr = { reticulate::import("pylineaGT") },
-#     error = function(e) {
-#       tryCatch(
-#         # try to install the package in the already created environment
-#         expr = { reticulate::conda_install(env_name, "pylineaGT", pip=TRUE) },
-#         error = function(e) {
-#           # try to create the virtual environment
-#           tryCatch(expr = { reticulate::conda_create("lineagt-env") },
-#                    error = function (e) {
-#                      # install miniconda and the virtual environment
-#                      reticulate::install_miniconda()
-#                      reticulate::conda_create("lineagt-env") },
-#                    # install the python package
-#                    finally = reticulate::conda_install("lineagt-env", "pylineaGT", pip=TRUE)
-#           )
-#           }
-#       )
-#       }
-#     )
-# }

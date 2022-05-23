@@ -1,10 +1,10 @@
 # Function to perform a single run of the model
 single_fit = function(k, df, run=NULL, steps=500, covariance="diag", lr=0.001,
-                      p=0.01, convergence=TRUE, random_state=25) {
+                      p=0.01, convergence=TRUE, random_state=25, py_pkg=NULL) {
 
   print(paste("RUN", run, "- K =", k))
 
-  x = initialize_object(k, df)
+  x = initialize_object(k, df, py_pkg)
   x = run_inference(x,
                     steps=as.integer(steps),
                     covariance=covariance,
@@ -25,9 +25,8 @@ single_fit = function(k, df, run=NULL, steps=500, covariance="diag", lr=0.001,
 
 # Function to initialize a python model
 # takes as input the long dataframe
-initialize_object = function(K, dataset) {
-
-  py_pkg = reticulate::import("pylineaGT")
+initialize_object = function(K, dataset, py_pkg=NULL) {
+  if (is.null(py_pkg)) py_pkg = reticulate::import("pylineaGT")
 
   lineages = dataset$lineage %>% unique()
   if (!is.null(dataset$timepoints %>% levels())) timepoints = dataset$timepoints %>% levels()

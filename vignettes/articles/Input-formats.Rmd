@@ -16,14 +16,10 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-# lineaGT::configure_environment()
 library(lineaGT)
 library(magrittr)
 ```
 
-```{r message=FALSE, warning=FALSE}
-# lineaGT::configure_environment()
-```
 
 The dataset can be filtered calling the `filter_dataset()` function.
 

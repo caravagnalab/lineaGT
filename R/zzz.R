@@ -5,6 +5,7 @@
 
   if (have_lineagt_conda_env()) {
     use_lineagt_conda_env()
+    # py_pkg <<- reticulate::import("pylineaGT")
   }
 
 }

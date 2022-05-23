@@ -25,7 +25,7 @@ filter_dataset = function(cov.df,
                           random_state=25) {
 
   py_pkg = reticulate::import("pylineaGT")
-  x = initialize_object(K=as.integer(1), dataset=cov.df)
+  x = initialize_object(K=as.integer(1), dataset=cov.df, py_pkg)
   x$py_model$filter_dataset(min_cov=as.integer(min_cov),
                             min_ccf=as.numeric(min_frac),
                             metric=metric,

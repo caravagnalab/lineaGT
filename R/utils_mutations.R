@@ -19,18 +19,24 @@ get_binomial_theta = function(x) {
 }
 
 
-check_dp = function(vaf.df, x) {
-  # vaf_df is the dataframe from vaf_df_from_file
-  # returns a dataframe with same structure but dp_early/mid/late equals the
-  # mean of the other timepoints when 0
-  # mean coverage for the corresponding cluster when 0 again
-  return(
-    vaf.df %>%
-      # group_by(lineage, mutation, IS) %>%
-      # mutate(dp=ifelse(dp==0, ceiling(mean(dp)), dp)) %>%
-      # ungroup() %>%
-      mutate(dp=ifelse(dp==0, ceiling(get_mean(x)[labels,paste("cov",timepoints,lineage,sep=".")]), dp))
-  )
+check_dp = function(vaf.df, x, thr=5) {
+  means = x %>% get_mean() %>%
+    as.data.frame() %>% tibble::rownames_to_column(var="labels") %>%
+    dplyr::mutate(labels=factor(labels, levels=unique(labels))) %>%
+    tidyr::pivot_longer(cols=starts_with("cov"), names_to="cov.timepoints.lineage", values_to="mean_cov") %>%
+    tidyr::separate(cov.timepoints.lineage, into=c("else", "timepoints", "lineage"), sep="[.]") %>%
+    dplyr::mutate("else"=NULL)
+
+  joined = dplyr::inner_join(vaf.df, means, by=c("labels", "timepoints", "lineage")) %>%
+    dplyr::mutate(original_dp=dp) %>%
+    dplyr::mutate(dp=ceiling(mean_cov)) %>%
+    dplyr::rowwise() %>% dplyr::mutate(dp=max(dp,original_dp)) %>%
+    dplyr::mutate(alt=ceiling(vaf/100*dp)) %>%
+    dplyr::group_by(labels) %>%
+    dplyr::mutate(dp=ifelse(dp < thr, mean(dp) %>% as.integer(), dp)) %>%
+    dplyr::ungroup()
+
+  return(joined)
 }
 
 
@@ -51,15 +57,19 @@ annotate_vaf_df = function(vaf.df, x, min_frac=0) {
 
 # Function to get from a vaf dataframe obtained by vaf_df_from_file() the input for a VIBER run
 get_input_viber = function(vaf.df, x) {
-  vaf.df_wide = check_dp(vaf.df, x) %>% long_to_wide_muts()
-
-  trials = vaf.df_wide %>% dplyr::select(starts_with("dp"), labels) %>%
-    rename_with(.fn=~str_replace_all(.x,"dp.",""))
-
-  successes = vaf.df_wide %>% dplyr::select(starts_with("alt"), labels) %>%
-    rename_with(.fn=~str_replace_all(.x,"alt.",""))
-
+  vaf.df_wide = vaf.df %>% long_to_wide_muts()
+  trials = vaf.df_wide %>% dplyr::select(starts_with("dp"),
+                                         labels) %>% rename_with(.fn = ~str_replace_all(.x, "dp.", ""))
+  successes = vaf.df_wide %>% dplyr::select(starts_with("alt"),
+                                            labels) %>% rename_with(.fn = ~str_replace_all(.x, "alt.", ""))
   return(list("successes"=successes, "trials"=trials, "vaf.df"=vaf.df_wide))
+}
+
+
+filter_muts = function(vaf.df) {
+  vaf.df %>% group_by(mutation, lineage, labels) %>%
+    dplyr::mutate(vaf_diff=vaf-dplyr::lag(vaf), vaf_diff=ifelse(is.na(vaf_diff),0,vaf_diff)) %>%
+    dplyr::filter(any(abs(vaf_diff)>40)) %>% View
 }
 
 

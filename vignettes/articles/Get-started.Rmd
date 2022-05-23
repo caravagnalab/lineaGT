@@ -1,0 +1,36 @@
+---
+title: "Get started"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Input formats}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+### Installation of the package
+
+You can install LineaGT from GitHub using `devtools`
+```{r setup}
+devtools::install_github("caravagnalab/lineaGT")
+```
+
+Load the package.
+```{r}
+library(lineaGT)
+```
+
+### Helper function to install the Python dependencies
+A `conda` environment can be configured running the `configure_environment()` function.
+```{r}
+configure_environment()
+```
+
+The function will first check if a Anaconda or Miniconda installation is available, otherwise it will prompt a Miniconda installation.
+Then, if the `conda` environment `lineagt-env` is not availabe, it will create it and the required `Python` dependecies will be installed in the environment.

@@ -44,8 +44,8 @@ reference:
   contents:
   - print.mvnmm
   - plot.mvnmm
-  
-- title: Other functions
-  desc: Other functions
-  contents: 
+
+- title: Helper functions
+  desc: Function to configure and install the required dependencies.
+  contents:
   - configure_environment
