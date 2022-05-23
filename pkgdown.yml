@@ -2,11 +2,12 @@ pandoc: 2.7.3
 pkgdown: 2.0.3
 pkgdown_sha: ~
 articles:
+  Get-started: Get-started.html
   Input-formats: Input-formats.html
   Lineage-inference: Lineage-inference.html
   Plotting-functions: Plotting-functions.html
   Utilities: Utilities.html
-last_built: 2022-05-16T20:49Z
+last_built: 2022-05-23T14:33Z
 urls:
   reference: caravagnalab.github.io/lineaGT/reference
   article: caravagnalab.github.io/lineaGT/articles
