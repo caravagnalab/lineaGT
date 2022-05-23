@@ -30,10 +30,10 @@ jobs:
           extra-packages: pkgdown
           needs: website
 
-      - name: Install package
-        run: |
-          R CMD INSTALL .
-          Rscript -e 'lineagt::configure_environment()'
+      # - name: Install package
+      #   run: |
+      #     R CMD INSTALL .
+      #     Rscript -e 'lineaGT::configure_environment()'
 
       - name: Build and deploy pkgdown site
         if: contains(env.isPush, 'true')

@@ -77,28 +77,3 @@ fit = function(cov.df,
 }
 
 
-
-
-
-# exp = "homo_ltr"
-# for (exp in c("homo_ltr", "homo_pgk", "wt_ltr", "wt_pgk")) {
-#   cov.df.csv = paste("../LineaGT_data/murine/",
-#                      toupper(exp), "/", toupper(exp), ".cov.csv", sep="")
-#   cov.df = cov.df.csv %>% read.csv() %>%
-#     tidyr::pivot_longer(cols=starts_with("cov"), names_to="timepoints", values_to="coverage") %>%
-#     separate(timepoints, into=c("else","timepoints"), sep="_") %>% mutate("else"=NULL)
-#
-#   vaf.df.csv = paste("../LineaGT_data/murine/",
-#                      toupper(exp), "/", toupper(exp), ".vaf.csv", sep="")
-#   vaf.df = vaf.df.csv %>% lineaGT:::vaf_df_from_file()
-#
-#   experiment_list = cov.df$experiment %>% unique()
-#
-#   for (exp_id in experiment_list) {
-#     cov.df.e = cov.df %>% filter(experiment == exp_id) %>% lineaGT::filter_dataset()
-#     vaf.df.e = vaf.df %>% filter(experiment == exp_id)
-#     x.e = lineaGT::fit(cov.df.e, vaf.df.e, k_interval=c(10,20), n_runs=1)
-#   }
-# }
-
-
