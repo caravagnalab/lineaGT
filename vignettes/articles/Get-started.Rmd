@@ -23,8 +23,9 @@ devtools::install_github("caravagnalab/lineaGT")
 
 Load the package.
 ```{r}
-library(lineaGT)
+library(lineaGT) 
 ```
+
 
 ### Helper function to install the Python dependencies
 A `conda` environment can be configured running the `configure_environment()` function.
