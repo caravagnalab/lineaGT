@@ -34,11 +34,11 @@ jobs:
         run: |
           R CMD INSTALL .
 
-      - name: Install dependencies
-        run: |
-          library(lineaGT)
-          configure_environment()
-        shell: Rscript {0}
+#       - name: Install dependencies
+#         run: |
+#           library(lineaGT)
+#           configure_environment()
+#         shell: Rscript {0}
 
       - name: Build and deploy pkgdown site
         if: contains(env.isPush, 'true')
