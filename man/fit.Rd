@@ -6,7 +6,7 @@
 \usage{
 fit(
   cov.df,
-  vaf.df,
+  vaf.df = NULL,
   k_interval = c(10, 30),
   n_runs = 3,
   steps = 500,
@@ -15,6 +15,9 @@ fit(
   convergence = TRUE,
   covariance = "diag",
   min_frac = 0,
+  show_progr = TRUE,
+  store_grads = TRUE,
+  store_losses = TRUE,
   random_state = 25
 )
 }

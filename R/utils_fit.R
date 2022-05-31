@@ -1,5 +1,5 @@
 # Function to perform a single run of the model
-single_fit = function(k, df, run=NULL, steps=500, covariance="diag", lr=0.001,
+fit_singleK = function(k, df, run="", steps=500, covariance="diag", lr=0.001,
                       p=0.01, convergence=TRUE, random_state=25, py_pkg=NULL) {
 
   print(paste("RUN", run, "- K =", k))

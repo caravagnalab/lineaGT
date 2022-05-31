@@ -51,9 +51,9 @@ check_conda_env = function(envname="lineagt-env", use_default=F) {
     if (use_default) answ = "create"
     else {
       cat("Do you want to load an existing environment, to create a new one named 'lineagt-env' or to cancel?\n")
-    cat("(load/create/cancel)\n")
-    answ = readline()
-    }
+      cat("(load/create/cancel)\n")
+      answ = readline()
+      }
 
     if (answ == "create") {
       envname = "lineagt-env"
@@ -76,74 +76,20 @@ check_conda_env = function(envname="lineagt-env", use_default=F) {
 }
 
 
-have_loaded_env = function() {
-  return(grepl("envs", reticulate::py_discover_config()$python))
-}
-
-
 check_python_deps = function(envname="lineagt-env", use_default=F) {
-  if (!have_python_deps(envname)) {
-    cat(paste("The required Python packages are not installed in the '", envname, "' environment.\n", sep=""))
-
-    if (use_default) answ = "yes"
-    else {
-      cat("Proceed with the installation?\n")
-      cat("(yes/no)\n")
-      answ = readline()
-    }
-
-    if (answ == "yes") install_python_deps(envname)
-    else return()
-  }
-}
-
-
-have_python_deps = function(envname="lineagt-env", packages="pylineagt") {
-    tryCatch(expr = packages %in% reticulate::py_list_packages(envname)$package,
-             error = function(e) FALSE)
-}
-
-
-# find out whether the user has conda installed and visible
-have_conda = function() {
-  conda_bin = tryCatch(reticulate::conda_binary("auto"),
-                       error = function(e) NULL)
-  !is.null(conda_bin)
-}
-
-
-install_miniconda_lineagt = function() {
-  reticulate::install_miniconda()
-}
-
-
-have_conda_env = function(envname="lineagt-env"){
-  tryCatch(expr = envname %in% reticulate::conda_list()$name,
-           error = function(e) FALSE )
-}
-
-
-create_conda_env = function(envname="lineagt-env") {
-  reticulate::conda_create(envname=envname)
-}
-
-
-install_python_deps = function(envname="lineagt-env") {
-  reticulate::conda_install(envname=envname, packages=c("pylineaGT"), pip=TRUE)
-}
-
-
-use_conda_env = function(envname="lineagt-env") {
-  Sys.unsetenv("RETICULATE_PYTHON")
-  tryCatch(
-    expr = reticulate::use_condaenv(envname, required=TRUE),
-    error = function(e) NULL
-  )
-}
-
-
-using_conda_env = function(envname="lineagt-env") {
-  config = reticulate::py_discover_config()
-  grepl(envname, config$python)
+  try(expr = install_python_deps(envname), silent = TRUE)
+  # if (!have_python_deps(envname)) {
+  #   cat(paste("The required Python packages are not installed in the '", envname, "' environment.\n", sep=""))
+  #
+  #   if (use_default) answ = "yes"
+  #   else {
+  #     cat("Proceed with the installation?\n")
+  #     cat("(yes/no)\n")
+  #     answ = readline()
+  #   }
+  #
+  #   if (answ == "yes") install_python_deps(envname)
+  #   else return()
+  # }
 }
 

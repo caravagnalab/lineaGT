@@ -17,7 +17,7 @@
 #' specific of the dataset, the input IS and column names, a list params that will contain the
 #' inferred parameters, the python object
 #'
-#' @importFrom dplyr filter mutate select group_by inner_join rename_with case_when all_of ungroup
+#' @importFrom dplyr filter mutate select group_by inner_join rename_with case_when all_of ungroup slice
 #' @importFrom tidyr separate unite pivot_wider pivot_longer tibble
 #' @importFrom magrittr %>%
 #' @importFrom stringr str_replace_all
@@ -32,7 +32,7 @@
 #' @export fit
 
 fit = function(cov.df,
-               vaf.df,
+               vaf.df=NULL,
                k_interval=c(10,30),
                n_runs=3,
                steps=500,
@@ -41,37 +41,34 @@ fit = function(cov.df,
                convergence=TRUE,
                covariance="diag",
                min_frac=0,
+               show_progr=TRUE,
+               store_grads=TRUE,
+               store_losses=TRUE,
                random_state=25) {
-
-  ic = data.frame(matrix(nrow=0, ncol=4)); colnames(ic) = c("BIC", "AIC", "ICL", "NLL")
-  losses = data.frame(matrix(nrow=0, ncol=steps)); colnames(losses) = paste("iter_", 1:steps, sep="")
-  grads = data.frame(matrix(nrow=0, ncol=steps)); colnames(grads) = paste("iter_", 1:steps, sep="")
 
   py_pkg = reticulate::import("pylineaGT")
 
-  for (k in as.integer(k_interval[1]):as.integer(k_interval[2])) {
-    for (run in 1:n_runs) {
-      x_k = single_fit(k, cov.df, run, steps, covariance, lr, p, convergence, random_state, py_pkg)
+  out = py_pkg$run_inference$Run(cov_df=cov.df %>% long_to_wide_cov(),
+                                 lineages=cov.df$lineage %>% unique(),
+                                 k_interval=list(as.integer(k_interval[1]), as.integer(k_interval[2])),
+                                 n_runs=as.integer(n_runs),
+                                 steps=as.integer(steps),
+                                 lr=as.numeric(lr),
+                                 p=as.numeric(p),
+                                 convergence=convergence,
+                                 covariance=covariance,
+                                 show_progr=show_progr,
+                                 store_grads=store_grads,
+                                 store_losses=store_losses,
+                                 random_state=as.integer(random_state))
 
-      kk = x_k$K
-      n_iter = x_k$n_iter
-
-      ic[paste(kk, run,sep=":"),] = x_k$IC
-      losses[paste(kk, run, sep=":"),1:n_iter] = x_k$losses
-      grads[paste(kk, run, "mean", sep=":"), 1:n_iter] = x_k$gradients$mean
-      grads[paste(kk, run, "sigma", sep=":"), 1:n_iter] = x_k$gradients$sigma
-      grads[paste(kk, run, "weights", sep=":"), 1:n_iter] = x_k$gradients$weights
-    }
-
-  }
-
-  selection = list("ic"=ic, "losses"=losses, "grads"=grads)
+  selection = list("ic"=out[[1]], "losses"=out[[2]], "grads"=out[[3]])
 
   best_k = get_best_k(selection, method="BIC")
-  x = single_fit(best_k, cov.df, steps=steps, lr=lr, py_pkg)
+  x = fit_singleK(best_k, cov.df, steps=steps, lr=lr, py_pkg)
   x$runs = selection
 
-  x = run_viber(x, vaf.df, min_frac=min_frac)
+  if (!is.null(vaf.df)) x = run_viber(x, vaf.df, min_frac=min_frac)
 
   return(x)
 }
