@@ -77,7 +77,8 @@ check_conda_env = function(envname="lineagt-env", use_default=F) {
 
 
 check_python_deps = function(envname="lineagt-env", use_default=F) {
-  try(expr = install_python_deps(envname), silent = TRUE)
+  try(install_python_deps(envname), silent=T)
+
   # if (!have_python_deps(envname)) {
   #   cat(paste("The required Python packages are not installed in the '", envname, "' environment.\n", sep=""))
   #

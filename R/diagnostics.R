@@ -1,16 +1,3 @@
-# get_best_k = function(selection, method="BIC") {
-#   best = get_ic(selection) %>%
-#     group_by(K, variable) %>%
-#     dplyr::summarise(value_best=min(value))
-#
-#   best_k = ((best %>% filter(variable=="BIC"))[(best %>% filter(variable=="BIC"))$value_best %>%
-#                                                  which.min(),"K"] %>%
-#               as.data.frame())[1,"K"] %>% droplevels() %>% levels() %>% as.integer()
-#
-#   return(best_k)
-# }
-
-
 get_best_k = function(selection, method="BIC") {
   return(selection$ic %>%
            reshape2::melt(id=c("K","run"), variable.name="mm") %>%
@@ -22,30 +9,24 @@ get_best_k = function(selection, method="BIC") {
 }
 
 
-get_ic = function(selection) {
-  return(selection$ic %>%
+get_IC = function(x) {
+  return(x$runs$ic %>%
            reshape2::melt(id=c("K","run"), variable.name="method") %>%
            dplyr::as_tibble() %>%
            dplyr::mutate(K=as.integer(K), run=as.integer(run)))
-  # ic_df = selection$ic %>% tibble::rownames_to_column(var="k:run") %>%
-  #   reshape2::melt(id=c("k:run")) %>%
-  #   separate("k:run", into=c("K", "run"), sep=":") %>%
-  #   mutate(K=as.integer(K)) %>%
-  #   mutate(K=factor(K, levels=paste(sort(K %>% unique()))))
-  #
-  # return(ic_df)
 }
 
 
-get_losses = function(selection) {
-  return(selection$losses %>%
-           dplyr::as_tibble() %>%
-           dplyr::mutate(K=as.integer(K), run=as.integer(run)))
+get_losses = function(x, runs=FALSE) {
+  if (runs) return(x$runs$losses %>%
+                     dplyr::as_tibble() %>%
+                     dplyr::mutate(K=as.integer(K), run=as.integer(run)))
+  return(x$losses)
 }
 
 
-get_gradient_norms = function(selection) {
-  return(selection$grads %>%
+get_gradient_norms = function(x) {
+  return(x$runs$grads %>%
            dplyr::as_tibble() %>%
            dplyr::mutate(K=as.integer(K),
                   run=as.integer(run),

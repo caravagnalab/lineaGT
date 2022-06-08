@@ -48,19 +48,19 @@ fit = function(cov.df,
 
   py_pkg = reticulate::import("pylineaGT")
 
-  out = py_pkg$run_inference$Run(cov_df=cov.df %>% long_to_wide_cov(),
-                                 lineages=cov.df$lineage %>% unique(),
-                                 k_interval=list(as.integer(k_interval[1]), as.integer(k_interval[2])),
-                                 n_runs=as.integer(n_runs),
-                                 steps=as.integer(steps),
-                                 lr=as.numeric(lr),
-                                 p=as.numeric(p),
-                                 convergence=convergence,
-                                 covariance=covariance,
-                                 show_progr=show_progr,
-                                 store_grads=store_grads,
-                                 store_losses=store_losses,
-                                 random_state=as.integer(random_state))
+  out = py_pkg$run_inference(cov_df=cov.df %>% long_to_wide_cov(),
+                             lineages=cov.df$lineage %>% unique(),
+                             k_interval=list(as.integer(k_interval[1]), as.integer(k_interval[2])),
+                             n_runs=as.integer(n_runs),
+                             steps=as.integer(steps),
+                             lr=as.numeric(lr),
+                             p=as.numeric(p),
+                             convergence=convergence,
+                             covariance=covariance,
+                             show_progr=show_progr,
+                             store_grads=store_grads,
+                             store_losses=store_losses,
+                             random_state=as.integer(random_state))
 
   selection = list("ic"=out[[1]], "losses"=out[[2]], "grads"=out[[3]])
 

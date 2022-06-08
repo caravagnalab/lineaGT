@@ -1,4 +1,4 @@
-run_viber = function(x, vaf.df, min_frac=0, highlight=list(), filter=FALSE) {
+run_viber = function(x, vaf.df, min_frac=0, highlight=list(), filter=FALSE, infer_phylo=TRUE) {
   vaf.df = annotate_vaf_df(vaf.df=vaf.df, x=x, min_frac=min_frac)
 
   x = add_vaf(x, vaf.df)
@@ -12,13 +12,17 @@ run_viber = function(x, vaf.df, min_frac=0, highlight=list(), filter=FALSE) {
   clusters_joined = intersect(select_relevant_clusters(x, min_frac), highlight)
 
   joined = data.frame()
-  fit_all = trees = plots = list()
+  fit_all = list()
+  if (infer_phylo) trees = plots = list()
   for (cluster in clusters_joined) {
-    fit_k = fit_cluster_viber(viber_input, cluster=cluster)
+    fit_k = fit_cluster_viber(viber_input, cluster=cluster, infer_phylo=infer_phylo)
     joined = rbind(joined, fit_k$df)
     fit_all[[cluster]] = fit_k$fit
-    trees[[cluster]] = fit_k$tree
-    plots[[cluster]] = fit_k$plot
+
+    if (infer_phylo) {
+      trees[[cluster]] = fit_k$tree
+      plots[[cluster]] = fit_k$plot
+    }
   }
 
   x$viber_run = fit_all
@@ -35,7 +39,7 @@ run_viber = function(x, vaf.df, min_frac=0, highlight=list(), filter=FALSE) {
 }
 
 
-fit_cluster_viber = function(viber_input, cluster) {
+fit_cluster_viber = function(viber_input, cluster, infer_phylo=TRUE) {
   viber_df_k = list("successes"=viber_input$successes %>% filter(labels==cluster) %>% dplyr::select(-labels),
                     "trials"=viber_input$trials %>% filter(labels==cluster) %>% dplyr::select(-labels),
                     "vaf.df"=viber_input$vaf.df %>% filter(labels==cluster))
@@ -53,10 +57,13 @@ fit_cluster_viber = function(viber_input, cluster) {
     labels = fit_viber$labels$cluster.Binomial
     viber_df_k$vaf.df$labels_viber = labels
     viber_df_k$vaf.df$pi_viber = fit_viber$pi_k[labels] %>% as.vector()
-    if (length(fit_viber$labels$cluster.Binomial %>% unique) > 1) {
-      tree_joint = VIBER::get_clone_trees(fit_viber)
-      plot_joint = ctree:::plot.ctree(tree_joint[[1]])
+
+    if (infer_phylo) {
+      tt = fit_trees(fit_viber)
+      tree_joint = tt$tree
+      plot_joint = tt$plot
     }
+
   }, silent = T)
 
   try(expr = {
@@ -69,4 +76,40 @@ fit_cluster_viber = function(viber_input, cluster) {
   return(list("df"=viber_df_k$vaf.df, "fit"=fit_viber, "tree"=tree_joint, "plot"=plot_joint))
 }
 
+
+fit_phylogenies = function(x, vaf.df=NULL, min_frac=0, highlight=list(), filter=FALSE) {
+
+  if (purrr::is_empty(highlight)) highlight = x %>% get_unique_labels()
+  clusters_joined = intersect(select_relevant_clusters(x, min_frac), highlight)
+
+  trees = plots = list()
+
+  if (!"viber_run" %in% names(x)) {
+    x = x %>% run_viber(vaf.df=vaf.df, highlight=clusters_joined)
+  }
+
+  for (cluster in clusters_joined) {
+    viber_run = x$viber_run[[cluster]]
+    tt = fit_trees(viber_run)
+    trees[[cluster]] = tt$tree
+    plots[[cluster]] = tt$plot
+  }
+
+  x$trees = trees
+  x$plots = plots
+
+  return(x)
+}
+
+
+# to infer the tree on a single cluster
+fit_trees = function(fit_viber) {
+  tree = plot = list()
+  if (length(fit_viber$labels$cluster.Binomial %>% unique) > 1) {
+    tree = VIBER::get_clone_trees(fit_viber)
+    plot = ctree:::plot.ctree(tree[[1]])
+  }
+
+  return(list("tree"=tree, "plot"=plot))
+}
 
