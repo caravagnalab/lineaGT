@@ -1,4 +1,3 @@
-
 long_to_wide_cov = function(dataset) {
   ## transforms the input dataset from long to wide format
   ## input columns are: "coverage", "timepoints", "lineage", "IS"

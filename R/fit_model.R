@@ -17,7 +17,8 @@
 #' specific of the dataset, the input IS and column names, a list params that will contain the
 #' inferred parameters, the python object
 #'
-#' @importFrom dplyr filter mutate select group_by inner_join rename_with case_when all_of ungroup slice
+#' @importFrom dplyr filter mutate select group_by inner_join rename_with
+#' @importFrom dplye case_when all_of ungroup slice pull
 #' @importFrom tidyr separate unite pivot_wider pivot_longer tibble
 #' @importFrom magrittr %>%
 #' @importFrom stringr str_replace_all
@@ -33,6 +34,7 @@
 
 fit = function(cov.df,
                vaf.df=NULL,
+               infer_phylogenies=TRUE,
                k_interval=c(10,30),
                n_runs=3,
                steps=500,
@@ -41,7 +43,7 @@ fit = function(cov.df,
                convergence=TRUE,
                covariance="diag",
                min_frac=0,
-               show_progr=TRUE,
+               show_progr=FALSE,
                store_grads=TRUE,
                store_losses=TRUE,
                random_state=25) {
@@ -65,10 +67,13 @@ fit = function(cov.df,
   selection = list("ic"=out[[1]], "losses"=out[[2]], "grads"=out[[3]])
 
   best_k = get_best_k(selection, method="BIC")
+
+  cat(paste("Found", best_k, "clones!"))
+
   x = fit_singleK(best_k, cov.df, steps=steps, lr=lr, py_pkg)
   x$runs = selection
 
-  if (!is.null(vaf.df)) x = run_viber(x, vaf.df, min_frac=min_frac)
+  if (!is.null(vaf.df)) x = run_viber(x, vaf.df, min_frac=min_frac, infer_phylo=infer_phylogenies)
 
   return(x)
 }

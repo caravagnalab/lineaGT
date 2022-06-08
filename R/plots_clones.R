@@ -20,11 +20,15 @@
 #'
 #' @export plot_mullerplot
 
-plot_mullerplot = function(x, which="frac", highlight=c(), min_frac=0, legend.pos="right", wrap=F, mutations=F) {
-  if (purrr::is_empty(highlight)) highlight = select_relevant_clusters(x, min_frac)
+plot_mullerplot = function(x, which="frac", highlight=c(), min_frac=0,
+                           legend.pos="right", wrap=F, mutations=F) {
+
+  keep_cl = retrieve_clusters(x, min_frac, highlight)
+  highlight = c(keep_cl, get_unique_muts_labels(x, keep_cl))
   color_palette = highlight_palette(x$color_palette, highlight)
-  pop_df = get_muller_pop(x)
-  edges_df = get_muller_edges(x)
+
+  pop_df = get_muller_pop(x, mutations=mutations)
+  edges_df = get_muller_edges(x, mutations=mutations)
 
   timepoints = x %>% get_dimensions()
   lineages = x %>% get_lineages()

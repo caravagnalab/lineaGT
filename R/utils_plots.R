@@ -29,17 +29,29 @@ split_to_camelcase = function(txt) {
 }
 
 
-get_colors = function(x=NULL, list_lab=list()) {
+get_colors = function(x=NULL, list_lab=list(), color_palette=list()) {
   if (purrr::is_empty(list_lab)) {
     N = x$K
-    colss = Polychrome::createPalette(N, c("#856de3", "#9e461c"), target="normal", range=c(15, 80), M=100000)
+    colss = Polychrome::createPalette(N, c("#856de3", "#9e461c"), target="normal", range=c(15, 80), M=1000)
     colss = colss[1:N]
     try({ names(colss) = x$params$labels %>% levels() }, silent=T) }
   else {
-    N = list_lab %>% length()
-    colss = Polychrome::createPalette(N, c("#856de3", "#9e461c"), target="normal", range=c(15, 80), M=100000)
-    colss = colss[1:N]
-    names(colss) = list_lab
+    # means we want colors for the subclones
+    colss = c()
+    for (cl in color_palette %>% names) {
+      mut_cl = get_unique_muts_labels(x, clusters=c(cl))
+      if (!purrr::is_empty(mut_cl)) {
+        n_cols = mut_cl %>% length() + 1
+        new_cols = Polychrome::createPalette(n_cols, c(color_palette[cl]),
+                                             target="normal", range=c(15, 80), M=1000)[2:n_cols]
+        names(new_cols) = mut_cl
+        colss = c(colss, new_cols)
+      }
+    }
+    # N = list_lab %>% length()
+    # colss = Polychrome::createPalette(N, c("#856de3", "#9e461c"), target="normal", range=c(15, 80), M=100000)
+    # colss = colss[1:N]
+    # names(colss) = list_lab
   }
   return(colss)
 }
@@ -56,66 +68,36 @@ highlight_palette = function(color_palette, highlight=c()) {
 }
 
 
-
-get_muller_pop = function(x, means=list()) {
-  if (purrr::is_empty(means)) means = get_mean(x)
-
-  pop_df = means %>% as.data.frame() %>%
-    tibble::rownames_to_column(var="Identity") %>%
-    tidyr::pivot_longer(cols=c(starts_with("cov"), starts_with("vaf")), names_to="timepoints_lineage", values_to="Population") %>%
-    tidyr::separate(timepoints_lineage, into=c("else", "Generation", "Lineage"), sep="\\.|\\_") %>%
-    mutate("else"=NULL, Population=ifelse(Population==0, 0.001, Population)) %>%
-    group_by(Generation, Lineage) %>%
-    mutate(Frequency=Population/sum(Population)) %>%
-    dplyr::ungroup()
-
-  pop_df = rbind(pop_df, list("Identity"=rep("P", x$`T`+x$lineages %>% length()),
-                              "Generation"=c(x$dimensions,rep("init", x$lineages %>% length())),
-                              "Population"=rep(1, x$`T`+x$lineages %>% length()),
-                              "Lineage"=rep(x$lineages, 3+1),
-                              "Frequency"=rep(1, x$`T`+x$lineages %>% length())))
-  pop_df = rbind(pop_df, list("Identity"=rep(x %>% get_unique_labels(), x$lineages %>% length()),
-                       "Generation"=rep("init", x$K*(x$lineages %>% length())),
-                       "Population"=rep(1, x$K*(x$lineages %>% length())),
-                       "Lineage"=rep(x$lineages, each=x$K),
-                       "Frequency"=rep(1/x$K, x$K*(x$lineages %>% length())))) %>%
-    mutate(Generation=dplyr::case_when(grepl("early", Generation) ~ "60",
-                                       grepl("mid", Generation) ~ "140",
-                                       grepl("late", Generation) ~ "280",
-                                       grepl("init", Generation) ~ "0")) %>%
-    mutate(Generation=as.numeric(Generation)) %>%
-    group_by(Identity, Lineage) %>%
-    mutate(lm_a=coef(lm(log1p(Population)~Generation))[1],
-           lm_r=coef(lm(log1p(Population)~Generation))[2]) %>% ungroup()
-  return(pop_df)
+select_relevant_clusters = function(x, min_frac) {
+  return(
+    x %>%
+      get_muller_pop() %>%
+      group_by(Identity) %>%
+      filter(any(Frequency > min_frac), Identity!="P") %>%
+      dplyr::pull(Identity) %>%
+      unique()
+  )
 }
 
 
-get_muller_edges = function(x, labels=list()) {
-  if (purrr::is_empty(labels)) return(data.frame("Parent"="P", "Identity"=get_unique_labels(x)))
-  return(data.frame("Parent"="P", "Identity"=labels))
+retrieve_clusters = function(x, min_frac, highlight) {
+  if (purrr::is_empty(highlight)) highlight = x %>% get_unique_labels()
+  return(intersect(select_relevant_clusters(x, min_frac), highlight))
 }
 
 
-select_relevant_clusters = function(x, min_frac, means=list()) {
-  pop_df = get_muller_pop(x, means)
-  clusters_keep = (pop_df %>% group_by(Identity) %>%
-                     filter(any(Frequency > min_frac), Identity!="P"))$Identity %>% unique()
-  return(clusters_keep)
-}
 
-
-reshape_vaf_dataframe_long = function(x) {
-  vaf = x %>% get_vaf_dataframe() %>% mutate(labels_mut=paste(labels,labels_viber,sep=".")) %>%
-    dplyr::select(starts_with("vaf"), mutation, IS, contains("labels"), contains("viber")) %>%
-    tidyr::pivot_longer(cols=starts_with("vaf"), names_to="timepoints_lineage", values_to="vaf") %>%
-    separate(timepoints_lineage, into=c("vv","timepoints","lineage")) %>%
-    mutate(timepoints=paste(vv,timepoints,sep="."),vv=NULL) %>%
-    tidyr::pivot_wider(names_from=timepoints, values_from="vaf")
-
-  try(expr = {vaf = vaf %>% dplyr::select(-"vaf.over")}, silent=T)
-  try(expr = {vaf = vaf %>% dplyr::select(-"vaf.steady")}, silent=T)
-
-  return(vaf)
-}
+# reshape_vaf_dataframe_long = function(x) {
+#   vaf = x %>% get_vaf_dataframe() %>% mutate(labels_mut=paste(labels,labels_viber,sep=".")) %>%
+#     dplyr::select(starts_with("vaf"), mutation, IS, contains("labels"), contains("viber")) %>%
+#     tidyr::pivot_longer(cols=starts_with("vaf"), names_to="timepoints_lineage", values_to="vaf") %>%
+#     separate(timepoints_lineage, into=c("vv","timepoints","lineage")) %>%
+#     mutate(timepoints=paste(vv,timepoints,sep="."),vv=NULL) %>%
+#     tidyr::pivot_wider(names_from=timepoints, values_from="vaf")
+#
+#   try(expr = {vaf = vaf %>% dplyr::select(-"vaf.over")}, silent=T)
+#   try(expr = {vaf = vaf %>% dplyr::select(-"vaf.steady")}, silent=T)
+#
+#   return(vaf)
+# }
 

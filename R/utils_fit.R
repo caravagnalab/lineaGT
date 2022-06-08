@@ -2,7 +2,7 @@
 fit_singleK = function(k, df, run="", steps=500, covariance="diag", lr=0.001,
                       p=0.01, convergence=TRUE, random_state=25, py_pkg=NULL) {
 
-  print(paste("RUN", run, "- K =", k))
+  # print(paste("RUN", run, "- K =", k))
 
   x = initialize_object(k, df, py_pkg)
   x = run_inference(x,
@@ -18,6 +18,8 @@ fit_singleK = function(k, df, run="", steps=500, covariance="diag", lr=0.001,
   x$losses = load_losses(x$py_model)
   x$gradients = load_params_gradients(x$py_model)
   x$n_iter = x$py_model$losses_grad_train$losses %>% length
+
+  x$py_model = NULL
 
   return(x)
 }

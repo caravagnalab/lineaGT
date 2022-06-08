@@ -7,6 +7,7 @@
 fit(
   cov.df,
   vaf.df = NULL,
+  infer_phylogenies = TRUE,
   k_interval = c(10, 30),
   n_runs = 3,
   steps = 500,
@@ -15,7 +16,7 @@ fit(
   convergence = TRUE,
   covariance = "diag",
   min_frac = 0,
-  show_progr = TRUE,
+  show_progr = FALSE,
   store_grads = TRUE,
   store_losses = TRUE,
   random_state = 25

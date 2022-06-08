@@ -7,7 +7,15 @@ plot_phylogeny = function(x, min_frac=0, highlight=c(), vaf.df=NULL) {
     x = fit_phylogenies(x, vaf.df=vaf.df, min_frac=min_frac, highlight=highlight)
   }
 
-  return(x$plots[clusters_joined])
+  tree_plots = list()
+  for (cluster in clusters_joined) {
+    if (!purrr::is_empty(x$trees[[cluster]])) {
+      tree = x$trees[[cluster]][[1]]
+      tree_plots[[cluster]] = ctree:::plot.ctree(tree) + labs(title=cluster)
+    }
+  }
+
+  return(tree_plots)
 }
 
 

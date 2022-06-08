@@ -4,9 +4,7 @@ get_binomial_theta = function(x) {
   theta = data.frame()
   for(cluster in viber_fits %>% names()) {
     if (!purrr::is_empty(viber_fits[[cluster]])) {
-      df_k = viber_fits[[cluster]]$theta_k %>% t %>% as.data.frame() %>%
-        dplyr::rename_with( ~ paste0("v.", .x)) %>% tibble::rownames_to_column(var="v_cluster") %>%
-        mutate(labels_mut=paste(cluster, v_cluster, sep="."), v_cluster=NULL, labels=cluster)
+      df_k = get_binomial_theta_cluster(viber_fits[[cluster]], cluster)
       theta = rbind(theta, df_k)
     }
   }
@@ -18,14 +16,34 @@ get_binomial_theta = function(x) {
   )
 }
 
+get_binomial_theta_cluster = function(viber_fit, cluster) {
+  return(
+    viber_fit$theta_k %>%
+      t() %>%
+      as.data.frame() %>%
+      dplyr::rename_with( ~ paste0("v.", .x)) %>%
+      tibble::rownames_to_column(var="v_cluster") %>%
+      mutate(labels_mut=paste(cluster, v_cluster, sep="."), v_cluster=NULL, labels=cluster)
+  )
+}
 
-check_dp = function(vaf.df, x, thr=5) {
-  means = x %>% get_mean() %>%
-    as.data.frame() %>% tibble::rownames_to_column(var="labels") %>%
-    dplyr::mutate(labels=factor(labels, levels=unique(labels))) %>%
-    tidyr::pivot_longer(cols=starts_with("cov"), names_to="cov.timepoints.lineage", values_to="mean_cov") %>%
-    tidyr::separate(cov.timepoints.lineage, into=c("else", "timepoints", "lineage"), sep="[.]") %>%
-    dplyr::mutate("else"=NULL)
+
+get_mean_long = function(x) {
+  return(
+    x %>%
+      get_mean() %>%
+      as.data.frame() %>% tibble::rownames_to_column(var="labels") %>%
+      dplyr::mutate(labels=factor(labels, levels=unique(labels))) %>%
+      tidyr::pivot_longer(cols=starts_with("cov"), names_to="cov.timepoints.lineage", values_to="mean_cov") %>%
+      tidyr::separate(cov.timepoints.lineage, into=c("else", "timepoints", "lineage"), sep="[.]") %>%
+      dplyr::mutate("else"=NULL)
+  )
+}
+
+
+check_dp = function(x, thr=5) {
+  vaf.df = x %>% get_vaf_dataframe()
+  means = x %>% get_mean_long()
 
   joined = dplyr::inner_join(vaf.df, means, by=c("labels", "timepoints", "lineage")) %>%
     dplyr::mutate(original_dp=dp) %>%
@@ -36,40 +54,51 @@ check_dp = function(vaf.df, x, thr=5) {
     dplyr::mutate(dp=ifelse(dp < thr, mean(dp) %>% as.integer(), dp)) %>%
     dplyr::ungroup()
 
-  return(joined)
+  return(add_vaf(x, joined))
 }
 
 
-annotate_vaf_df = function(vaf.df, x, min_frac=0) {
-  ll = x$lineages
-  tp = x$timepoints
+# returns the object x with the annotated vaf dataframe
+annotate_vaf_df = function(x, vaf.df, min_frac=0) {
+  ll = x %>% get_lineages()
+  tp = x %>% get_timepoints()
   highlight = select_relevant_clusters(x, min_frac=min_frac)
-  dataframe = x %>% get_cov_dataframe() %>% filter(labels %in% highlight)
+
+  dataframe = x %>%
+    get_cov_dataframe() %>%
+    dplyr::filter(labels %in% highlight)
   IS_keep = dataframe$IS %>% unique()
 
   vaf.df_filt = vaf.df %>%
-    filter(IS %in% IS_keep, lineage %in% ll, timepoints %in% tp) %>%
+    dplyr::filter(IS %in% IS_keep, lineage %in% ll, timepoints %in% tp) %>%
     dplyr::select(alt, dp, vaf, mutation, IS, lineage, timepoints)
 
-  return(dplyr::inner_join(vaf.df_filt, dataframe, by=c("IS", "lineage", "timepoints")))
+  vaf.ann = dplyr::inner_join(vaf.df_filt, dataframe, by=c("IS", "lineage", "timepoints"))
+
+  return(add_vaf(x, vaf.ann))
 }
 
 
 # Function to get from a vaf dataframe obtained by vaf_df_from_file() the input for a VIBER run
-get_input_viber = function(vaf.df, x) {
-  vaf.df_wide = vaf.df %>% long_to_wide_muts()
-  trials = vaf.df_wide %>% dplyr::select(starts_with("dp"),
-                                         labels) %>% rename_with(.fn = ~str_replace_all(.x, "dp.", ""))
-  successes = vaf.df_wide %>% dplyr::select(starts_with("alt"),
-                                            labels) %>% rename_with(.fn = ~str_replace_all(.x, "alt.", ""))
+get_input_viber = function(x) {
+  vaf.df_wide = x %>%
+    get_vaf_dataframe() %>%
+    long_to_wide_muts()
+  trials = vaf.df_wide %>%
+    dplyr::select(starts_with("dp"), labels) %>%
+    rename_with(.fn = ~str_replace_all(.x, "dp.", ""))
+  successes = vaf.df_wide %>%
+    dplyr::select(starts_with("alt"), labels) %>%
+    rename_with(.fn = ~str_replace_all(.x, "alt.", ""))
   return(list("successes"=successes, "trials"=trials, "vaf.df"=vaf.df_wide))
 }
 
 
 filter_muts = function(vaf.df) {
-  vaf.df %>% group_by(mutation, lineage, labels) %>%
+  vaf.df %>%
+    group_by(mutation, lineage, labels) %>%
     dplyr::mutate(vaf_diff=vaf-dplyr::lag(vaf), vaf_diff=ifelse(is.na(vaf_diff),0,vaf_diff)) %>%
-    dplyr::filter(any(abs(vaf_diff)>40)) %>% View
+    dplyr::filter(any(abs(vaf_diff)>40))
 }
 
 
