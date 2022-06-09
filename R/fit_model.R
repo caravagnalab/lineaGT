@@ -18,7 +18,7 @@
 #' inferred parameters, the python object
 #'
 #' @importFrom dplyr filter mutate select group_by inner_join rename_with
-#' @importFrom dplye case_when all_of ungroup slice pull
+#' @importFrom dplyr case_when all_of ungroup slice pull
 #' @importFrom tidyr separate unite pivot_wider pivot_longer tibble
 #' @importFrom magrittr %>%
 #' @importFrom stringr str_replace_all
