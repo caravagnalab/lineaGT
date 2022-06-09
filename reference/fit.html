@@ -61,6 +61,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">fit</span><span class="op">(</span>
   <span class="va">cov.df</span>,
   vaf.df <span class="op">=</span> <span class="cn">NULL</span>,
+  infer_phylogenies <span class="op">=</span> <span class="cn">TRUE</span>,
   k_interval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">30</span><span class="op">)</span>,
   n_runs <span class="op">=</span> <span class="fl">3</span>,
   steps <span class="op">=</span> <span class="fl">500</span>,
@@ -69,7 +70,7 @@
   convergence <span class="op">=</span> <span class="cn">TRUE</span>,
   covariance <span class="op">=</span> <span class="st">"diag"</span>,
   min_frac <span class="op">=</span> <span class="fl">0</span>,
-  show_progr <span class="op">=</span> <span class="cn">TRUE</span>,
+  show_progr <span class="op">=</span> <span class="cn">FALSE</span>,
   store_grads <span class="op">=</span> <span class="cn">TRUE</span>,
   store_losses <span class="op">=</span> <span class="cn">TRUE</span>,
   random_state <span class="op">=</span> <span class="fl">25</span>
