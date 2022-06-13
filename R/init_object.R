@@ -51,6 +51,7 @@ get_python_params = function(py_model) {
   # params$assignments = get_z_assignments(py_model)
   params$probabilites = get_z_probs(py_model)
   params$labels = get_labels(py_model)
+  params$hyperparameters = py_model$hyperparameters
   return(params)
 }
 

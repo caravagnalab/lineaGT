@@ -35,6 +35,7 @@
 fit = function(cov.df,
                vaf.df=NULL,
                infer_phylogenies=TRUE,
+               hyperparameters=list(),
                k_interval=c(10,30),
                n_runs=3,
                steps=500,

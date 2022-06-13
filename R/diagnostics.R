@@ -17,11 +17,17 @@ get_IC = function(x) {
 }
 
 
-get_losses = function(x, runs=FALSE) {
-  if (runs) return(x$runs$losses %>%
+get_losses = function(x, train=FALSE) {
+  if (train) return(x$runs$losses %>%
                      dplyr::as_tibble() %>%
                      dplyr::mutate(K=as.integer(K), run=as.integer(run)))
-  return(x$losses)
+  return(
+    x.e$losses %>%
+      tibble::as_tibble() %>%
+      dplyr::rename(losses=value) %>%
+      tibble::rownames_to_column(var="index") %>%
+      mutate(index=as.numeric(index))
+           )
 }
 
 

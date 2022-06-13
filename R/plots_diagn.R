@@ -1,15 +1,25 @@
-plot_losses = function(x) {
-  losses = x %>% get_losses() %>%
+plot_losses = function(x, train=FALSE) {
+  losses = x %>% get_losses(train=train)
+
+  if (!train)
+    return(losses %>%
+             ggplot() +
+             geom_point(aes(x=index, y=losses)) +
+             scale_x_continuous(breaks=function(x) unique(floor(pretty(seq(0, (max(x) + 1) * 1.1))))) +
+             ylab("ELBO") + xlab("Iterations")
+    )
+
+  losses = losses %>%
     mutate(losses=purrr::map(losses, ~data.frame(losses=.x, index=seq_along(.x)))) %>%
     tidyr::unnest(losses) %>%
     mutate(K=factor(K, levels=K %>% unique()), run=factor(run, levels=run %>% unique()))
 
   return(losses %>%
            ggplot() +
-           geom_line(aes(x=index, y=losses, color=K)) +
+           geom_point(aes(x=index, y=losses, color=K)) +
            facet_wrap(~run) +
            scale_x_continuous(breaks=function(x) unique(floor(pretty(seq(0, (max(x) + 1) * 1.1))))) +
-           ylab("Losses") + xlab("Iterations")
+           ylab("ELBO") + xlab("Iterations")
          )
 
 }
@@ -22,7 +32,7 @@ plot_gradient_norms = function(x) {
 
   return(grads %>%
            ggplot() +
-           geom_line(aes(x=index, y=grad_norm, color=K)) +
+           geom_point(aes(x=index, y=grad_norm, color=K)) +
            facet_wrap(param~run) +
            scale_x_continuous(breaks=function(x) unique(floor(pretty(seq(0, (max(x) + 1) * 1.1))))) +
            ylab("Gradient Norms") + xlab("Iterations")
@@ -34,7 +44,7 @@ plot_IC = function(x) {
 
   return(ic %>%
            ggplot() +
-           geom_line(aes(x=K, y=value, color=method)) +
+           geom_point(aes(x=K, y=value, color=method)) +
            facet_wrap(method~run, scales="free_y", nrow=ic$method %>% unique() %>% length()) +
            xlab("K") + ylab("Value")
          )
