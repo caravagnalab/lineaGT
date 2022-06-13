@@ -62,6 +62,7 @@
   <span class="va">cov.df</span>,
   vaf.df <span class="op">=</span> <span class="cn">NULL</span>,
   infer_phylogenies <span class="op">=</span> <span class="cn">TRUE</span>,
+  hyperparameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
   k_interval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">30</span><span class="op">)</span>,
   n_runs <span class="op">=</span> <span class="fl">3</span>,
   steps <span class="op">=</span> <span class="fl">500</span>,
@@ -82,26 +83,43 @@
     <dl><dt>cov.df</dt>
 <dd><p>Input coverage dataset. It must have at least the columns <code>coverage</code>, <code>timepoints</code>,
 <code>lineage</code>, <code>IS</code>, with the coverage values, timepoint, lineage and IS, respectively.</p></dd>
+
+
 <dt>vaf.df</dt>
 <dd><p>Input VAF dataset. It must have at least the columns <code>alt</code>, <code>dp</code>, <code>vaf</code>,
 <code>timepoints</code>, <code>lineage</code>, <code>IS</code>, <code>mutation</code>, with the number of reads for the mutated allele,
 overall depth, vaf values, timepoint, lineage, IS and mutation, respectively.</p></dd>
+
+
 <dt>k_interval</dt>
 <dd><p>Interval of K values to test.</p></dd>
+
+
 <dt>n_runs</dt>
 <dd><p>Number of runs to perform for each K.</p></dd>
+
+
 <dt>steps</dt>
 <dd><p>Maximum number of steps for the inference.</p></dd>
+
+
 <dt>lr</dt>
 <dd><p>Learning rate used in the inference.</p></dd>
+
+
 <dt>covariance</dt>
 <dd><p>Covariance type for the Multivariate Gaussian.</p></dd>
+
+
 <dt>random_state</dt>
 <dd><p>Value of the seed.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>a <code>mvnmm</code> object, containing the input dataset, annotated with IS_values, N, K, T
+    
+
+<p>a <code>mvnmm</code> object, containing the input dataset, annotated with IS_values, N, K, T
 specific of the dataset, the input IS and column names, a list params that will contain the
 inferred parameters, the python object</p>
     </div>
@@ -115,7 +133,7 @@ inferred parameters, the python object</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
     </footer></div>
