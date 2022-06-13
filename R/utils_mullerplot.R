@@ -3,14 +3,63 @@ get_muller_edges = function(x, mutations=FALSE) {
 
   if (!mutations) return(edges)
 
+  edges = x %>% get_binomial_theta() %>%
+    inner_join(x %>% get_mean_long(), by=c("labels", "timepoints", "lineage")) %>%
+    dplyr::rename(Parent=labels, Identity=labels_mut) %>%
+    dplyr::select(Parent, Identity) %>% unique() %>%
+    dplyr::add_row(edges)
+
   return(
-    x %>% get_binomial_theta() %>%
-      inner_join(x %>% get_mean_long(), by=c("labels", "timepoints", "lineage")) %>%
-      dplyr::rename(Parent=labels, Identity=labels_mut) %>%
-      dplyr::select(Parent, Identity) %>% unique() %>%
-      dplyr::add_row(edges)
+    x %>%
+      get_parents() %>%
+      dplyr::full_join(edges, by=c("Parent", "Identity")) %>%
+      mutate(Parent=ifelse(is.na(Label), Parent, Label)) %>%
+      dplyr::select(-Label)
   )
 }
+
+
+get_parents = function(x, highlight=c()) {
+  if (purrr::is_empty(highlight))
+    highlight = get_unique_labels(x)
+
+  edges = setNames(data.frame(matrix(ncol=3, nrow=0)),
+                   c("Parent", "Identity", "Label")) %>%
+    tibble::as_tibble() %>%
+    mutate(Parent=as.character(Parent), Identity=as.character(Identity), Label=as.character(Label))
+
+  for (cluster in highlight) {
+    tree = x$trees[[cluster]]
+
+    if (!purrr::is_empty(tree)) {
+      edges = edges %>%
+        dplyr::add_row(
+          tree[[1]] %>%
+            get_adj() %>%
+            as.data.frame() %>%
+            rownames_to_column(var="Label") %>%
+            reshape2::melt(id="Label", variable.name="Identity") %>%
+            filter(value==1) %>%
+            filter(Label != "GL", Identity != "GL") %>%
+            dplyr::select(-value) %>%
+            dplyr::mutate(Label=paste(cluster, Label, sep="."),
+                          Identity=paste(cluster, Identity, sep="."),
+                          Parent=cluster) %>%
+            tibble::as_tibble()
+        )
+
+    }
+  }
+  return(edges)
+}
+
+
+get_adj = function(tree) {
+  return(
+    tree$adj_mat
+  )
+}
+
 
 # means format must be a dataframe with columns: labels, timepoints, lineage, mean_cov
 get_muller_pop = function(x, map_tp_time=list("init"=0,"early"=60,"mid"=140,"late"=280),
@@ -35,6 +84,7 @@ get_muller_pop = function(x, map_tp_time=list("init"=0,"early"=60,"mid"=140,"lat
 
   return(pop_df)
 }
+
 
 format_means_df = function(mean_df) {
   return(
