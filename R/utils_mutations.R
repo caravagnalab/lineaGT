@@ -41,8 +41,8 @@ get_mean_long = function(x) {
 }
 
 
-check_dp = function(x, thr=5) {
-  vaf.df = x %>% get_vaf_dataframe()
+check_dp = function(x, thr=5, label="") {
+  vaf.df = x %>% get_vaf_dataframe(label)
   means = x %>% get_mean_long()
 
   joined = dplyr::inner_join(vaf.df, means, by=c("labels", "timepoints", "lineage")) %>%
@@ -54,12 +54,12 @@ check_dp = function(x, thr=5) {
     dplyr::mutate(dp=ifelse(dp < thr, mean(dp) %>% as.integer(), dp)) %>%
     dplyr::ungroup()
 
-  return(add_vaf(x, joined))
+  return(add_vaf(x, joined, label))
 }
 
 
 # returns the object x with the annotated vaf dataframe
-annotate_vaf_df = function(x, vaf.df, min_frac=0) {
+annotate_vaf_df = function(x, vaf.df, min_frac=0, label="") {
   ll = x %>% get_lineages()
   tp = x %>% get_timepoints()
   highlight = select_relevant_clusters(x, min_frac=min_frac)
@@ -75,15 +75,18 @@ annotate_vaf_df = function(x, vaf.df, min_frac=0) {
 
   vaf.ann = dplyr::inner_join(vaf.df_filt, dataframe, by=c("IS", "lineage", "timepoints"))
 
-  return(add_vaf(x, vaf.ann))
+  return(add_vaf(x, vaf.ann, label))
 }
 
 
 # Function to get from a vaf dataframe obtained by vaf_df_from_file() the input for a VIBER run
-get_input_viber = function(x) {
+get_input_viber = function(x, lineages=c(), label="") {
+  if (purrr::is_empty(lineages)) lineages = x %>% get_lineages()
   vaf.df_wide = x %>%
-    get_vaf_dataframe() %>%
+    get_vaf_dataframe(label) %>%
+    dplyr::filter(lineage%in%lineages) %>%
     long_to_wide_muts()
+
   trials = vaf.df_wide %>%
     dplyr::select(starts_with("dp"), labels) %>%
     rename_with(.fn = ~str_replace_all(.x, "dp.", ""))

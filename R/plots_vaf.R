@@ -20,8 +20,8 @@
 #' @export plot_vaf
 
 
-plot_vaf = function(x, min_frac=0, highlight=c()) {
-  dataframe = x %>% get_vaf_dataframe() %>%
+plot_vaf = function(x, min_frac=0, highlight=c(), label="") {
+  dataframe = x %>% get_vaf_dataframe(label=label) %>%
     dplyr::select(-contains("ref"), -contains("dp"), -contains("alt"), -contains("theta")) %>%
     tidyr::pivot_wider(names_from=c("timepoints"), names_sep=".", values_from=c("vaf"), names_prefix="vaf.")
 

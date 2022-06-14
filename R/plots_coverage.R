@@ -87,14 +87,21 @@ plot_marginal = function(x, highlight=c(), binwidth=5) {
 
   dd = x %>% get_cov_dataframe() %>% filter(labels %in% highlight)
 
-  p = dd %>% ggplot() +
-    geom_histogram(aes(x=coverage, fill=labels), position="identity", alpha=.7, binwidth=binwidth) +
-    scale_fill_manual(values=color_palette, breaks=highlight) +
-    facet_grid(timepoints ~ labels) +
-    ylab("Counts") +
-    xlab("Coverage") +
-    labs(fill="Clusters") +
-    my_ggplot_theme()
+  p = list()
+  lineages = x %>% get_lineages()
+
+  for (ll in lineages) {
+    p[[ll]] = dd %>%
+      filter(lineage==ll) %>%
+      ggplot() +
+      geom_histogram(aes(x=coverage, fill=labels), position="identity", alpha=.7, binwidth=binwidth) +
+      scale_fill_manual(values=color_palette, breaks=highlight) +
+      facet_grid(timepoints ~ labels) +
+      ylab("Counts") +
+      xlab("Coverage") +
+      labs(fill="Clusters", subtitle=ll) +
+      my_ggplot_theme()
+  }
 
   return(p)
 }

@@ -237,11 +237,11 @@ get_unique_labels = function(x) {
 #'
 #' @export get_unique_muts_labels
 
-get_unique_muts_labels = function(x, clusters=c()) {
+get_unique_muts_labels = function(x, clusters=c(), label="") {
   if (purrr::is_empty(clusters)) return(get_all_unique_muts_labels(x))
   return(
     x %>%
-      get_vaf_dataframe() %>%
+      get_vaf_dataframe(label=label) %>%
       dplyr::filter(labels %in% clusters) %>%
       dplyr::pull(labels_mut) %>%
       unique()
@@ -249,9 +249,9 @@ get_unique_muts_labels = function(x, clusters=c()) {
 }
 
 
-get_all_unique_muts_labels = function(x) {
+get_all_unique_muts_labels = function(x, label="") {
   labels = x %>%
-    get_vaf_dataframe() %>%
+    get_vaf_dataframe(label=label) %>%
     dplyr::pull(labels_mut) %>%
     unique()
   return(labels)

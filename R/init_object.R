@@ -65,8 +65,10 @@ update_params = function(x) {
 }
 
 
-add_vaf = function(x, vaf_df) {
-  x$vaf.dataframe = vaf_df
+add_vaf = function(x, vaf.df, label="") {
+  nn = "vaf.dataframe"
+  if (label!="") nn = paste(nn, label, sep=".")
+  x[[nn]] = vaf.df
   return(x)
 }
 

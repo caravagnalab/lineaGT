@@ -6,14 +6,14 @@ run_viber = function(x, vaf.df=NULL, min_frac=0, highlight=list(), do_filter=FAL
 
   if (is.null(vaf.df) && !"vaf.dataframe" %in% names(x))
     message("A dataframe with the mutations is required!")
-  else if (is.null(vaf.df)) vaf.df = x %>% get_vaf_dataframe()
+  else if (is.null(vaf.df)) vaf.df = x %>% get_vaf_dataframe(label)
 
   clusters_joined = retrieve_clusters(x, min_frac, highlight)
   x = x %>%
-    annotate_vaf_df(vaf.df=vaf.df, min_frac=min_frac) %>%  # add cluster to each mutation
-    check_dp()  # check for too low values
+    annotate_vaf_df(vaf.df=vaf.df, min_frac=min_frac, label=label) %>%  # add cluster to each mutation
+    check_dp(label=label)  # check for too low values
 
-  viber_input = x %>% get_input_viber()  # get the input to run viber
+  viber_input = x %>% get_input_viber(lineages=lineages, label=label)  # get the input to run viber
 
   joined = data.frame(); fit_all = list()
   if (infer_phylo) trees = list() # plots = list()
@@ -39,7 +39,7 @@ run_viber = function(x, vaf.df=NULL, min_frac=0, highlight=list(), do_filter=FAL
 
   color_palette = c(x$color_palette,
                     get_colors(x=x,
-                               list_lab=get_unique_muts_labels(x),
+                               list_lab=vaf.df %>% dplyr::pull(labels_mut) %>% unique(),
                                color_palette=x$color_palette))
 
   if (label!="") {
@@ -60,17 +60,17 @@ run_viber = function(x, vaf.df=NULL, min_frac=0, highlight=list(), do_filter=FAL
 
 
 fit_cluster_viber = function(viber_input, cluster, infer_phylo=TRUE, lineages=c()) {
-  if (!purrr::is_empty(lineages)) lineages = get_lineages(x)[!get_lineages(x) %in% lineages]
+  # if (!purrr::is_empty(lineages)) lineages = get_lineages(x)[!get_lineages(x) %in% lineages]
 
   viber_df_k = list("successes"=viber_input$successes %>%
                       dplyr::filter(labels==cluster) %>%
-                      dplyr::select(-labels, -dplyr::contains(lineages)),
+                      dplyr::select(-labels), # , -dplyr::contains(lineages)),
                     "trials"=viber_input$trials %>%
                       dplyr::filter(labels==cluster) %>%
-                      dplyr::select(-labels, -dplyr::contains(lineages)),
+                      dplyr::select(-labels), # , -dplyr::contains(lineages)),
                     "vaf.df"=viber_input$vaf.df %>%
-                      dplyr::filter(labels==cluster) %>%
-                      dplyr::select(-dplyr::contains(lineages)))
+                      dplyr::filter(labels==cluster))
+                      # dplyr::select(-dplyr::contains(lineages)))
   k = viber_df_k$successes %>% nrow  # max n of clusters
   fit_viber = tree_joint = list()
 
@@ -116,7 +116,7 @@ fit_phylogenies = function(x, vaf.df=NULL, min_frac=0, highlight=list(), do_filt
                            label="", fit_viber=FALSE, lineages=c()) {
   if (is.null(vaf.df) && !"vaf.dataframe" %in% names(x))
     message("A dataframe with the mutations is required!")
-  else if (is.null(vaf.df)) vaf.df = x %>% get_vaf_dataframe()
+  else if (is.null(vaf.df)) vaf.df = x %>% get_vaf_dataframe(label)
 
   clusters_joined = retrieve_clusters(x, min_frac, highlight)
   trees = list()

@@ -4,7 +4,7 @@
 \alias{get_unique_muts_labels}
 \title{Retrieve the list of unique labels of mutation clusters.}
 \usage{
-get_unique_muts_labels(x, clusters = c())
+get_unique_muts_labels(x, clusters = c(), label = "")
 }
 \arguments{
 \item{x}{a mvnmm object.}

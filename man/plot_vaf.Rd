@@ -4,7 +4,7 @@
 \alias{plot_vaf}
 \title{VAF scatterplot}
 \usage{
-plot_vaf(x, min_frac = 0, highlight = c())
+plot_vaf(x, min_frac = 0, highlight = c(), label = "")
 }
 \arguments{
 \item{x}{a \code{mvnmm} object.}

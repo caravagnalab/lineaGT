@@ -30,8 +30,9 @@ get_cov_dataframe = function(x) {
 #'
 #' @export get_vaf_dataframe
 #'
-get_vaf_dataframe = function(x) {
-  return(x$vaf.dataframe)
+get_vaf_dataframe = function(x, label="") {
+  if (label=="") return(x$vaf.dataframe)
+  return(x[[paste("vaf.dataframe", label, sep=".")]])
 }
 
 
