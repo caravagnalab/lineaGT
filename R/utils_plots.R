@@ -71,7 +71,7 @@ highlight_palette = function(color_palette, highlight=c()) {
 select_relevant_clusters = function(x, min_frac) {
   return(
     x %>%
-      get_muller_pop() %>%
+      get_muller_pop(map_tp_time=NULL) %>%
       group_by(Identity) %>%
       filter(any(Frequency > min_frac), Identity!="P") %>%
       dplyr::pull(Identity) %>%

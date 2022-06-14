@@ -35,6 +35,7 @@
 fit = function(cov.df,
                vaf.df=NULL,
                infer_phylogenies=TRUE,
+               timepoints_to_int=list(),  # like list("early"=0, ...)
                hyperparameters=list(),
                k_interval=c(10,30),
                n_runs=3,
@@ -73,6 +74,8 @@ fit = function(cov.df,
 
   x = fit_singleK(best_k, cov.df, steps=steps, lr=lr, py_pkg)
   x$runs = selection
+
+  x$timepoints_int = timepoints_to_int
 
   if (!is.null(vaf.df)) x = run_viber(x, vaf.df, min_frac=min_frac, infer_phylo=infer_phylogenies)
 

@@ -127,6 +127,8 @@ add_time_0 = function(pop_df, x=x) {
 }
 
 convert_tp = function(pop_df, mapping=list("init"="0","early"="60","mid"="140","late"="280")) {
+  if (is.null(mapping)) return(pop_df)
+
   return(
     pop_df %>%
       mutate(Generation=mapping[Generation]) %>%

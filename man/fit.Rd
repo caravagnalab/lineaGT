@@ -8,6 +8,7 @@ fit(
   cov.df,
   vaf.df = NULL,
   infer_phylogenies = TRUE,
+  timepoints_to_int = list(),
   hyperparameters = list(),
   k_interval = c(10, 30),
   n_runs = 3,
