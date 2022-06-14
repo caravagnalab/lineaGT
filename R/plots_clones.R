@@ -21,7 +21,8 @@
 #' @export plot_mullerplot
 
 plot_mullerplot = function(x, which="frac", highlight=c(), min_frac=0,
-                           legend.pos="right", wrap=F, mutations=F) {
+                           legend.pos="right", wrap=F, mutations=F,
+                           timepoints_to_int=list("init"=0,"early"=60,"mid"=140,"late"=280)) {
 
   keep_cl = retrieve_clusters(x, min_frac, highlight)
   if (mutations)
@@ -30,12 +31,11 @@ plot_mullerplot = function(x, which="frac", highlight=c(), min_frac=0,
     highlight = keep_cl
   color_palette = highlight_palette(x$color_palette, highlight)
 
-  pop_df = get_muller_pop(x, mutations=mutations)
+  pop_df = get_muller_pop(x, mutations=mutations, map_tp_time=timepoints_to_int)
   edges_df = get_muller_edges(x, mutations=mutations)
 
   timepoints = x %>% get_dimensions()
   lineages = x %>% get_lineages()
-  exp_limits = c(min(pop_df$lm_r), max(pop_df$lm_r))
 
   plot_list = list()
   for (ll in lineages) {
@@ -60,7 +60,8 @@ plot_mullerplot = function(x, which="frac", highlight=c(), min_frac=0,
                                           color_palette=color_palette,
                                           lineage=ll,
                                           legend.pos=legend.pos)
-      if (which == "fitness")
+      if (which == "fitness"){
+        exp_limits = c(min(pop_df$lm_r), max(pop_df$lm_r))
         plot_list[[ll]] = mullerplot_util(mullerdf_ll,
                                           y="Frequency",
                                           fill="lm_r",
@@ -69,6 +70,7 @@ plot_mullerplot = function(x, which="frac", highlight=c(), min_frac=0,
                                           lineage=ll,
                                           legend.pos=legend.pos,
                                           exp_limits=exp_limits)
+      }
     }
   }
 

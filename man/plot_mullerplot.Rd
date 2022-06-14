@@ -11,7 +11,8 @@ plot_mullerplot(
   min_frac = 0,
   legend.pos = "right",
   wrap = F,
-  mutations = F
+  mutations = F,
+  timepoints_to_int = list(init = 0, early = 60, mid = 140, late = 280)
 )
 }
 \arguments{

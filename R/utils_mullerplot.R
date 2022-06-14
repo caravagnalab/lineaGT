@@ -77,10 +77,10 @@ get_muller_pop = function(x, map_tp_time=list("init"=0,"early"=60,"mid"=140,"lat
   pop_df = means %>%
     format_means_df() %>%  # to format the dataframe with correct colnames ecc
     add_parent(x=x) %>%  # add common parent "P" data
-    # add_time_0() %>%
+    add_time_0(x=x) %>%
     convert_tp(mapping=map_tp_time) %>%  # convert timepoints to numeric values
     add_exp_fit_coeff() %>%
-    dplyr::select(Identity, Generation, Lineage, Population, Frequency, lm_a, lm_r)
+    dplyr::select(Identity, Generation, Lineage, Population, Frequency, dplyr::starts_with("lm"))
 
   return(pop_df)
 }
@@ -112,16 +112,24 @@ add_parent = function(pop_df, x=x) {
 }
 
 add_time_0 = function(pop_df, x=x) {
-  ids = pop_df$Identity %>% unique()
+  ids = pop_df %>% filter(Identity!="P") %>% dplyr::pull(Identity) %>% unique()
   n_ids = length(ids)
+  n_lins = x %>% get_lineages() %>% length()
   return(
     pop_df %>%
       dplyr::add_row(
-        Identity=rep( ids, times = get_lineages(x) %>% length() ),
-        Population=rep( 0, times = n_ids * get_lineages(x) %>% length() ),
-        Frequency=rep( 0, times = n_ids * get_lineages(x) %>% length() ),
-        Generation=rep( "init", times = n_ids * get_lineages(x) %>% length() ),
+        Identity=rep( ids, times = n_lins ),
+        Population=rep( 0, times = n_ids * n_lins ),
+        Frequency=rep( 0, times = n_ids * n_lins ),
+        Generation=rep( "init", times = n_ids * n_lins ),
         Lineage=rep( x$lineages, each = n_ids )
+      ) %>%
+      dplyr::add_row(
+        Identity=rep( "P", times = n_lins ),
+        Population=rep( 1, times = n_lins ),
+        Frequency=rep( 1, times = n_lins ),
+        Generation=rep( "init", times = n_lins),
+        Lineage=x$lineages
       )
   )
 }
@@ -129,6 +137,7 @@ add_time_0 = function(pop_df, x=x) {
 convert_tp = function(pop_df, mapping=list("init"="0","early"="60","mid"="140","late"="280")) {
   if (is.null(mapping)) return(pop_df)
 
+  mapping$init = "0"
   return(
     pop_df %>%
       mutate(Generation=mapping[Generation]) %>%
@@ -138,6 +147,7 @@ convert_tp = function(pop_df, mapping=list("init"="0","early"="60","mid"="140","
 }
 
 add_exp_fit_coeff = function(pop_df) {
+  if (pop_df$Generation %>% unique() %>% length() == 1) return(pop_df)
   return(
     pop_df %>%
       dplyr::group_by(Identity, Lineage) %>%
