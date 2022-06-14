@@ -48,7 +48,6 @@ get_python_params = function(py_model) {
   params$weights = get_weights(py_model)
   params$sigma = get_sigma(py_model)
   params$Sigma = get_covariance_Sigma(py_model)
-  # params$assignments = get_z_assignments(py_model)
   params$probabilites = get_z_probs(py_model)
   params$labels = get_labels(py_model)
   params$hyperparameters = py_model$hyperparameters

@@ -11,7 +11,10 @@
 #' @export get_cov_dataframe
 
 get_cov_dataframe = function(x) {
-  try(expr = { dataframe = x$cov.dataframe; if (!purrr::is_empty(dataframe)) return(dataframe) }, silent = T)
+  try(expr = {
+    dataframe = x$cov.dataframe; if (!purrr::is_empty(dataframe)) return(dataframe)
+    },
+    silent = T)
 
   py_model = get_model(x)
   return(get_python_dataframe(py_model))
@@ -30,9 +33,16 @@ get_cov_dataframe = function(x) {
 #'
 #' @export get_vaf_dataframe
 #'
+
 get_vaf_dataframe = function(x, label="") {
   if (label=="") return(x$vaf.dataframe)
   return(x[[paste("vaf.dataframe", label, sep=".")]])
+}
+
+
+get_viber_run = function(x, label="") {
+  if (label == "") return(x$viber_run)
+  return(x[[paste("viber_run", label, sep=".")]])
 }
 
 
@@ -89,4 +99,10 @@ get_lineages = function(x) {
 
 get_timepoints = function(x) {
   return(x$timepoints)
+}
+
+
+get_color_palette = function(x, label="") {
+  if (label=="") return(x$color_palette)
+  return(x[[paste("color_palette", label, sep=".")]])
 }

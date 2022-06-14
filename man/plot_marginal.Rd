@@ -4,7 +4,7 @@
 \alias{plot_marginal}
 \title{Histogram of the marginal distribution of each dimension}
 \usage{
-plot_marginal(x, highlight = c(), binwidth = 5)
+plot_marginal(x, min_frac = 0, highlight = c(), binwidth = 5)
 }
 \arguments{
 \item{x}{a mvnmm object.}

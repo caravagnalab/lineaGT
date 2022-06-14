@@ -1,6 +1,6 @@
 # As input a mvnmm object with already a viber_run performed
-get_binomial_theta = function(x) {
-  viber_fits = x$viber_run
+get_binomial_theta = function(x, label="") {
+  viber_fits = x %>% get_viber_run(label=label)
   theta = data.frame()
   for(cluster in viber_fits %>% names()) {
     if (!purrr::is_empty(viber_fits[[cluster]])) {
@@ -15,6 +15,7 @@ get_binomial_theta = function(x) {
       mutate("else"=NULL, theta=theta*100)
   )
 }
+
 
 get_binomial_theta_cluster = function(viber_fit, cluster) {
   return(
@@ -82,6 +83,7 @@ annotate_vaf_df = function(x, vaf.df, min_frac=0, label="") {
 # Function to get from a vaf dataframe obtained by vaf_df_from_file() the input for a VIBER run
 get_input_viber = function(x, lineages=c(), label="") {
   if (purrr::is_empty(lineages)) lineages = x %>% get_lineages()
+
   vaf.df_wide = x %>%
     get_vaf_dataframe(label) %>%
     dplyr::filter(lineage%in%lineages) %>%
@@ -90,6 +92,7 @@ get_input_viber = function(x, lineages=c(), label="") {
   trials = vaf.df_wide %>%
     dplyr::select(starts_with("dp"), labels) %>%
     rename_with(.fn = ~str_replace_all(.x, "dp.", ""))
+
   successes = vaf.df_wide %>%
     dplyr::select(starts_with("alt"), labels) %>%
     rename_with(.fn = ~str_replace_all(.x, "alt.", ""))
@@ -97,35 +100,35 @@ get_input_viber = function(x, lineages=c(), label="") {
 }
 
 
-filter_muts = function(vaf.df) {
-  vaf.df %>%
-    group_by(mutation, lineage, labels) %>%
-    dplyr::mutate(vaf_diff=vaf-dplyr::lag(vaf), vaf_diff=ifelse(is.na(vaf_diff),0,vaf_diff)) %>%
-    dplyr::filter(any(abs(vaf_diff)>40))
-}
+# filter_muts = function(vaf.df) {
+#   vaf.df %>%
+#     group_by(mutation, lineage, labels) %>%
+#     dplyr::mutate(vaf_diff=vaf-dplyr::lag(vaf), vaf_diff=ifelse(is.na(vaf_diff),0,vaf_diff)) %>%
+#     dplyr::filter(any(abs(vaf_diff)>40))
+# }
 
 
-# Functions used to obtain and reshape some datasets
-# works with our vaf files
-vaf_df_from_file = function(vaf_file) {
-  vaf_df = read.csv(vaf_file)
-  try(expr = { vaf_df = vaf_df  %>%
-    dplyr::rename_with(.cols=all_of(dplyr::starts_with("dp_")),
-                       .fn=~paste0("cov_", str_replace_all(.x,"dp_",""))) }, silent = T)
-
-  vaf_df = vaf_df %>%
-    tidyr::pivot_longer(cols=starts_with("dp.ref.alt"), names_to="timepoint", values_to="dp:ref:alt") %>%
-    mutate(timepoint=stringr::str_replace_all(timepoint, "dp.ref.alt_", "")) %>%
-    filter(!timepoint %in% c("over","steady")) %>%
-    separate("dp:ref:alt", into=c("dp", "ref", "alt"), sep=":") %>%
-    mutate(ref=as.integer(ref), alt=as.integer(alt), dp=ref+alt) %>%
-    tidyr::pivot_wider(values_from=c("dp","ref","alt"), names_from="timepoint", values_fn=as.integer)
-
-  vaf_df = vaf_df %>%
-    dplyr::select(-starts_with("cov")) %>%
-    tidyr::pivot_longer(cols=c(starts_with("alt"),starts_with("dp"),starts_with("vaf"),starts_with("ref"))) %>%
-    separate(name, into=c("type","timepoints")) %>%
-    tidyr::pivot_wider(names_from = "type", values_from = "value")
-
-  return(vaf_df)
-}
+# # Functions used to obtain and reshape some datasets
+# # works with our vaf files
+# vaf_df_from_file = function(vaf_file) {
+#   vaf_df = read.csv(vaf_file)
+#   try(expr = { vaf_df = vaf_df  %>%
+#     dplyr::rename_with(.cols=all_of(dplyr::starts_with("dp_")),
+#                        .fn=~paste0("cov_", str_replace_all(.x,"dp_",""))) }, silent = T)
+#
+#   vaf_df = vaf_df %>%
+#     tidyr::pivot_longer(cols=starts_with("dp.ref.alt"), names_to="timepoint", values_to="dp:ref:alt") %>%
+#     mutate(timepoint=stringr::str_replace_all(timepoint, "dp.ref.alt_", "")) %>%
+#     filter(!timepoint %in% c("over","steady")) %>%
+#     separate("dp:ref:alt", into=c("dp", "ref", "alt"), sep=":") %>%
+#     mutate(ref=as.integer(ref), alt=as.integer(alt), dp=ref+alt) %>%
+#     tidyr::pivot_wider(values_from=c("dp","ref","alt"), names_from="timepoint", values_fn=as.integer)
+#
+#   vaf_df = vaf_df %>%
+#     dplyr::select(-starts_with("cov")) %>%
+#     tidyr::pivot_longer(cols=c(starts_with("alt"),starts_with("dp"),starts_with("vaf"),starts_with("ref"))) %>%
+#     separate(name, into=c("type","timepoints")) %>%
+#     tidyr::pivot_wider(names_from = "type", values_from = "value")
+#
+#   return(vaf_df)
+# }

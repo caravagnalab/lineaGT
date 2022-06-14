@@ -21,19 +21,27 @@
 
 
 plot_vaf = function(x, min_frac=0, highlight=c(), label="") {
+
   dataframe = x %>% get_vaf_dataframe(label=label) %>%
     dplyr::select(-contains("ref"), -contains("dp"), -contains("alt"), -contains("theta")) %>%
     tidyr::pivot_wider(names_from=c("timepoints"), names_sep=".", values_from=c("vaf"), names_prefix="vaf.")
 
-  if (purrr::is_empty(highlight)) highlight = select_relevant_clusters(x, min_frac)
-  highlight_v = get_unique_muts_labels(x, highlight)
-  color_palette = highlight_palette(x$color_palette, c(highlight, highlight_v))
+  # if (purrr::is_empty(highlight)) highlight = select_relevant_clusters(x, min_frac)
+  # highlight_v = get_unique_muts_labels(x, highlight, label=label)
+  # color_palette = highlight_palette(x, c(highlight, highlight_v), label=label)
+
+  highlight = get_highlight(x, min_frac, highlight, mutations=T, label=label)
+  highlight_v = get_unique_muts_labels(x, highlight, label=label)
+  color_palette = highlight_palette(x, highlight, label=label)
 
   combinations = get_pairs(dataframe, columns=dataframe %>%
                              dplyr::select(dplyr::starts_with("vaf")) %>%
                              colnames)
-  theta = x %>% get_binomial_theta() %>%
-    tidyr::pivot_wider(names_from=c("timepoints"), values_from=c("theta"), names_prefix="vaf.", names_sep=".")
+  theta = x %>% get_binomial_theta(label=label) %>%
+    tidyr::pivot_wider(names_from=c("timepoints"),
+                       values_from=c("theta"),
+                       names_prefix="vaf.",
+                       names_sep=".")
 
   p = list()
   for (t1_t2 in combinations$pair_name) {

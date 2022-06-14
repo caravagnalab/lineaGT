@@ -4,7 +4,14 @@
 \alias{plot_exp_rate}
 \title{Exponential rate}
 \usage{
-plot_exp_rate(x, highlight = c(), min_frac = 0, mutations = F)
+plot_exp_rate(
+  x,
+  highlight = c(),
+  min_frac = 0,
+  mutations = F,
+  label = "",
+  timepoints_to_int = list(init = 0, early = 60, mid = 140, late = 280)
+)
 }
 \arguments{
 \item{x}{a mvnmm object.}

@@ -4,8 +4,8 @@ plot_losses = function(x, train=FALSE) {
   if (!train)
     return(losses %>%
              ggplot() +
-             geom_point(aes(x=index, y=losses)) +
-             scale_x_continuous(breaks=function(x) unique(floor(pretty(seq(0, (max(x) + 1) * 1.1))))) +
+             geom_line(aes(x=index, y=losses)) +
+             # scale_x_continuous(breaks=function(x) unique(floor(pretty(seq(0, (max(x) + 1) * 1.1))))) +
              ylab("ELBO") + xlab("Iterations")
     )
 

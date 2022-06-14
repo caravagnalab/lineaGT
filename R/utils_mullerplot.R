@@ -1,9 +1,9 @@
-get_muller_edges = function(x, mutations=FALSE) {
+get_muller_edges = function(x, mutations=FALSE, label="") {
   edges = data.frame("Parent"="P", "Identity"=get_unique_labels(x))
 
   if (!mutations) return(edges)
 
-  edges = x %>% get_binomial_theta() %>%
+  edges = x %>% get_binomial_theta(label=label) %>%
     inner_join(x %>% get_mean_long(), by=c("labels", "timepoints", "lineage")) %>%
     dplyr::rename(Parent=labels, Identity=labels_mut) %>%
     dplyr::select(Parent, Identity) %>% unique() %>%
@@ -11,7 +11,7 @@ get_muller_edges = function(x, mutations=FALSE) {
 
   return(
     x %>%
-      get_parents() %>%
+      get_parents(label=label) %>%
       dplyr::full_join(edges, by=c("Parent", "Identity")) %>%
       mutate(Parent=ifelse(is.na(Label), Parent, Label)) %>%
       dplyr::select(-Label)
@@ -19,17 +19,22 @@ get_muller_edges = function(x, mutations=FALSE) {
 }
 
 
-get_parents = function(x, highlight=c()) {
-  if (purrr::is_empty(highlight))
-    highlight = get_unique_labels(x)
+get_trees = function(x, label="") {
+  if (label=="") return(x$trees)
+  return(x[[paste("trees", label, sep=".")]])
+}
+
+get_parents = function(x, highlight=c(), label="") {
+  if (purrr::is_empty(highlight)) highlight = get_unique_labels(x)
 
   edges = setNames(data.frame(matrix(ncol=3, nrow=0)),
                    c("Parent", "Identity", "Label")) %>%
     tibble::as_tibble() %>%
     mutate(Parent=as.character(Parent), Identity=as.character(Identity), Label=as.character(Label))
 
+  trees = get_trees(x, label)
   for (cluster in highlight) {
-    tree = x$trees[[cluster]]
+    tree = trees[[cluster]]
 
     if (!purrr::is_empty(tree)) {
       edges = edges %>%
@@ -63,12 +68,12 @@ get_adj = function(tree) {
 
 # means format must be a dataframe with columns: labels, timepoints, lineage, mean_cov
 get_muller_pop = function(x, map_tp_time=list("init"=0,"early"=60,"mid"=140,"late"=280),
-                          mutations=FALSE) {
+                          mutations=FALSE, label="") {
   means = x %>% get_mean_long()
 
   if (mutations)
     # the means dataframe must contain also the subclones
-    means = x %>% get_binomial_theta() %>%
+    means = x %>% get_binomial_theta(label=label) %>%
       inner_join(means, by=c("labels", "timepoints", "lineage")) %>%
       mutate(mean_cov=theta/100*mean_cov) %>%
       dplyr::rename(parent=labels, labels=labels_mut) %>%
@@ -112,6 +117,9 @@ add_parent = function(pop_df, x=x) {
 }
 
 add_time_0 = function(pop_df, x=x) {
+  n_tp = x %>% get_timepoints() %>% length()
+  if (n_tp > 1) return(pop_df)
+
   ids = pop_df %>% filter(Identity!="P") %>% dplyr::pull(Identity) %>% unique()
   n_ids = length(ids)
   n_lins = x %>% get_lineages() %>% length()

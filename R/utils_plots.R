@@ -48,17 +48,14 @@ get_colors = function(x=NULL, list_lab=list(), color_palette=list()) {
         colss = c(colss, new_cols)
       }
     }
-    # N = list_lab %>% length()
-    # colss = Polychrome::createPalette(N, c("#856de3", "#9e461c"), target="normal", range=c(15, 80), M=100000)
-    # colss = colss[1:N]
-    # names(colss) = list_lab
   }
   return(colss)
 }
 
 
-highlight_palette = function(color_palette, highlight=c()) {
+highlight_palette = function(x, highlight=c(), label="") {
   if (purrr::is_empty(highlight)) return(color_palette)
+  color_palette = get_color_palette(x, label)
 
   remove = color_palette[!names(color_palette)%in% highlight] %>% names
   keep = color_palette[names(color_palette)%in% highlight]
@@ -80,24 +77,20 @@ select_relevant_clusters = function(x, min_frac) {
 }
 
 
-retrieve_clusters = function(x, min_frac, highlight) {
+get_highlight = function(x, min_frac=0, highlight=c(), mutations=F, label="") {
+  if (mutations) {
+    if (purrr::is_empty(highlight)) highlight = select_relevant_clusters(x, min_frac)
+    highlight_v = get_unique_muts_labels(x, highlight, label=label)
+    return(
+      c(c(highlight, highlight_v))
+    )
+  }
+
   if (purrr::is_empty(highlight)) highlight = x %>% get_unique_labels()
-  return(intersect(select_relevant_clusters(x, min_frac), highlight))
+  return(
+    intersect(select_relevant_clusters(x, min_frac), highlight)
+  )
 }
 
 
-
-# reshape_vaf_dataframe_long = function(x) {
-#   vaf = x %>% get_vaf_dataframe() %>% mutate(labels_mut=paste(labels,labels_viber,sep=".")) %>%
-#     dplyr::select(starts_with("vaf"), mutation, IS, contains("labels"), contains("viber")) %>%
-#     tidyr::pivot_longer(cols=starts_with("vaf"), names_to="timepoints_lineage", values_to="vaf") %>%
-#     separate(timepoints_lineage, into=c("vv","timepoints","lineage")) %>%
-#     mutate(timepoints=paste(vv,timepoints,sep="."),vv=NULL) %>%
-#     tidyr::pivot_wider(names_from=timepoints, values_from="vaf")
-#
-#   try(expr = {vaf = vaf %>% dplyr::select(-"vaf.over")}, silent=T)
-#   try(expr = {vaf = vaf %>% dplyr::select(-"vaf.steady")}, silent=T)
-#
-#   return(vaf)
-# }
 

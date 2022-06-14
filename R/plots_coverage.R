@@ -20,7 +20,7 @@
 plot_scatter_density = function(x, plot_density=T, facet=FALSE, highlight=c()) {
   dataset = x %>% get_cov_dataframe() %>% long_to_wide_cov()
 
-  color_palette = highlight_palette(x$color_palette, highlight)
+  color_palette = highlight_palette(x, highlight)
   if (purrr::is_empty(highlight)) highlight = get_unique_labels(x)
 
   if (plot_density) density = compute_density(x) else density = NULL
@@ -81,9 +81,9 @@ plot_2D = function(x, dim1, dim2, color_palette, highlight, dens=NULL, facet=F, 
 #' @export plot_marginal
 
 
-plot_marginal = function(x, highlight=c(), binwidth=5) {
-  color_palette = highlight_palette(x$color_palette, highlight)
-  if (purrr::is_empty(highlight)) highlight = get_unique_labels(x)
+plot_marginal = function(x, min_frac=0, highlight=c(), binwidth=5) {
+  highlight = get_highlight(x, min_frac, highlight)
+  color_palette = highlight_palette(x, highlight)
 
   dd = x %>% get_cov_dataframe() %>% filter(labels %in% highlight)
 

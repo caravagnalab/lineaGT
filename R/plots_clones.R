@@ -22,17 +22,14 @@
 
 plot_mullerplot = function(x, which="frac", highlight=c(), min_frac=0,
                            legend.pos="right", wrap=F, mutations=F,
-                           timepoints_to_int=list("init"=0,"early"=60,"mid"=140,"late"=280)) {
+                           timepoints_to_int=list("init"=0,"early"=60,"mid"=140,"late"=280),
+                           label="") {
 
-  keep_cl = retrieve_clusters(x, min_frac, highlight)
-  if (mutations)
-    highlight = c(keep_cl, get_unique_muts_labels(x, keep_cl))
-  else
-    highlight = keep_cl
-  color_palette = highlight_palette(x$color_palette, highlight)
+  highlight = get_highlight(x, min_frac, highlight, mutations=mutations, label=label)
+  color_palette = highlight_palette(x, highlight, label)
 
-  pop_df = get_muller_pop(x, mutations=mutations, map_tp_time=timepoints_to_int)
-  edges_df = get_muller_edges(x, mutations=mutations)
+  pop_df = get_muller_pop(x, mutations=mutations, map_tp_time=timepoints_to_int, label=label)
+  edges_df = get_muller_edges(x, mutations=mutations, label=label)
 
   timepoints = x %>% get_dimensions()
   lineages = x %>% get_lineages()
@@ -122,22 +119,13 @@ mullerplot_util = function(mullerdf, y, fill, lineage, color_palette, highlight,
 #'
 #' @export plot_exp_fit
 
-
-plot_exp_fit = function(x, highlight=c(), min_frac=0, facet=F, mutations=F) {
-  if (mutations) {
-    theta = get_binomial_theta(x)
-    pop_df = get_muller_pop(x, means=theta)
-
-    if (!purrr::is_empty(highlight))
-      highlight = get_unique_muts_labels(x, highlight) else
-        highlight = select_relevant_clusters(x, min_frac, theta)
-    color_palette = highlight_palette(x$color_palette, highlight)
-
-  } else {
-    if (purrr::is_empty(highlight)) highlight = select_relevant_clusters(x, min_frac)
-    color_palette = highlight_palette(x$color_palette, highlight)
-    pop_df = get_muller_pop(x)
-  }
+plot_exp_fit = function(x, highlight=c(), min_frac=0, facet=F, mutations=F, label="",
+                        timepoints_to_int=list("init"=0,"early"=60,"mid"=140,"late"=280)) {
+  pop_df = get_muller_pop(x, mutations=mutations, label=label, map_tp_time=timepoints_to_int)
+  highlight = get_highlight(x, min_frac, highlight)
+  if (mutations) highlight = x %>%
+    get_unique_muts_labels(clusters=highlight, label=label)
+  color_palette = highlight_palette(x, highlight, label)
 
   p = pop_df %>% filter(Identity %in% highlight) %>%
     ggplot(aes(x=Generation, y=Population, color=Identity)) +
@@ -155,8 +143,9 @@ plot_exp_fit = function(x, highlight=c(), min_frac=0, facet=F, mutations=F) {
 
 
 exp_fit_util = function(p, pop_df, cl) {
+  lineages = pop_df %>% dplyr::filter(Identity == cl) %>% dplyr::pull(Lineage) %>% unique()
   exp_df = data.frame()
-  for(ll in pop_df$Lineage %>% unique()) {
+  for(ll in lineages) {
     lm_a = (pop_df %>% filter(Identity==cl, Lineage==ll))$lm_a %>% unique()
     lm_r = (pop_df %>% filter(Identity==cl, Lineage==ll))$lm_r %>% unique()
 
@@ -186,31 +175,27 @@ exp_fit_util = function(p, pop_df, cl) {
 #'
 #' @export plot_exp_rate
 
+plot_exp_rate = function(x, highlight=c(), min_frac=0, mutations=F, label="",
+                         timepoints_to_int=list("init"=0,"early"=60,"mid"=140,"late"=280)) {
 
-plot_exp_rate = function(x, highlight=c(), min_frac=0, mutations=F) {
-  if (mutations) {
-    if (!purrr::is_empty(highlight))
-      highlight = get_unique_muts_labels(x, highlight) else
-        highlight = select_relevant_clusters(x, min_frac, theta)
-    color_palette = highlight_palette(x$color_palette, highlight)
-
-    mean = get_binomial_theta(x)
-
-  } else {
-    if (purrr::is_empty(highlight)) highlight = select_relevant_clusters(x, min_frac)
-    color_palette = highlight_palette(x$color_palette, highlight)
-    mean = get_mean(x)
-  }
+  highlight = get_highlight(x, min_frac, highlight, mutations=mutations, label=label) %>%
+  color_palette = highlight_palette(x, highlight, label)
 
   highlight = highlight %>% stringr::str_replace("C_||C", "")
   names(color_palette) = names(color_palette) %>% stringr::str_replace("C_||C", "")
 
-  p = get_muller_pop(x, means=mean) %>% mutate(Identity=Identity %>% stringr::str_replace("C_||C","")) %>%
-    filter(Identity%in%highlight) %>%
+  p = x %>%
+    get_muller_pop(map_tp_time=timepoints_to_int, mutations=mutations, label=label) %>%
+    dplyr::mutate(Identity=Identity %>% stringr::str_replace("C_||C","")) %>%
+    dplyr::filter(Identity %in% highlight) %>%
     dplyr::arrange(lm_r) %>%
     ggplot(aes(x=Identity, y=lm_r, ymax=lm_r, ymin=0, color=Identity)) +
-    geom_linerange(alpha=.3) + geom_point(alpha=.3) + facet_wrap(~Lineage) +
-    scale_color_manual(values=color_palette[highlight]) + my_ggplot_theme() +
-    theme(aspect.ratio=1) + xlab("Clusters") + ylab("Exp rate") + labs(color="Clusters")
+    geom_linerange(alpha=.3) +
+    geom_point(alpha=.3) +
+    facet_wrap(~Lineage) +
+    scale_color_manual(values=color_palette[highlight]) +
+    my_ggplot_theme() +
+    theme(aspect.ratio=1) +
+    xlab("Clusters") + ylab("Exp rate") + labs(color="Clusters")
   return(p)
 }
