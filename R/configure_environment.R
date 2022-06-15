@@ -10,7 +10,6 @@
 #' @importFrom reticulate import conda_create conda_install install_miniconda miniconda_path conda_binary
 #' @export configure_environment
 
-
 configure_environment = function(envname="lineagt-env", use_default=F) {
   # install miniconda if needed
   check_conda(use_default=use_default)
@@ -70,7 +69,7 @@ check_conda_env = function(envname="lineagt-env", use_default=F) {
     envname = "lineagt-env"
   }
 
-  use_conda_env(envname)
+  load_conda_env(envname)
 
   return(envname)
 }

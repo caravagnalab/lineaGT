@@ -49,3 +49,7 @@ reference:
   desc: Function to configure and install the required dependencies.
   contents:
   - configure_environment
+  - have_loaded_env
+  - have_python_deps
+  - which_conda_env
+  - load_conda_env

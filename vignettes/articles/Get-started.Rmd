@@ -7,7 +7,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
+```{r message=FALSE, warning=FALSE, include=FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -16,22 +16,51 @@ knitr::opts_chunk$set(
 
 ### Installation of the package
 
-You can install LineaGT from GitHub using `devtools`
-```{r eval=FALSE, include=TRUE}
+You can install LineaGT from GitHub using `devtools`.
+```{r install_pkg, eval=FALSE, include=TRUE}
 devtools::install_github("caravagnalab/lineaGT")
 ```
 
 Load the package.
-```{r}
+```{r load_pkg, message=FALSE, warning=FALSE}
 library(lineaGT) 
 ```
 
 
-### Helper function to install the Python dependencies
-A `conda` environment can be configured running the `configure_environment()` function.
-```{r eval=FALSE}
-configure_environment()
+### Python dependencies installation
+When the package is loaded, the package will automatically check whether:
+
+- a version of Anaconda or Miniconda is available, otherwise a Miniconda installation will be started,
+
+- if there is no `conda` environment loaded, the package will check if the `lineagt-env` is present, otherwise it will be created,
+
+- to use an existing `conda` environment, it can be loaded **before** loading the package, either through the `reticulate` function `reticulate::use_condaenv` or by using the `lineaGT` function `load_conda_env`:
+
+```{r load_conda_env, eval=FALSE}
+reticulate::use_condaenv("env-name", required=TRUE)
+load_conda_env(envname="env-name")
+```
+
+- eventually, if the required `Python` dependencies are not installed in the loaded environment, they will be installed.
+
+
+### Functions to manually configure an environment
+The function `r configure_environment()` can also be used interactively to manually configure an existing environment, or to create one from scratch.
+
+```{r configure_env, eval=FALSE}
+configure_environment(env_name="lineaget-env", use_default=F)
 ```
 
 The function will first check if a Anaconda or Miniconda installation is available, otherwise it will prompt a Miniconda installation.
-Then, if the `conda` environment `lineagt-env` is not availabe, it will create it and the required `Python` dependecies will be installed in the environment.
+The input name of the environment is either the name of an existing environment or the name of the environment to be created.
+The environment will be loaded or created, and the required `Python` dependencies will be installed. 
+
+
+### Check the loaded Python version and environment
+
+The package provides also a set of helper functions to check if an environment is loaded.
+
+- `have_loaded_env()` to check if an environment is already loaded,
+- `which_conda_env()` to check which environment is loaded.
+- `have_python_deps(envname, py_pkgs)` to check if a `Python` packages list is installed in `envname`.
+- `load_conda_env(envname)` to load a specific environment.
