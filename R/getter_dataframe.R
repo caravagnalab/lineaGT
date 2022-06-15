@@ -35,8 +35,9 @@ get_cov_dataframe = function(x) {
 #'
 
 get_vaf_dataframe = function(x, label="") {
-  if (label=="") return(x$vaf.dataframe)
-  return(x[[paste("vaf.dataframe", label, sep=".")]])
+  if (paste("vaf.dataframe", label, sep=".") %in% names(x))
+    return(x[[paste("vaf.dataframe", label, sep=".")]])
+  return(x$vaf.dataframe)
 }
 
 
@@ -104,5 +105,9 @@ get_timepoints = function(x) {
 
 get_color_palette = function(x, label="") {
   if (label=="") return(x$color_palette)
-  return(x[[paste("color_palette", label, sep=".")]])
+
+  if (paste("color_palette", label, sep=".") %in% names(x))
+    return(x[[paste("color_palette", label, sep=".")]])
+  else
+    return(x$color_palette)
 }

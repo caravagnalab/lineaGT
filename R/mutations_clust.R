@@ -8,7 +8,7 @@ run_viber = function(x, vaf.df=NULL, min_frac=0, highlight=list(), do_filter=FAL
     message("A dataframe with the mutations is required!")
   else if (is.null(vaf.df)) vaf.df = x %>% get_vaf_dataframe(label)
 
-  clusters_joined = retrieve_clusters(x, min_frac, highlight)
+  clusters_joined = get_highlight(x, min_frac, highlight)
   x = x %>%
     annotate_vaf_df(vaf.df=vaf.df, min_frac=min_frac, label=label) %>%  # add cluster to each mutation
     check_dp(label=label)  # check for too low values
@@ -16,44 +16,28 @@ run_viber = function(x, vaf.df=NULL, min_frac=0, highlight=list(), do_filter=FAL
   viber_input = x %>% get_input_viber(lineages=lineages, label=label)  # get the input to run viber
 
   joined = data.frame(); fit_all = list()
-  if (infer_phylo) trees = list() # plots = list()
+  if (infer_phylo) trees = list()
 
   for (cluster in clusters_joined) {
     fit_k = fit_cluster_viber(viber_input,
                               cluster=cluster,
-                              infer_phylo=infer_phylo,
-                              lineages=lineages)
-    joined = rbind(joined, fit_k$df)
+                              infer_phylo=infer_phylo)
+
+    joined = joined %>% dplyr::add_row(fit_k$df)
     fit_all[[cluster]] = fit_k$fit
-
-    if (infer_phylo) {
+    if (infer_phylo)
       trees[[cluster]] = fit_k$tree
-    }
   }
 
-  theta = get_binomial_theta(x, label=label)
-  vaf.df = joined %>%
-    dplyr::mutate(labels_mut=paste(labels, labels_viber, sep=".")) %>%
-    wide_to_long_muts() %>%
-    dplyr::inner_join(theta, by=c("labels_mut","labels","timepoints","lineage"))
+  x = add_viber_run(x, viber_run=viber_run_all, label=label)
 
-  color_palette = c(get_color_palette(x, label),
-                    get_colors(x=x,
-                               list_lab=vaf.df %>% dplyr::pull(labels_mut) %>% unique(),
-                               color_palette=x$color_palette))
+  vaf.df = add_theta_to_vaf(x, joined, label=label)
+  x = add_vaf(x, vaf.df=vaf.df, label=label)
 
-  if (label!="") {
-    x[[paste("viber_run", label, sep=".")]] = fit_all
-    x[[paste("vaf.dataframe", label, sep=".")]] = vaf.df
-    x[[paste("trees", label, sep=".")]] = trees
-    x[[paste("color_palette", label, sep=".")]] = color_palette
+  color_palette = update_color_palette(x, clusters_joined, label=label)
+  x = add_color_palette(x, color_palette, label=label)
 
-  } else {
-    x$viber_run = fit_all
-    x$trees = trees
-    x$vaf.dataframe = vaf.df
-    x$color_palette = color_palette
-  }
+  x = add_phylo(x, trees, label=label)
 
   return(x)
 }
@@ -106,51 +90,5 @@ fit_cluster_viber = function(viber_input, cluster, infer_phylo=TRUE) {
   }, silent = T )
 
   return(list("df"=viber_df_k$vaf.df, "fit"=fit_viber, "tree"=tree_joint)) #, "plot"=plot_joint))
-}
-
-
-# function to infer the phylogenies on a fit object
-fit_phylogenies = function(x, vaf.df=NULL, min_frac=0, highlight=list(), do_filter=FALSE,
-                           label="", fit_viber=FALSE, lineages=c()) {
-
-  if (is.null(vaf.df) && !"vaf.dataframe" %in% names(x))
-    message("A dataframe with the mutations is required!")
-  else if (is.null(vaf.df)) vaf.df = x %>% get_vaf_dataframe(label)
-
-  clusters_joined = retrieve_clusters(x, min_frac, highlight)
-  trees = list()
-  if (!"viber_run" %in% names(x) || fit_viber) {
-    return(
-      x %>% run_viber(vaf.df=vaf.df,
-                      highlight=clusters_joined,
-                      lineages=lineages,
-                      label=label,
-                      infer_phylo=TRUE)
-    )
-  }
-
-  viber_run_all = x %>% get_viber_run(label=label)
-  for (cluster in clusters_joined) {
-    viber_run = viber_run_all[[cluster]]
-    tt = fit_trees(viber_run)
-    trees[[cluster]] = tt
-  }
-
-  ll = "trees"
-  if (label != "") ll = paste(ll, label, sep=".")
-  x[[ll]] = trees
-
-  return(x)
-}
-
-
-# to infer the tree on a single cluster
-fit_trees = function(fit_viber) {
-  tree = list() # plot = list()
-  if (length(fit_viber$labels$cluster.Binomial %>% unique) > 1) {
-    tree = VIBER::get_clone_trees(fit_viber)
-  }
-
-  return(tree)
 }
 

@@ -29,7 +29,7 @@ split_to_camelcase = function(txt) {
 }
 
 
-get_colors = function(x=NULL, list_lab=list(), color_palette=list()) {
+get_colors = function(x=NULL, list_lab=list(), color_palette=list(), label="") {
   if (purrr::is_empty(list_lab)) {
     N = x$K
     colss = Polychrome::createPalette(N, c("#856de3", "#9e461c"), target="normal", range=c(15, 80), M=1000)
@@ -39,7 +39,7 @@ get_colors = function(x=NULL, list_lab=list(), color_palette=list()) {
     # means we want colors for the subclones
     colss = c()
     for (cl in color_palette %>% names) {
-      mut_cl = get_unique_muts_labels(x, clusters=c(cl))
+      mut_cl = get_unique_muts_labels(x, clusters=c(cl), label=label)
       if (!purrr::is_empty(mut_cl)) {
         n_cols = mut_cl %>% length() + 1
         new_cols = Polychrome::createPalette(n_cols, c(color_palette[cl]),

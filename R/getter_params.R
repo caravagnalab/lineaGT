@@ -146,22 +146,6 @@ get_z_probs = function(x) {
 }
 
 
-
-# get_z_assignments = function(x) {
-#   py_model = get_model(x)
-#   tryCatch(
-#     expr = {
-#       clusters_sort = get_unique_labels(py_model)
-#       assignments = py_model$params$z_assignments$detach()$numpy()
-#       colnames(assignments) = clusters_sort
-#       rownames(assignments) = py_model$IS
-#       return(assignments) },
-#     error = function(e) return(list()) )
-#
-#   try(expr = { assignm = x$params$assignments; if (!purrr::is_empty(assignm)) return(assignm) }, silent = T)
-# }
-
-
 #' Extract the observations labels.
 #'
 #' @description Returns a list with \code{N} elements, corresponding to the labels for each
@@ -238,7 +222,7 @@ get_unique_labels = function(x) {
 #' @export get_unique_muts_labels
 
 get_unique_muts_labels = function(x, clusters=c(), label="") {
-  if (purrr::is_empty(clusters)) return(get_all_unique_muts_labels(x))
+  if (purrr::is_empty(clusters)) return(get_all_unique_muts_labels(x, label=label))
   return(
     x %>%
       get_vaf_dataframe(label=label) %>%

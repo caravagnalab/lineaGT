@@ -53,7 +53,8 @@ check_dp = function(x, thr=5, label="") {
     dplyr::mutate(alt=ceiling(vaf/100*dp)) %>%
     dplyr::group_by(labels) %>%
     dplyr::mutate(dp=ifelse(dp < thr, mean(dp) %>% as.integer(), dp)) %>%
-    dplyr::ungroup()
+    dplyr::ungroup() %>%
+    dplyr::select(-original_dp)
 
   return(add_vaf(x, joined, label))
 }
@@ -97,6 +98,30 @@ get_input_viber = function(x, lineages=c(), label="") {
     dplyr::select(starts_with("alt"), labels) %>%
     rename_with(.fn = ~str_replace_all(.x, "alt.", ""))
   return(list("successes"=successes, "trials"=trials, "vaf.df"=vaf.df_wide))
+}
+
+
+
+update_color_palette = function(x, clusters=c(), label="") {
+  list_lab = x %>%
+    get_unique_muts_labels(clusters=clusters, label=label)
+  return(
+    c(get_color_palette(x, label),
+      get_colors(x=x,
+                 list_lab=list_lab,
+                 color_palette=x %>% get_color_palette(label=label)))
+  )
+}
+
+
+add_theta_to_vaf = function(x, vaf.df, label="") {
+  theta = get_binomial_theta(x, label=label)
+  return(
+    vaf.df %>%
+      wide_to_long_muts() %>%
+      dplyr::mutate(labels_mut=paste(labels, labels_viber, sep=".")) %>%
+      dplyr::inner_join(theta, by=c("labels_mut","labels","timepoints","lineage"))
+  )
 }
 
 
