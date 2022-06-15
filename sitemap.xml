@@ -79,7 +79,16 @@
     <loc>caravagnalab.github.io/lineaGT/reference/get_z_probs.html</loc>
   </url>
   <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/have_loaded_env.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/have_python_deps.html</loc>
+  </url>
+  <url>
     <loc>caravagnalab.github.io/lineaGT/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/load_conda_env.html</loc>
   </url>
   <url>
     <loc>caravagnalab.github.io/lineaGT/reference/plot.mvnmm.html</loc>
@@ -104,5 +113,8 @@
   </url>
   <url>
     <loc>caravagnalab.github.io/lineaGT/reference/print.mvnmm.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/which_conda_env.html</loc>
   </url>
 </urlset>

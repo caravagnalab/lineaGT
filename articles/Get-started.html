@@ -83,28 +83,51 @@
 <div class="section level3">
 <h3 id="installation-of-the-package">Installation of the package<a class="anchor" aria-label="anchor" href="#installation-of-the-package"></a>
 </h3>
-<p>You can install LineaGT from GitHub using <code>devtools</code></p>
+<p>You can install LineaGT from GitHub using <code>devtools</code>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"caravagnalab/lineaGT"</span><span class="op">)</span></code></pre></div>
 <p>Load the package.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/caravagnalab/lineaGT" class="external-link">lineaGT</a></span><span class="op">)</span> 
-<span class="co">#&gt; Warning: replacing previous import 'cli::num_ansi_colors' by</span>
-<span class="co">#&gt; 'crayon::num_ansi_colors' when loading 'VIBER'</span>
-<span class="co">#&gt; Warning: replacing previous import 'cli::num_ansi_colors' by</span>
-<span class="co">#&gt; 'crayon::num_ansi_colors' when loading 'easypar'</span>
-<span class="co">#&gt; <span style="color: #00BB00;">✔</span> Loading <span style="color: #00BB00;">ctree</span>, <span style="font-style: italic;">'Clone trees in cancer'</span>. Support : <span style="color: #0000BB; font-style: italic;">&lt;https://caravagn.github.io/ctree/&gt;</span></span>
-<span class="co">#&gt; Warning: replacing previous import 'crayon::%+%' by 'ggplot2::%+%' when loading</span>
-<span class="co">#&gt; 'VIBER'</span>
-<span class="co">#&gt; <span style="color: #00BB00;">✔</span> Loading <span style="color: #00BB00;">VIBER</span>, <span style="font-style: italic;">'Variational inference for multivariate Binomial mixtures'</span>. Support : <span style="color: #0000BB; font-style: italic;">&lt;https://caravagn.github.io/VIBER/&gt;</span></span></code></pre></div>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/caravagnalab/lineaGT" class="external-link">lineaGT</a></span><span class="op">)</span> </code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="helper-function-to-install-the-python-dependencies">Helper function to install the Python dependencies<a class="anchor" aria-label="anchor" href="#helper-function-to-install-the-python-dependencies"></a>
+<h3 id="python-dependencies-installation">Python dependencies installation<a class="anchor" aria-label="anchor" href="#python-dependencies-installation"></a>
 </h3>
-<p>A <code>conda</code> environment can be configured running the <code><a href="../reference/configure_environment.html">configure_environment()</a></code> function.</p>
+<p>When the package is loaded, the package will automatically check whether:</p>
+<ul>
+<li><p>a version of Anaconda or Miniconda is available, otherwise a Miniconda installation will be started,</p></li>
+<li><p>if there is no <code>conda</code> environment loaded, the package will check if the <code>lineagt-env</code> is present, otherwise it will be created,</p></li>
+<li><p>to use an existing <code>conda</code> environment, it can be loaded <strong>before</strong> loading the package, either through the <code>reticulate</code> function <code><a href="https://rstudio.github.io/reticulate/reference/use_python.html" class="external-link">reticulate::use_condaenv</a></code> or by using the <code>lineaGT</code> function <code>load_conda_env</code>:</p></li>
+</ul>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/configure_environment.html">configure_environment</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<p>The function will first check if a Anaconda or Miniconda installation is available, otherwise it will prompt a Miniconda installation. Then, if the <code>conda</code> environment <code>lineagt-env</code> is not availabe, it will create it and the required <code>Python</code> dependecies will be installed in the environment.</p>
+<code class="sourceCode R"><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/use_python.html" class="external-link">use_condaenv</a></span><span class="op">(</span><span class="st">"env-name"</span>, required<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
+<span class="fu"><a href="../reference/load_conda_env.html">load_conda_env</a></span><span class="op">(</span>envname<span class="op">=</span><span class="st">"env-name"</span><span class="op">)</span></code></pre></div>
+<ul>
+<li>eventually, if the required <code>Python</code> dependencies are not installed in the loaded environment, they will be installed.</li>
+</ul>
+</div>
+<div class="section level3">
+<h3 id="functions-to-manually-configure-an-environment">Functions to manually configure an environment<a class="anchor" aria-label="anchor" href="#functions-to-manually-configure-an-environment"></a>
+</h3>
+<p>The function ‘pylineaGT’ can also be used interactively to manually configure an existing environment, or to create one from scratch.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/configure_environment.html">configure_environment</a></span><span class="op">(</span>env_name<span class="op">=</span><span class="st">"lineaget-env"</span>, use_default<span class="op">=</span><span class="cn">F</span><span class="op">)</span></code></pre></div>
+<p>The function will first check if a Anaconda or Miniconda installation is available, otherwise it will prompt a Miniconda installation. The input name of the environment is either the name of an existing environment or the name of the environment to be created. The environment will be loaded or created, and the required <code>Python</code> dependencies will be installed.</p>
+</div>
+<div class="section level3">
+<h3 id="check-the-loaded-python-version-and-environment">Check the loaded Python version and environment<a class="anchor" aria-label="anchor" href="#check-the-loaded-python-version-and-environment"></a>
+</h3>
+<p>The package provides also a set of helper functions to check if an environment is loaded.</p>
+<ul>
+<li>
+<code><a href="../reference/have_loaded_env.html">have_loaded_env()</a></code> to check if an environment is already loaded,</li>
+<li>
+<code><a href="../reference/which_conda_env.html">which_conda_env()</a></code> to check which environment is loaded.</li>
+<li>
+<code>have_python_deps(envname, py_pkgs)</code> to check if a <code>Python</code> packages list is installed in <code>envname</code>.</li>
+<li>
+<code>load_conda_env(envname)</code> to load a specific environment.</li>
+</ul>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
