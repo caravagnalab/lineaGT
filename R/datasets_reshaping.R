@@ -14,9 +14,12 @@ long_to_wide_muts = function(vaf.df) {
   return(
     vaf.df %>%
       dplyr::select(alt, dp, vaf, timepoints, lineage, IS, mutation,
-                    dplyr::starts_with("labels"), dplyr::contains("pi")) %>%
+                    dplyr::starts_with("labels"), dplyr::contains("pi"), dplyr::contains("theta")) %>%
       tidyr::pivot_wider(names_from=c("timepoints","lineage"), names_sep=".",
-                         values_from=c("alt","dp","vaf"))
+                         values_from=c(dplyr::starts_with("alt"),
+                                       dplyr::starts_with("dp"),
+                                       dplyr::starts_with("vaf"),
+                                       dplyr::starts_with("theta")))
   )
 }
 
@@ -34,7 +37,10 @@ wide_to_long_cov = function(dataset) {
 wide_to_long_muts = function(vaf.df) {
   return(
     vaf.df %>%
-      tidyr::pivot_longer(cols=c(starts_with("alt"), starts_with("dp"), starts_with("vaf")),
+      tidyr::pivot_longer(cols=c(dplyr::starts_with("alt"),
+                                 dplyr::starts_with("dp"),
+                                 dplyr::starts_with("vaf"),
+                                 dplyr::starts_with("theta")),
                           names_to="type.timepoints.lineage") %>%
       separate(type.timepoints.lineage, into=c("type", "timepoints", "lineage")) %>%
       tidyr::pivot_wider(names_from="type", values_from="value")

@@ -21,14 +21,14 @@
 
 
 plot_vaf = function(x, min_frac=0, highlight=c(), label="") {
+  if (label != "")
+    dataframe = x %>% add_lineage_vaf(label=label)
+  else
+    dataframe = x %>% get_vaf_dataframe()
 
-  dataframe = x %>% get_vaf_dataframe(label=label) %>%
+  dataframe = dataframe %>%
     dplyr::select(-contains("ref"), -contains("dp"), -contains("alt"), -contains("theta")) %>%
     tidyr::pivot_wider(names_from=c("timepoints"), names_sep=".", values_from=c("vaf"), names_prefix="vaf.")
-
-  # if (purrr::is_empty(highlight)) highlight = select_relevant_clusters(x, min_frac)
-  # highlight_v = get_unique_muts_labels(x, highlight, label=label)
-  # color_palette = highlight_palette(x, c(highlight, highlight_v), label=label)
 
   highlight = get_highlight(x, min_frac, highlight, mutations=T, label=label)
   highlight_v = get_unique_muts_labels(x, highlight, label=label)
@@ -72,5 +72,27 @@ plot_vaf_2D = function(dataframe, theta, dim1, dim2, color_palette) {
     my_ggplot_theme()
 
   return(pl)
+}
+
+
+
+add_lineage_vaf = function(x, label="") {
+  ll_used = x %>% get_vaf_dataframe(label=label) %>% dplyr::pull(lineage) %>% unique()
+  ll_notused = (x %>% get_lineages())[! (x %>% get_lineages()) %in% ll_used]
+
+  vaf.1 = x %>%
+    get_vaf_dataframe() %>%
+    filter(lineage %in% ll_notused) %>%
+    dplyr::select(-labels_viber, -pi_viber, -labels_mut, -theta) %>%
+    long_to_wide_muts()
+
+  vaf.2 = x %>%
+    get_vaf_dataframe(label=label) %>%
+    long_to_wide_muts()
+
+  return(
+    inner_join(vaf.1, vaf.2, by=c("IS", "mutation", "labels", "labels_init")) %>%
+      wide_to_long_muts()
+  )
 }
 
