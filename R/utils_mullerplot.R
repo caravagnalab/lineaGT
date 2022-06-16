@@ -174,10 +174,8 @@ filter_muller_df = function(df, highlight=highlight) {
     df %>%
       dplyr::mutate(labels=Identity) %>%
       tidyr::separate(labels, into=c("labels", "labels_mut"), sep="[.]", fill="right") %>%
-      dplyr::filter(labels %in% highlight.cov) %>%
+      dplyr::filter(labels %in% c(highlight, "P")) %>%
       dplyr::select(-"labels", -"labels_mut")
   )
 }
-
-
 

@@ -24,6 +24,10 @@ plot_exp_fit(
 \item{facet}{Boolean. If set to \code{TRUE}, the plot will be faceted against the clusters.}
 
 \item{mutations}{Boolean. If set to \code{TRUE}, the growth will be visualize for each cluster of mutations.}
+
+\item{label}{a character corresponding to the label of the run to visualize.}
+
+\item{timepoints_to_int}{a list to map each \code{timepoint} value to an integer.}
 }
 \description{
 Function to visualize the growht of each clone and lineage.

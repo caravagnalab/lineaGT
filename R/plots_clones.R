@@ -8,7 +8,11 @@
 #' computed assuming a exponential growth.
 #' @param highlight a vector of clusters IDs to highlight in the plot.
 #' @param min_frac min_frac numeric value in \code{[0,1]} representing the minimum abundance to highlight a clone.
-#' @param legend.pos position of the legend. If set to \code{"none"}, the legend is not shown.
+#' @param timepoints_to_int a list to map each \code{timepoint} value to an integer.
+#' @param mutations Boolean. If set to \code{TRUE}, also the clusters of mutations will be visualized.
+#' @param single_clone Boolean. If \code{mutations} and \code{single_clone} are set to \code{TRUE}, only the clones
+#' reported in \code{highlight} and the respective subclones will be visualised.
+#' @param label a character corresponding to the label of the run to visualize.#' @param legend.pos position of the legend. If set to \code{"none"}, the legend is not shown.
 #' @param wrap Boolean. If set to \code{TRUE}, a single plot with the mullerplots for each lineage will be returned.
 #'
 #' @examples
@@ -21,9 +25,9 @@
 #' @export plot_mullerplot
 
 plot_mullerplot = function(x, which="frac", highlight=c(), min_frac=0,
-                           legend.pos="right", wrap=F, mutations=F, single_clone=T,
                            timepoints_to_int=list("init"=0,"early"=60,"mid"=140,"late"=280),
-                           label="") {
+                           mutations=F, single_clone=T, label="",
+                           legend.pos="right", wrap=F) {
   highlight.cov = highlight
   highlight = get_highlight(x, min_frac, highlight, mutations=mutations, label=label)
   color_palette = highlight_palette(x, highlight, label)
@@ -31,9 +35,9 @@ plot_mullerplot = function(x, which="frac", highlight=c(), min_frac=0,
   pop_df = get_muller_pop(x, mutations=mutations, map_tp_time=timepoints_to_int, label=label)
   edges_df = get_muller_edges(x, mutations=mutations, label=label)
 
-  if (single_clone) {
-    pop_df = pop_df %>% filter_muller_df(highlight=highlight)
-    edges_df = edges_df %>% filter_muller_df(highlight=highlight)
+  if (single_clone && mutations) {
+    pop_df = pop_df %>% filter_muller_df(highlight=highlight.cov)
+    edges_df = edges_df %>% filter_muller_df(highlight=highlight.cov)
   }
 
   timepoints = x %>% get_dimensions()
@@ -117,6 +121,8 @@ mullerplot_util = function(mullerdf, y, fill, lineage, color_palette, highlight,
 #' @param min_frac min_frac numeric value in \code{[0,1]} representing the minimum abundance to highlight a clone.
 #' @param facet Boolean. If set to \code{TRUE}, the plot will be faceted against the clusters.
 #' @param mutations Boolean. If set to \code{TRUE}, the growth will be visualize for each cluster of mutations.
+#' @param label a character corresponding to the label of the run to visualize.
+#' @param timepoints_to_int a list to map each \code{timepoint} value to an integer.
 #'
 #' @examples
 #' if (FALSE) plot_exp_fit(x)
@@ -173,6 +179,8 @@ exp_fit_util = function(p, pop_df, cl) {
 #' @param min_frac min_frac numeric value in \code{[0,1]} representing the minimum abundance to highlight a clone.
 #' @param facet Boolean. If set to \code{TRUE}, the plot will be faceted against the clusters.
 #' @param mutations Boolean. If set to \code{TRUE}, the growth will be visualize for each cluster of mutations.
+#' @param label a character corresponding to the label of the run to visualize.
+#' @param timepoints_to_int a list to map each \code{timepoint} value to an integer.
 #'
 #' @examples
 #' if (FALSE) plot_exp_rate(x)

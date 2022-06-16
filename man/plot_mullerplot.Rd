@@ -9,12 +9,12 @@ plot_mullerplot(
   which = "frac",
   highlight = c(),
   min_frac = 0,
-  legend.pos = "right",
-  wrap = F,
+  timepoints_to_int = list(init = 0, early = 60, mid = 140, late = 280),
   mutations = F,
   single_clone = T,
-  timepoints_to_int = list(init = 0, early = 60, mid = 140, late = 280),
-  label = ""
+  label = "",
+  legend.pos = "right",
+  wrap = F
 )
 }
 \arguments{
@@ -28,7 +28,14 @@ computed assuming a exponential growth.}
 
 \item{min_frac}{min_frac numeric value in \code{[0,1]} representing the minimum abundance to highlight a clone.}
 
-\item{legend.pos}{position of the legend. If set to \code{"none"}, the legend is not shown.}
+\item{timepoints_to_int}{a list to map each \code{timepoint} value to an integer.}
+
+\item{mutations}{Boolean. If set to \code{TRUE}, also the clusters of mutations will be visualized.}
+
+\item{single_clone}{Boolean. If \code{mutations} and \code{single_clone} are set to \code{TRUE}, only the clones
+reported in \code{highlight} and the respective subclones will be visualised.}
+
+\item{label}{a character corresponding to the label of the run to visualize.#' @param legend.pos position of the legend. If set to \code{"none"}, the legend is not shown.}
 
 \item{wrap}{Boolean. If set to \code{TRUE}, a single plot with the mullerplots for each lineage will be returned.}
 }
