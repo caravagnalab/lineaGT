@@ -63,12 +63,12 @@
   which <span class="op">=</span> <span class="st">"frac"</span>,
   highlight <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>,
   min_frac <span class="op">=</span> <span class="fl">0</span>,
-  legend.pos <span class="op">=</span> <span class="st">"right"</span>,
-  wrap <span class="op">=</span> <span class="cn">F</span>,
+  timepoints_to_int <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>init <span class="op">=</span> <span class="fl">0</span>, early <span class="op">=</span> <span class="fl">60</span>, mid <span class="op">=</span> <span class="fl">140</span>, late <span class="op">=</span> <span class="fl">280</span><span class="op">)</span>,
   mutations <span class="op">=</span> <span class="cn">F</span>,
   single_clone <span class="op">=</span> <span class="cn">T</span>,
-  timepoints_to_int <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>init <span class="op">=</span> <span class="fl">0</span>, early <span class="op">=</span> <span class="fl">60</span>, mid <span class="op">=</span> <span class="fl">140</span>, late <span class="op">=</span> <span class="fl">280</span><span class="op">)</span>,
-  label <span class="op">=</span> <span class="st">""</span>
+  label <span class="op">=</span> <span class="st">""</span>,
+  legend.pos <span class="op">=</span> <span class="st">"right"</span>,
+  wrap <span class="op">=</span> <span class="cn">F</span>
 <span class="op">)</span></code></pre></div>
     </div>
 
@@ -92,8 +92,21 @@ computed assuming a exponential growth.</p></dd>
 <dd><p>min_frac numeric value in <code>[0,1]</code> representing the minimum abundance to highlight a clone.</p></dd>
 
 
-<dt>legend.pos</dt>
-<dd><p>position of the legend. If set to <code>"none"</code>, the legend is not shown.</p></dd>
+<dt>timepoints_to_int</dt>
+<dd><p>a list to map each <code>timepoint</code> value to an integer.</p></dd>
+
+
+<dt>mutations</dt>
+<dd><p>Boolean. If set to <code>TRUE</code>, also the clusters of mutations will be visualized.</p></dd>
+
+
+<dt>single_clone</dt>
+<dd><p>Boolean. If <code>mutations</code> and <code>single_clone</code> are set to <code>TRUE</code>, only the clones
+reported in <code>highlight</code> and the respective subclones will be visualised.</p></dd>
+
+
+<dt>label</dt>
+<dd><p>a character corresponding to the label of the run to visualize.#' @param legend.pos position of the legend. If set to <code>"none"</code>, the legend is not shown.</p></dd>
 
 
 <dt>wrap</dt>
