@@ -21,15 +21,20 @@
 #' @export plot_mullerplot
 
 plot_mullerplot = function(x, which="frac", highlight=c(), min_frac=0,
-                           legend.pos="right", wrap=F, mutations=F,
+                           legend.pos="right", wrap=F, mutations=F, single_clone=T,
                            timepoints_to_int=list("init"=0,"early"=60,"mid"=140,"late"=280),
                            label="") {
-
+  highlight.cov = highlight
   highlight = get_highlight(x, min_frac, highlight, mutations=mutations, label=label)
   color_palette = highlight_palette(x, highlight, label)
 
   pop_df = get_muller_pop(x, mutations=mutations, map_tp_time=timepoints_to_int, label=label)
   edges_df = get_muller_edges(x, mutations=mutations, label=label)
+
+  if (single_clone) {
+    pop_df = pop_df %>% filter_muller_df(highlight=highlight)
+    edges_df = edges_df %>% filter_muller_df(highlight=highlight)
+  }
 
   timepoints = x %>% get_dimensions()
   lineages = x %>% get_lineages()
@@ -100,6 +105,7 @@ mullerplot_util = function(mullerdf, y, fill, lineage, color_palette, highlight,
 
   return(pl)
 }
+
 
 
 #' Exponential fitting

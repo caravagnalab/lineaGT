@@ -16,11 +16,12 @@
 #' @import ggplot2
 #' @importFrom dplyr select starts_with
 #' @importFrom purrr is_empty
+#' @importFrom patchwork wrap_plots
 #'
 #' @export plot_vaf
 
 
-plot_vaf = function(x, min_frac=0, highlight=c(), label="") {
+plot_vaf = function(x, min_frac=0, highlight=c(), label="", wrap=T) {
   if (label != "")
     dataframe = x %>% add_lineage_vaf(label=label)
   else
@@ -51,6 +52,8 @@ plot_vaf = function(x, min_frac=0, highlight=c(), label="") {
     tt = theta %>% filter(labels %in% highlight)
     if (nrow(df) > 0) { p[[t1_t2]] = plot_vaf_2D(df, tt, xy[1], xy[2], color_palette[highlight_v]) }
   }
+
+  if (wrap) return(p %>% patchwork::wrap_plots(guides="collect"))
   return(p)
 }
 

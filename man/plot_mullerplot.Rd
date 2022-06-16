@@ -12,6 +12,7 @@ plot_mullerplot(
   legend.pos = "right",
   wrap = F,
   mutations = F,
+  single_clone = T,
   timepoints_to_int = list(init = 0, early = 60, mid = 140, late = 280),
   label = ""
 )

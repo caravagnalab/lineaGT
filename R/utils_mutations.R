@@ -106,10 +106,11 @@ update_color_palette = function(x, clusters=c(), label="") {
   list_lab = x %>%
     get_unique_muts_labels(clusters=clusters, label=label)
   return(
-    c(get_color_palette(x, label),
+    c(get_color_palette(x, label)[x %>% get_unique_labels()],
       get_colors(x=x,
                  list_lab=list_lab,
-                 color_palette=x %>% get_color_palette(label=label)))
+                 color_palette=get_color_palette(x, label)[x %>% get_unique_labels()],
+                 label=label))
   )
 }
 

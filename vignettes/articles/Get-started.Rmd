@@ -34,7 +34,7 @@ When the package is loaded, the package will automatically check whether:
 
 - if there is no `conda` environment loaded, the package will check if the `lineagt-env` is present, otherwise it will be created,
 
-- to use an existing `conda` environment, it can be loaded **before** loading the package, either through the `reticulate` function `reticulate::use_condaenv` or by using the `lineaGT` function `load_conda_env`:
+- to use an existing `conda` environment, it can be loaded **before** loading the package, either through the `reticulate` function `reticulate::use_condaenv()` or by using the `lineaGT` function `load_conda_env()`:
 
 ```{r load_conda_env, eval=FALSE}
 reticulate::use_condaenv("env-name", required=TRUE)
@@ -62,5 +62,5 @@ The package provides also a set of helper functions to check if an environment i
 
 - `have_loaded_env()` to check if an environment is already loaded,
 - `which_conda_env()` to check which environment is loaded.
-- `have_python_deps(envname, py_pkgs)` to check if a `Python` packages list is installed in `envname`.
-- `load_conda_env(envname)` to load a specific environment.
+- `have_python_deps()` to check if a `Python` packages list is installed in the specified environment.
+- `load_conda_env()` to load the specified environment.

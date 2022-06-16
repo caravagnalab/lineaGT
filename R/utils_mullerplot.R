@@ -24,11 +24,11 @@ get_trees = function(x, label="") {
   return(x[[paste("trees", label, sep=".")]])
 }
 
+
 get_parents = function(x, highlight=c(), label="") {
   if (purrr::is_empty(highlight)) highlight = get_unique_labels(x)
 
-  edges = setNames(data.frame(matrix(ncol=3, nrow=0)),
-                   c("Parent", "Identity", "Label")) %>%
+  edges = setNames(data.frame(matrix(ncol=3, nrow=0)), c("Parent", "Identity", "Label")) %>%
     tibble::as_tibble() %>%
     mutate(Parent=as.character(Parent), Identity=as.character(Identity), Label=as.character(Label))
 
@@ -36,7 +36,7 @@ get_parents = function(x, highlight=c(), label="") {
   for (cluster in highlight) {
     tree = trees[[cluster]]
 
-    if (!purrr::is_empty(tree)) {
+    if (!purrr::is_empty(tree))
       edges = edges %>%
         dplyr::add_row(
           tree[[1]] %>%
@@ -52,8 +52,6 @@ get_parents = function(x, highlight=c(), label="") {
                           Parent=cluster) %>%
             tibble::as_tibble()
         )
-
-    }
   }
   return(edges)
 }
@@ -64,6 +62,7 @@ get_adj = function(tree) {
     tree$adj_mat
   )
 }
+
 
 
 # means format must be a dataframe with columns: labels, timepoints, lineage, mean_cov
@@ -103,6 +102,7 @@ format_means_df = function(mean_df) {
   )
 }
 
+
 add_parent = function(pop_df, x=x) {
   return(
     pop_df %>%
@@ -115,6 +115,7 @@ add_parent = function(pop_df, x=x) {
       )
   )
 }
+
 
 add_time_0 = function(pop_df, x=x) {
   n_tp = x %>% get_timepoints() %>% length()
@@ -142,6 +143,7 @@ add_time_0 = function(pop_df, x=x) {
   )
 }
 
+
 convert_tp = function(pop_df, mapping=list("init"="0","early"="60","mid"="140","late"="280")) {
   if (is.null(mapping)) return(pop_df)
 
@@ -154,6 +156,7 @@ convert_tp = function(pop_df, mapping=list("init"="0","early"="60","mid"="140","
   )
 }
 
+
 add_exp_fit_coeff = function(pop_df) {
   if (pop_df$Generation %>% unique() %>% length() == 1) return(pop_df)
   return(
@@ -162,6 +165,17 @@ add_exp_fit_coeff = function(pop_df) {
       dplyr::mutate(lm_a=coef(lm(log1p(Population)~Generation))[1],
                     lm_r=coef(lm(log1p(Population)~Generation))[2]) %>%
       dplyr::ungroup()
+  )
+}
+
+
+filter_muller_df = function(df, highlight=highlight) {
+  return(
+    df %>%
+      dplyr::mutate(labels=Identity) %>%
+      tidyr::separate(labels, into=c("labels", "labels_mut"), sep="[.]", fill="right") %>%
+      dplyr::filter(labels %in% highlight.cov) %>%
+      dplyr::select(-"labels", -"labels_mut")
   )
 }
 
