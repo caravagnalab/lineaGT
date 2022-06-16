@@ -20,6 +20,11 @@ fit_phylogenies = function(x, vaf.df=NULL, min_frac=0, highlight=list(), do_filt
 
   viber_run_all = x %>% get_viber_run(label=label)
 
+  if (is.null(viber_run_all)){
+    message("No mutations clustering has been performed with the input label!")
+    return()
+  }
+
   for (cluster in clusters_joined) {
     viber_run = viber_run_all[[cluster]]
     tt = fit_trees(viber_run)
@@ -36,8 +41,8 @@ fit_phylogenies = function(x, vaf.df=NULL, min_frac=0, highlight=list(), do_filt
 fit_trees = function(fit_viber) {
   if (length(fit_viber$labels$cluster.Binomial %>% unique) > 1)
     tree = run_ctree(fit_viber)
-  # tree = VIBER::get_clone_trees(fit_viber)
-
+  else
+    tree = list()
 
   return(tree)
 }
