@@ -29,7 +29,7 @@ plot_mullerplot = function(x, which="frac", highlight=c(), min_frac=0,
                            mutations=F, single_clone=T, label="",
                            legend.pos="right", wrap=F) {
   highlight.cov = highlight
-  highlight = get_highlight(x, min_frac, highlight, mutations=mutations, label=label)
+  highlight = get_highlight(x, min_frac, highlight.cov, mutations=mutations, label=label)
   color_palette = highlight_palette(x, highlight, label)
 
   pop_df = get_muller_pop(x, mutations=mutations, map_tp_time=timepoints_to_int, label=label)

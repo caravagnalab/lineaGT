@@ -78,8 +78,34 @@ plot_vaf_2D = function(dataframe, theta, dim1, dim2, color_palette) {
 }
 
 
+plot_vaf_time = function(x, label="", min_frac=0, highlight=c(),
+                         timepoints_to_int=list("init"=0,"early"=60,"mid"=140,"late"=280)) {
+
+  highlight.c = get_highlight(x, min_frac, highlight, mutations=F)
+  highlight.m = get_unique_muts_labels(x, clusters=highlight.c, label=label)
+
+  return(
+    x %>% add_lineage_vaf(label=label) %>%
+      filter(labels %in% highlight.c) %>%
+      mutate(timepoints=timepoints_to_int[timepoints]) %>%
+      mutate(timepoints=unlist(timepoints)) %>%
+      mutate(timepoints=as.numeric(timepoints)) %>%
+      ggplot() +
+      geom_point(aes(x=timepoints, y=vaf, color=labels_mut), alpha=.5, size=.7) +
+      geom_point(aes(x=timepoints, y=theta, color=labels_mut), shape=15, size=1.5) +
+      facet_wrap(labels~lineage, ncol=x %>% get_lineages() %>% length()) +
+      scale_color_manual(values=get_color_palette(x,label=label)[highlight.m]) +
+      ylab("VAF") + xlab("Time") + labs(color="Clusters") +
+      my_ggplot_theme()
+  )
+}
+
+
 
 add_lineage_vaf = function(x, label="") {
+  if (label == "")
+    return(x %>% get_vaf_dataframe())
+
   ll_used = x %>% get_vaf_dataframe(label=label) %>% dplyr::pull(lineage) %>% unique()
   ll_notused = (x %>% get_lineages())[! (x %>% get_lineages()) %in% ll_used]
 
