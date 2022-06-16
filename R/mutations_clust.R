@@ -23,13 +23,13 @@ run_viber = function(x, vaf.df=NULL, min_frac=0, highlight=list(), do_filter=FAL
                               cluster=cluster,
                               infer_phylo=infer_phylo)
 
-    joined = joined %>% dplyr::add_row(fit_k$df)
+    joined = rbind(joined, fit_k$df)
     fit_all[[cluster]] = fit_k$fit
     if (infer_phylo)
       trees[[cluster]] = fit_k$tree
   }
 
-  x = add_viber_run(x, viber_run=viber_run_all, label=label)
+  x = add_viber_run(x, viber_run=fit_all, label=label)
 
   vaf.df = add_theta_to_vaf(x, joined, label=label)
   x = add_vaf(x, vaf.df=vaf.df, label=label)
