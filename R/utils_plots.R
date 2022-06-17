@@ -54,7 +54,7 @@ get_colors = function(x=NULL, list_lab=list(), color_palette=list(), label="") {
 
 
 highlight_palette = function(x, highlight=c(), label="") {
-  if (purrr::is_empty(highlight)) return(color_palette)
+  if (purrr::is_empty(highlight)) return(x$color_palette)
   color_palette = get_color_palette(x, label)
 
   remove = color_palette[!names(color_palette)%in% highlight] %>% names
