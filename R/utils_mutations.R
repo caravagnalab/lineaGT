@@ -8,12 +8,13 @@ get_binomial_theta = function(x, label="") {
       theta = rbind(theta, df_k)
     }
   }
-  return(
-    theta %>%
-      tidyr::pivot_longer(cols=starts_with("v."), names_to="v.timepoints.lineage", values_to="theta") %>%
-      separate(v.timepoints.lineage, into=c("else","timepoints","lineage")) %>%
-      mutate("else"=NULL, theta=theta*100)
-  )
+  if (!purrr::is_empty(theta))
+    return(
+      theta %>%
+        tidyr::pivot_longer(cols=starts_with("v."), names_to="v.timepoints.lineage", values_to="theta") %>%
+        separate(v.timepoints.lineage, into=c("else","timepoints","lineage")) %>%
+        mutate("else"=NULL, theta=theta*100)
+    )
 }
 
 
@@ -117,11 +118,18 @@ update_color_palette = function(x, clusters=c(), label="") {
 
 add_theta_to_vaf = function(x, vaf.df, label="") {
   theta = get_binomial_theta(x, label=label)
+  if (!purrr::is_empty(theta))
+    return(
+      vaf.df %>%
+        wide_to_long_muts() %>%
+        dplyr::mutate(labels_mut=paste(labels, labels_viber, sep=".")) %>%
+        dplyr::inner_join(theta, by=c("labels_mut","labels","timepoints","lineage"))
+      )
   return(
     vaf.df %>%
       wide_to_long_muts() %>%
       dplyr::mutate(labels_mut=paste(labels, labels_viber, sep=".")) %>%
-      dplyr::inner_join(theta, by=c("labels_mut","labels","timepoints","lineage"))
+      dplyr::mutate(theta=0)
   )
 }
 

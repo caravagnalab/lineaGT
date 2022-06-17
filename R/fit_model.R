@@ -52,6 +52,13 @@ fit = function(cov.df,
 
   py_pkg = reticulate::import("pylineaGT")
 
+  max_k = cov.df.e %>% long_to_wide_cov() %>% dplyr::select(-IS) %>% unique() %>% nrow()
+
+  if (k_interval[2] > max_k) {
+    k_interval[2] = min(k_interval[2], max_k-1)
+    k_interval[1] = max(2, k_interval[2] - 10)
+  }
+
   out = py_pkg$run_inference(cov_df=cov.df %>% long_to_wide_cov(),
                              lineages=cov.df$lineage %>% unique(),
                              k_interval=list(as.integer(k_interval[1]), as.integer(k_interval[2])),

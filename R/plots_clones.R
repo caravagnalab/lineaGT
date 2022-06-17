@@ -80,7 +80,7 @@ plot_mullerplot = function(x, which="frac", highlight=c(), min_frac=0,
     }
   }
 
-  if (wrap) return(patchwork::wrap_plots(plot_list, guides="collect"))
+  if (wrap) return(patchwork::wrap_plots(plot_list, guides="collect", ncol=2))
   return(plot_list)
 }
 
