@@ -31,10 +31,12 @@ Imports:
     VIBER,
     Polychrome,
     easypar,
-    patchwork
+    patchwork,
+    ctree
 Remotes:
     caravagn/VIBER,
-    caravagn/easypar
+    caravagn/easypar,
+    caravagn/ctree
 Suggests: 
     knitr, 
     rmarkdown
