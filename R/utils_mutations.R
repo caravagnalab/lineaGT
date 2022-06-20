@@ -3,7 +3,7 @@ add_theta_to_vaf = function(vaf.df, x.muts.k, cluster, label="") {
   if (purrr::is_empty(theta))
     return(
       vaf.df %>%
-        mutate(theta=NA, labels_mut=NA)
+        mutate(theta=NA, labels_mut=paste(labels, labels_viber, sep="."))
     )
   return(
     vaf.df %>%
