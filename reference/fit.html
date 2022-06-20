@@ -62,16 +62,13 @@
   <span class="va">cov.df</span>,
   vaf.df <span class="op">=</span> <span class="cn">NULL</span>,
   infer_phylogenies <span class="op">=</span> <span class="cn">TRUE</span>,
-  timepoints_to_int <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
-  hyperparameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
   k_interval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">30</span><span class="op">)</span>,
-  n_runs <span class="op">=</span> <span class="fl">3</span>,
+  n_runs <span class="op">=</span> <span class="fl">2</span>,
   steps <span class="op">=</span> <span class="fl">500</span>,
   lr <span class="op">=</span> <span class="fl">0.005</span>,
   p <span class="op">=</span> <span class="fl">0.01</span>,
   convergence <span class="op">=</span> <span class="cn">TRUE</span>,
   covariance <span class="op">=</span> <span class="st">"diag"</span>,
-  min_frac <span class="op">=</span> <span class="fl">0</span>,
   show_progr <span class="op">=</span> <span class="cn">FALSE</span>,
   store_grads <span class="op">=</span> <span class="cn">TRUE</span>,
   store_losses <span class="op">=</span> <span class="cn">TRUE</span>,
@@ -82,14 +79,21 @@
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>cov.df</dt>
-<dd><p>Input coverage dataset. It must have at least the columns <code>coverage</code>, <code>timepoints</code>,
-<code>lineage</code>, <code>IS</code>, with the coverage values, timepoint, lineage and IS, respectively.</p></dd>
+<dd><p>Input coverage dataset. It must have at least the columns <code>coverage</code>, and <code>IS</code>,
+and additional columns <code>timepoints</code> and <code>lineage</code>, will be added if missing, assuming single
+timepoint and lineage.</p></dd>
 
 
 <dt>vaf.df</dt>
-<dd><p>Input VAF dataset. It must have at least the columns <code>alt</code>, <code>dp</code>, <code>vaf</code>,
-<code>timepoints</code>, <code>lineage</code>, <code>IS</code>, <code>mutation</code>, with the number of reads for the mutated allele,
+<dd><p>Input VAF dataset. If not <code>NULL</code>, the mutations clustering will be performed.
+It must have at least the columns <code>mutation</code>, <code>IS</code>, <code>alt</code>, <code>dp</code>, and additional
+<code>vaf</code>, <code>timepoints</code>, <code>lineage</code>, <code>IS</code>, <code>mutation</code>, with the number of reads for the mutated allele,
 overall depth, vaf values, timepoint, lineage, IS and mutation, respectively.</p></dd>
+
+
+<dt>infer_phylogenies</dt>
+<dd><p>A Boolean. If set to <code>TRUE</code>, the function will also compute and attach to
+the returned object the phylogenetic trees for each cluster.</p></dd>
 
 
 <dt>k_interval</dt>
@@ -108,8 +112,27 @@ overall depth, vaf values, timepoint, lineage, IS and mutation, respectively.</p
 <dd><p>Learning rate used in the inference.</p></dd>
 
 
+<dt>convergence</dt>
+<dd><p>A Boolean. If set to <code>TRUE</code>, the function will check for early convergence,
+otherwise it will perform <code>steps</code> iterations.</p></dd>
+
+
 <dt>covariance</dt>
 <dd><p>Covariance type for the Multivariate Gaussian.</p></dd>
+
+
+<dt>show_progr</dt>
+<dd><p>A Boolean. If <code>TRUE</code>, the progression bar will be shown during inference.</p></dd>
+
+
+<dt>store_grads</dt>
+<dd><p>A Booolean. If <code>TRUE</code>, the gradient norms for the parameters at each
+iteration will be stored.</p></dd>
+
+
+<dt>store_losses</dt>
+<dd><p>A Boolean. If <code>TRUE</code>, the computed losses for the parameters at each
+iteration will be stored.</p></dd>
 
 
 <dt>random_state</dt>
