@@ -65,32 +65,5 @@ highlight_palette = function(x, highlight=c(), label="") {
 }
 
 
-select_relevant_clusters = function(x, min_frac) {
-  return(
-    x %>%
-      get_muller_pop(map_tp_time=NULL) %>%
-      group_by(Identity) %>%
-      filter(any(Frequency > min_frac), Identity!="P") %>%
-      dplyr::pull(Identity) %>%
-      unique()
-  )
-}
-
-
-get_highlight = function(x, min_frac=0, highlight=c(), mutations=F, label="") {
-  if (mutations) {
-    if (purrr::is_empty(highlight)) highlight = select_relevant_clusters(x, min_frac)
-    highlight_v = get_unique_muts_labels(x, highlight, label=label)
-    return(
-      c(c(highlight, highlight_v))
-    )
-  }
-
-  if (purrr::is_empty(highlight)) highlight = x %>% get_unique_labels()
-  return(
-    intersect(select_relevant_clusters(x, min_frac), highlight)
-  )
-}
-
 
 

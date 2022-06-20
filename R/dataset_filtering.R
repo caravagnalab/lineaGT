@@ -18,14 +18,14 @@
 #' @export filter_dataset
 
 filter_dataset = function(cov.df,
-                          min_cov=50,
+                          min_cov=5,
                           min_frac=0.05,
                           k_interval=c(5,30),
                           metric="calinski_harabasz_score",
                           random_state=25) {
 
   py_pkg = reticulate::import("pylineaGT")
-  x = initialize_object(K=as.integer(1), dataset=cov.df, py_pkg)
+  x = initialize_object(K=as.integer(1), cov.df=cov.df, py_pkg)
   x$py_model$filter_dataset(min_cov=as.integer(min_cov),
                             min_ccf=as.numeric(min_frac),
                             metric=metric,

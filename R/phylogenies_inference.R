@@ -1,3 +1,4 @@
+# TODO add reference and export the function
 # function to infer the phylogenies on a fit object
 fit_phylogenies = function(x, vaf.df=NULL, min_frac=0, highlight=list(), do_filter=FALSE,
                            label="", fit_viber=FALSE, lineages=c()) {
@@ -11,19 +12,17 @@ fit_phylogenies = function(x, vaf.df=NULL, min_frac=0, highlight=list(), do_filt
   trees = list()
   if (!"viber_run" %in% names(x) || fit_viber)
     return(
-      x %>% run_viber(vaf.df=vaf.df,
+      x %>% fit_mutations(vaf.df=vaf.df,
                       highlight=clusters_joined,
                       lineages=lineages,
                       label=label,
                       infer_phylo=TRUE)
     )
 
-  viber_run_all = x %>% get_viber_run(label=label)
+  viber_run_all = x %>% get_muts_fit(label=label)
 
-  if (is.null(viber_run_all)){
-    message("No mutations clustering has been performed with the input label!")
-    return()
-  }
+  if (is.null(viber_run_all))
+    return(message("No mutations clustering has been performed with the input label!"))
 
   for (cluster in clusters_joined) {
     viber_run = viber_run_all[[cluster]]
@@ -46,7 +45,6 @@ fit_trees = function(fit_viber) {
 
   return(tree)
 }
-
 
 
 run_ctree = function(viber_run) {

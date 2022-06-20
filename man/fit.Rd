@@ -8,16 +8,13 @@ fit(
   cov.df,
   vaf.df = NULL,
   infer_phylogenies = TRUE,
-  timepoints_to_int = list(),
-  hyperparameters = list(),
   k_interval = c(10, 30),
-  n_runs = 3,
+  n_runs = 2,
   steps = 500,
   lr = 0.005,
   p = 0.01,
   convergence = TRUE,
   covariance = "diag",
-  min_frac = 0,
   show_progr = FALSE,
   store_grads = TRUE,
   store_losses = TRUE,
@@ -25,12 +22,17 @@ fit(
 )
 }
 \arguments{
-\item{cov.df}{Input coverage dataset. It must have at least the columns \code{coverage}, \code{timepoints},
-\code{lineage}, \code{IS}, with the coverage values, timepoint, lineage and IS, respectively.}
+\item{cov.df}{Input coverage dataset. It must have at least the columns \code{coverage}, and \code{IS},
+and additional columns \code{timepoints} and \code{lineage}, will be added if missing, assuming single
+timepoint and lineage.}
 
-\item{vaf.df}{Input VAF dataset. It must have at least the columns \code{alt}, \code{dp}, \code{vaf},
-\code{timepoints}, \code{lineage}, \code{IS}, \code{mutation}, with the number of reads for the mutated allele,
+\item{vaf.df}{Input VAF dataset. If not \code{NULL}, the mutations clustering will be performed.
+It must have at least the columns \code{mutation}, \code{IS}, \code{alt}, \code{dp}, and additional
+\code{vaf}, \code{timepoints}, \code{lineage}, \code{IS}, \code{mutation}, with the number of reads for the mutated allele,
 overall depth, vaf values, timepoint, lineage, IS and mutation, respectively.}
+
+\item{infer_phylogenies}{A Boolean. If set to \code{TRUE}, the function will also compute and attach to
+the returned object the phylogenetic trees for each cluster.}
 
 \item{k_interval}{Interval of K values to test.}
 
@@ -40,7 +42,18 @@ overall depth, vaf values, timepoint, lineage, IS and mutation, respectively.}
 
 \item{lr}{Learning rate used in the inference.}
 
+\item{convergence}{A Boolean. If set to \code{TRUE}, the function will check for early convergence,
+otherwise it will perform \code{steps} iterations.}
+
 \item{covariance}{Covariance type for the Multivariate Gaussian.}
+
+\item{show_progr}{A Boolean. If \code{TRUE}, the progression bar will be shown during inference.}
+
+\item{store_grads}{A Booolean. If \code{TRUE}, the gradient norms for the parameters at each
+iteration will be stored.}
+
+\item{store_losses}{A Boolean. If \code{TRUE}, the computed losses for the parameters at each
+iteration will be stored.}
 
 \item{random_state}{Value of the seed.}
 }

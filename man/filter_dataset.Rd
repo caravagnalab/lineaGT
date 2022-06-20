@@ -6,7 +6,7 @@
 \usage{
 filter_dataset(
   cov.df,
-  min_cov = 50,
+  min_cov = 5,
   min_frac = 0.05,
   k_interval = c(5, 30),
   metric = "calinski_harabasz_score",

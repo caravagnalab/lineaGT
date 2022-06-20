@@ -1,10 +1,15 @@
 # Function to perform a single run of the model
-fit_singleK = function(k, df, run="", steps=500, covariance="diag", lr=0.001,
-                      p=0.01, convergence=TRUE, random_state=25, py_pkg=NULL) {
+fit_singleK = function(k,
+                       cov.df,
+                       steps=500,
+                       covariance="diag",
+                       lr=0.001,
+                       p=0.01,
+                       convergence=TRUE,
+                       random_state=25,
+                       py_pkg=NULL) {
 
-  # print(paste("RUN", run, "- K =", k))
-
-  x = initialize_object(k, df, py_pkg)
+  x = initialize_object(k, cov.df, py_pkg)
   x = run_inference(x,
                     steps=as.integer(steps),
                     covariance=covariance,
@@ -27,15 +32,19 @@ fit_singleK = function(k, df, run="", steps=500, covariance="diag", lr=0.001,
 
 # Function to initialize a python model
 # takes as input the long dataframe
-initialize_object = function(K, dataset, py_pkg=NULL) {
-  if (is.null(py_pkg)) py_pkg = reticulate::import("pylineaGT")
+initialize_object = function(K,
+                             cov.df,
+                             py_pkg=NULL) {
+  if (is.null(py_pkg))
+    py_pkg = reticulate::import("pylineaGT")
 
-  lineages = dataset$lineage %>% unique()
-  if (!is.null(dataset$timepoints %>% levels())) timepoints = dataset$timepoints %>% levels()
-  else timepoints = dataset$timepoints %>% unique()
+  lineages = cov.df %>% check_lineages()
+  timepoints = cov.df %>% check_timepoints()
 
-  df = long_to_wide_cov(dataset)
-  columns = df %>% dplyr::select(dplyr::starts_with("cov")) %>% colnames()
+  df = long_to_wide_cov(cov.df)
+  columns = df %>%
+    dplyr::select(dplyr::starts_with("cov")) %>%
+    colnames()
   IS = df$IS
 
   py_model = py_pkg$mvnmm$MVNMixtureModel(K=as.integer(K),
@@ -48,6 +57,29 @@ initialize_object = function(K, dataset, py_pkg=NULL) {
 }
 
 
+check_lineages = function(cov.df) {
+  if ("lineage" %in% (cov.df %>% colnames()))
+    lineages = cov.df$lineage %>% unique()
+  else
+    lineages = "l.1"
+
+  return(lineages)
+}
+
+
+check_timepoints = function(cov.df) {
+  if ("timepoints" %in% (cov.df %>% colnames())) {
+    if (!is.null(cov.df$timepoints %>% levels()))
+      timepoints = cov.df$timepoints %>% levels()
+    else
+      timepoints = cov.df$timepoints %>% unique()
+  } else
+    timepoints = "t.1"
+
+  return(timepoints)
+}
+
+
 run_inference = function(x, steps=500, covariance="diag", lr=0.005,
                          p=0.01, convergence=TRUE, random_state=25) {
   x$py_model$fit(steps=as.integer(steps),
@@ -55,8 +87,7 @@ run_inference = function(x, steps=500, covariance="diag", lr=0.005,
                  lr=as.numeric(lr),
                  p=as.numeric(p),
                  convergence=convergence,
-                 random_state=as.integer(random_state),
-                 convergence=TRUE)
+                 random_state=as.integer(random_state))
   return(update_params(x))
 }
 

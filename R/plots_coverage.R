@@ -16,7 +16,6 @@
 #' @importFrom dplyr select all_of
 #' @export plot_scatter_density
 
-
 plot_scatter_density = function(x, plot_density=T, facet=FALSE, highlight=c()) {
   dataset = x %>% get_cov_dataframe() %>% long_to_wide_cov()
 
@@ -79,7 +78,6 @@ plot_2D = function(x, dim1, dim2, color_palette, highlight, dens=NULL, facet=F, 
 #' if (FALSE) plot_marginal(x)
 #'
 #' @export plot_marginal
-
 
 plot_marginal = function(x, min_frac=0, highlight=c(), binwidth=5) {
   highlight = get_highlight(x, min_frac, highlight)

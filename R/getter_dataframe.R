@@ -41,18 +41,6 @@ get_vaf_dataframe = function(x, label="") {
 }
 
 
-get_viber_run = function(x, label="") {
-  if (label == "") return(x$viber_run)
-  return(x[[paste("viber_run", label, sep=".")]])
-}
-
-
-get_model = function(x) {
-  if ("mvnmm" %in% class(x)) return(x$py_model)
-  if ("pylineaGT.mvnmm.MVNMixtureModel" %in% class(x)) return(x)
-}
-
-
 #' Extract the model dimensions.
 #'
 #' @description Returns a vector with the dimensions of the model.
@@ -68,6 +56,7 @@ get_model = function(x) {
 get_dimensions = function(x) {
   return(x$dimensions)
 }
+
 
 #' Extract the data lineages.
 #'
@@ -103,6 +92,18 @@ get_timepoints = function(x) {
 }
 
 
+get_muts_fit = function(x, label="") {
+  if (label == "") return(x$viber_run)
+  return(x[[paste("viber_run", label, sep=".")]])
+}
+
+
+get_model = function(x) {
+  if ("mvnmm" %in% class(x)) return(x$py_model)
+  if ("pylineaGT.mvnmm.MVNMixtureModel" %in% class(x)) return(x)
+}
+
+
 get_color_palette = function(x, label="") {
   if (label=="") return(x$color_palette)
 
@@ -110,4 +111,20 @@ get_color_palette = function(x, label="") {
     return(x[[paste("color_palette", label, sep=".")]])
   else
     return(x$color_palette)
+}
+
+
+get_trees = function(x, label="") {
+  if (!any(grepl("trees", x %>% names)))
+    return(list())
+  if (label=="")
+    return(x$trees)
+  return(x[[paste("trees", label, sep=".")]])
+}
+
+
+get_adj = function(tree.k) {
+  return(
+    tree.k$adj_mat
+  )
 }

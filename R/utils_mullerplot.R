@@ -3,7 +3,9 @@ get_muller_edges = function(x, mutations=FALSE, label="") {
 
   if (!mutations) return(edges)
 
-  edges = x %>% get_binomial_theta(label=label) %>%
+  edges = x %>%
+    # get_binomial_theta(label=label) %>%
+    get_vaf_dataframe(label=label) %>%
     inner_join(x %>% get_mean_long(), by=c("labels", "timepoints", "lineage")) %>%
     dplyr::rename(Parent=labels, Identity=labels_mut) %>%
     dplyr::select(Parent, Identity) %>% unique() %>%
@@ -19,15 +21,10 @@ get_muller_edges = function(x, mutations=FALSE, label="") {
 }
 
 
-get_trees = function(x, label="") {
-  if (label=="") return(x$trees)
-  return(x[[paste("trees", label, sep=".")]])
-}
-
-
 get_parents = function(x, highlight=c(), label="") {
   if (purrr::is_empty(highlight)) highlight = get_unique_labels(x)
 
+  # create an empty dataset with colnames
   edges = setNames(data.frame(matrix(ncol=3, nrow=0)), c("Parent", "Identity", "Label")) %>%
     tibble::as_tibble() %>%
     mutate(Parent=as.character(Parent), Identity=as.character(Identity), Label=as.character(Label))
@@ -58,14 +55,6 @@ get_parents = function(x, highlight=c(), label="") {
 }
 
 
-get_adj = function(tree) {
-  return(
-    tree$adj_mat
-  )
-}
-
-
-
 # means format must be a dataframe with columns: labels, timepoints, lineage, mean_cov
 get_muller_pop = function(x, map_tp_time=list("init"=0,"early"=60,"mid"=140,"late"=280),
                           mutations=FALSE, label="") {
@@ -73,7 +62,11 @@ get_muller_pop = function(x, map_tp_time=list("init"=0,"early"=60,"mid"=140,"lat
 
   if (mutations)
     # the means dataframe must contain also the subclones
-    means = x %>% get_binomial_theta(label=label) %>%
+    means = x %>%
+      # get_binomial_theta(label=label) %>%
+      get_vaf_dataframe(label=label) %>%
+      dplyr::select(theta, dplyr::contains("labels"), timepoints, lineage) %>%
+      unique() %>%
       inner_join(means, by=c("labels", "timepoints", "lineage")) %>%
       mutate(mean_cov=theta/100*mean_cov) %>%
       dplyr::rename(parent=labels, labels=labels_mut) %>%
@@ -138,7 +131,7 @@ add_time_0 = function(pop_df, x=x) {
         Identity=rep( "P", times = n_lins ),
         Population=rep( 1, times = n_lins ),
         Frequency=rep( 1, times = n_lins ),
-        Generation=rep( "init", times = n_lins),
+        Generation=rep( "init", times = n_lins ),
         Lineage=x$lineages
       )
   )

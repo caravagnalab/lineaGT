@@ -28,7 +28,7 @@ plot_mullerplot = function(x, which="frac", highlight=c(), min_frac=0,
                            timepoints_to_int=list("init"=0,"early"=60,"mid"=140,"late"=280),
                            mutations=F, single_clone=T, label="",
                            legend.pos="right", wrap=F) {
-  highlight.cov = highlight
+  highlight.cov = get_highlight(x, min_frac=min_frac, highlight=highlight)
   highlight = get_highlight(x, min_frac, highlight.cov, mutations=mutations, label=label)
   color_palette = highlight_palette(x, highlight, label)
 
@@ -48,6 +48,8 @@ plot_mullerplot = function(x, which="frac", highlight=c(), min_frac=0,
     tp = timepoints[grep(pattern=ll, x=timepoints)]
     if (length(tp) != 0) {
       pop_ll = pop_df %>% filter(Lineage==ll)
+      print(edges_df)
+      print(pop_ll)
       mullerdf_ll = ggmuller::get_Muller_df(edges_df, pop_ll)
 
       if (which == "frac" || which == "")

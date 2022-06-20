@@ -1,6 +1,6 @@
-add_viber_run = function(x, viber_run, label="") {
-  if (label == "") x$viber_run = viber_run
-  else x[[paste("viber_run", label, sep=".")]] = viber_run
+add_muts_fit = function(x, x.muts, label="") {
+  if (label == "") x$x.muts = x.muts
+  else x[[paste("x.muts", label, sep=".")]] = x.muts
   return(x)
 }
 
