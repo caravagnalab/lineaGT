@@ -88,7 +88,7 @@ fit_cluster_viber = function(input, cluster, infer_phylo=TRUE) {
   }, silent = T)
 
   if (purrr::is_empty(x.muts.k)) {
-    input.k$vaf.df$labels_viber = NA
+    input.k$vaf.df$labels_viber = "C1"
     input.k$vaf.df$pi_viber = NA
   }
 

@@ -237,6 +237,7 @@ get_unique_muts_labels = function(x, clusters=c(), label="") {
 get_all_unique_muts_labels = function(x, label="") {
   labels = x %>%
     get_vaf_dataframe(label=label) %>%
+    tidyr::drop_na() %>%
     dplyr::pull(labels_mut) %>%
     unique()
   return(labels)

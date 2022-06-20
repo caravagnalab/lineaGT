@@ -28,6 +28,7 @@ plot_vaf = function(x, min_frac=0, highlight=c(), label="", wrap=T) {
     dataframe = x %>% get_vaf_dataframe()
 
   dataframe = dataframe %>%
+    dplyr::mutate(theta=theta*100) %>%
     dplyr::select(-contains("ref"), -contains("dp"), -contains("alt")) %>%
     tidyr::pivot_wider(names_from=c("timepoints"),
                        names_sep=".",
@@ -41,20 +42,14 @@ plot_vaf = function(x, min_frac=0, highlight=c(), label="", wrap=T) {
                              dplyr::select(dplyr::starts_with("vaf")) %>%
                              colnames)
 
-  # theta = x %>%
-  #   get_%>%
-  #   tidyr::pivot_wider(names_from=c("timepoints"),
-  #                      values_from=c("theta"),
-  #                      names_prefix="vaf.",
-  #                      names_sep=".")
-
   p = list()
   for (t1_t2 in combinations$pair_name) {
     xy.vaf = strsplit(t1_t2, ":")[[1]]
     xy.theta = str_replace_all(xy.vaf, "vaf.", "theta.")
 
-    df = dataframe %>% filter(labels %in% highlight)
-    tt = theta %>% filter(labels %in% highlight)
+    df = dataframe %>%
+      filter(labels %in% highlight)
+
     if (nrow(df) > 0) { p[[t1_t2]] = plot_vaf_2D(df, xy.vaf, xy.theta, color_palette[highlight_v]) }
   }
 
@@ -65,12 +60,14 @@ plot_vaf = function(x, min_frac=0, highlight=c(), label="", wrap=T) {
 
 
 plot_vaf_2D = function(dataframe, dims.vaf, dims.theta, color_palette) {
+  if (nrow(dataframe) == 1)
+    return(message("Only one mutation"))
   pl = dataframe %>%
     dplyr::select(starts_with("vaf"), starts_with("theta"), labels, lineage, labels_mut, mutation, pi_viber) %>%
     ggplot() +
     geom_point(aes_string(x=dims.vaf[1], y=dims.vaf[2], color="labels_mut"), alpha=.5, size=.7) +
     # geom_point(data=theta, aes_string(x=dim1, y=dim2, color="labels_mut"), shape=15, inherit.aes=F, size=1.5) +
-    geom_point(aes_string(x=dims.theta[1]*100, y=dims.theta[2]*100, color="labels_mut"), shape=15, inherit.aes=F, size=1.5) +
+    geom_point(aes_string(x=dims.theta[1], y=dims.theta[2], color="labels_mut"), shape=15, inherit.aes=F, size=1.5) +
     facet_grid(lineage ~ labels) +
     scale_color_manual(values=color_palette) +
     xlab(split_to_camelcase(dims.vaf[1])) +
@@ -103,7 +100,7 @@ plot_vaf_time = function(x, min_frac=0, highlight=c(), label="",
       facet_wrap(labels~lineage, ncol=x %>% get_lineages() %>% length()) +
       scale_color_manual(values=get_color_palette(x,label=label)[highlight.m]) +
       ylab("VAF") + xlab("Time") + labs(color="Clusters") +
-      my_ggplot_theme()
+      ylim(0,100) + my_ggplot_theme()
   )
 }
 

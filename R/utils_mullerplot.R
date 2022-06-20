@@ -66,9 +66,11 @@ get_muller_pop = function(x, map_tp_time=list("init"=0,"early"=60,"mid"=140,"lat
       # get_binomial_theta(label=label) %>%
       get_vaf_dataframe(label=label) %>%
       dplyr::select(theta, dplyr::contains("labels"), timepoints, lineage) %>%
+      dplyr::select(-labels_init, -labels_viber) %>%
+      tidyr::drop_na() %>%
       unique() %>%
       inner_join(means, by=c("labels", "timepoints", "lineage")) %>%
-      mutate(mean_cov=theta/100*mean_cov) %>%
+      mutate(mean_cov=theta*mean_cov) %>%
       dplyr::rename(parent=labels, labels=labels_mut) %>%
       dplyr::add_row( means %>% mutate(parent="P") )
 

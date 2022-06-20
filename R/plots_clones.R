@@ -48,8 +48,6 @@ plot_mullerplot = function(x, which="frac", highlight=c(), min_frac=0,
     tp = timepoints[grep(pattern=ll, x=timepoints)]
     if (length(tp) != 0) {
       pop_ll = pop_df %>% filter(Lineage==ll)
-      print(edges_df)
-      print(pop_ll)
       mullerdf_ll = ggmuller::get_Muller_df(edges_df, pop_ll)
 
       if (which == "frac" || which == "")
