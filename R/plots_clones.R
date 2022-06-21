@@ -47,7 +47,7 @@ plot_mullerplot = function(x, which="frac", highlight=c(), min_frac=0,
   for (ll in lineages) {
     tp = timepoints[grep(pattern=ll, x=timepoints)]
     if (length(tp) != 0) {
-      pop_ll = pop_df %>% filter(Lineage==ll)
+      pop_ll = pop_df %>% dplyr::filter(Lineage==ll)
       mullerdf_ll = ggmuller::get_Muller_df(edges_df, pop_ll)
 
       if (which == "frac" || which == "")
@@ -139,7 +139,7 @@ plot_exp_fit = function(x, highlight=c(), min_frac=0, facet=F, mutations=F, labe
     get_unique_muts_labels(clusters=highlight, label=label)
   color_palette = highlight_palette(x, highlight, label)
 
-  p = pop_df %>% filter(Identity %in% highlight) %>%
+  p = pop_df %>% dplyr::filter(Identity %in% highlight) %>%
     ggplot(aes(x=Generation, y=Population, color=Identity)) +
     geom_point(alpha=.3) + my_ggplot_theme() + ylab("")
 
@@ -158,8 +158,8 @@ exp_fit_util = function(p, pop_df, cl) {
   lineages = pop_df %>% dplyr::filter(Identity == cl) %>% dplyr::pull(Lineage) %>% unique()
   exp_df = data.frame()
   for(ll in lineages) {
-    lm_a = (pop_df %>% filter(Identity==cl, Lineage==ll))$lm_a %>% unique()
-    lm_r = (pop_df %>% filter(Identity==cl, Lineage==ll))$lm_r %>% unique()
+    lm_a = (pop_df %>% dplyr::filter(Identity==cl, Lineage==ll))$lm_a %>% unique()
+    lm_r = (pop_df %>% dplyr::filter(Identity==cl, Lineage==ll))$lm_r %>% unique()
 
     xx = 1:max(pop_df$Generation)
     yy = exp(lm_a)*exp(lm_r*xx)
