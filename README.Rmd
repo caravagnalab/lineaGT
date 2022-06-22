@@ -15,7 +15,8 @@ knitr::opts_chunk$set(
   [![R-CMD-check](https://github.com/caravagnalab/LineaGT/workflows/R-CMD-check/badge.svg)](https://github.com/caravagnalab/LineaGT/actions)
 <!-- badges: end -->
 
-# lineaGT <a href="https://caravagnalab.github.io/LineaGT/"><img src="man/figures/logo.jpg" align="right" height="46" /></a>
+# lineaGT <a href="caravagnalab.github.io/lineaGT"><img src="man/figures/logo.png" align="right" height="139" /></a>
+
 
 This package implements algorithm to determine lineage inference for gene therapy assays based on insertion sites, accounting also for somatic mutations accumulation. The  assays supported by the `lineaGT` package are ....... 
 
