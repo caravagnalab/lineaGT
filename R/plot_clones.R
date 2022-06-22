@@ -26,14 +26,14 @@
 
 plot_mullerplot = function(x, which="frac", highlight=c(), min_frac=0,
                            timepoints_to_int=list("init"=0,"early"=60,"mid"=140,"late"=280),
-                           mutations=F, single_clone=T, label="",
+                           mutations=F, single_clone=T, tree_score=1, label="",
                            legend.pos="right", wrap=F) {
   highlight.cov = get_highlight(x, min_frac=min_frac, highlight=highlight)
   highlight = get_highlight(x, min_frac, highlight.cov, mutations=mutations, label=label)
   color_palette = highlight_palette(x, highlight, label)
 
   pop_df = get_muller_pop(x, mutations=mutations, map_tp_time=timepoints_to_int, label=label)
-  edges_df = get_muller_edges(x, mutations=mutations, label=label)
+  edges_df = get_muller_edges(x, mutations=mutations, label=label, tree_score=tree_score)
 
   if (single_clone && mutations) {
     pop_df = pop_df %>% filter_muller_df(highlight=highlight.cov)
@@ -43,71 +43,87 @@ plot_mullerplot = function(x, which="frac", highlight=c(), min_frac=0,
   timepoints = x %>% get_dimensions()
   lineages = x %>% get_lineages()
 
-  plot_list = list()
+  mullerdf = data.frame()
   for (ll in lineages) {
     tp = timepoints[grep(pattern=ll, x=timepoints)]
     if (length(tp) != 0) {
-      pop_ll = pop_df %>% dplyr::filter(Lineage==ll)
-      mullerdf_ll = ggmuller::get_Muller_df(edges_df, pop_ll)
+      pop_ll = pop_df %>% filter(Lineage==ll)
+      mullerdf_ll = ggmuller::get_Muller_df(edges_df, pop_ll) %>%
+        dplyr::mutate(Lineage=ll)
 
-      if (which == "frac" || which == "")
-        plot_list[[ll]] = mullerplot_util(mullerdf_ll,
-                                          y="Frequency",
-                                          fill="Identity",
-                                          lineage=ll,
-                                          highlight=highlight,
-                                          color_palette=color_palette,
-                                          legend.pos=legend.pos)
-      if (which == "pop" || which == "")
-        plot_list[[ll]] = mullerplot_util(mullerdf_ll %>% ggmuller::add_empty_pop(),
-                                          y="Population",
-                                          highlight=highlight,
-                                          fill="Identity",
-                                          color_palette=color_palette,
-                                          lineage=ll,
-                                          legend.pos=legend.pos)
-      if (which == "fitness"){
-        exp_limits = c(min(pop_df$lm_r), max(pop_df$lm_r))
-        plot_list[[ll]] = mullerplot_util(mullerdf_ll,
-                                          y="Frequency",
-                                          fill="lm_r",
-                                          highlight=highlight,
-                                          color_palette=color_palette,
-                                          lineage=ll,
-                                          legend.pos=legend.pos,
-                                          exp_limits=exp_limits)
-      }
+      mullerdf = rbind(mullerdf, mullerdf_ll)
     }
   }
 
-  if (wrap) return(patchwork::wrap_plots(plot_list, guides="collect", ncol=2))
-  return(plot_list)
+  return(
+    mullerplot_util(mullerdf,
+                    which=which,
+                    highlight=highlight,
+                    color_palette=color_palette,
+                    legend.pos=legend.pos)
+  )
+
+  mullerdf_ll_all %>% pop_df_add_empty() %>%
+    mullerplot_util(y="Population",
+                    fill="Identity",
+                    highlight=highlight,
+                    color_palette=color_palette,
+                    legend.pos=legend.pos)
+
+  mullerdf_ll_all %>%
+    mullerplot_util(y="Frequency",
+                    fill="Identity",
+                    highlight=highlight,
+                    color_palette=color_palette,
+                    legend.pos=legend.pos)
+
 }
 
 
-mullerplot_util = function(mullerdf, y, fill, lineage, color_palette, highlight,
-                           legend.pos="right", exp_limits=NULL) {
-  if (fill=="Identity")
-    pl = mullerdf %>% ggplot() +
-      geom_area(aes_string(x="Generation", y=y, group="Group_id", fill="Identity", colour="Identity"), alpha=.9) +
+# mullerdf,
+# which=which,
+# highlight=highlight,
+# color_palette=color_palette,
+# legend.pos=legend.pos
+
+mullerplot_util = function(mullerdf, which, color_palette, highlight, legend.pos="right") {
+  if (which == "fitness") {
+    exp_limits = c(min(mullerdf$lm_r), max(mullerdf$lm_r))
+
+    return(
+      mullerdf %>% ggplot() +
+        geom_area(aes_string(x="Generation", y="Frequency", group="Group_id", fill="lm_r")) +
+        geom_vline(xintercept=mullerdf$Generation %>% unique(), linetype="dashed") +
+        guides(linetype="none", color="none") +
+        facet_wrap(~Lineage) +
+        xlab("Time") +
+        labs(title=split_to_camelcase(lineage), fill="Exp rate") +
+        my_ggplot_theme(legend.pos=legend.pos) +
+        scale_fill_gradient2(mid="white", low="blue", high="red", limits=exp_limits)
+    )
+  }
+
+  if (which == "frac") {
+    fill = "Identity"
+    y = "Frequency"
+  } else if (which == "pop") {
+    fill = "Identity"
+    y = "Population"
+    mullerdf = mullerdf %>% pop_df_add_empty()
+  }
+
+  return(
+    mullerdf %>% ggplot() +
+      geom_area(aes_string(x="Generation", y=y, group="Group_id", fill=fill, colour="Identity")) +
       geom_vline(xintercept=mullerdf$Generation %>% unique(), linetype="dashed") +
       guides(linetype="none", color="none") +
-      scale_fill_manual(name="Clusters", values=color_palette, na.value="transparent", breaks=highlight) +
-      scale_color_manual(values=color_palette, na.value="transparent", breaks=highlight) +
+      facet_wrap(~Lineage) +
+      scale_fill_manual(name="Clusters", values=color_palette, na.value="#FFFFFF00", breaks=highlight) +
+      scale_color_manual(values=color_palette, na.value="#FFFFFF00", breaks=highlight) +
       xlab("Time") +
-      labs(title=split_to_camelcase(lineage)) +
       my_ggplot_theme(legend.pos=legend.pos)
+  )
 
-  if (fill == "lm_r")
-    pl = mullerdf %>% ggplot() +
-      geom_area(aes_string(x="Generation", y=y, group="Group_id", fill="lm_r"), alpha=.9) +
-      geom_vline(xintercept=mullerdf$Generation %>% unique(), linetype="dashed") +
-      guides(linetype="none", color="none") +
-      xlab("Time") + labs(title=split_to_camelcase(lineage), fill="Exp rate") +
-      my_ggplot_theme(legend.pos=legend.pos) +
-      scale_fill_gradient2(mid="white", low="blue", high="red", limits=exp_limits)
-
-  return(pl)
 }
 
 
@@ -139,7 +155,7 @@ plot_exp_fit = function(x, highlight=c(), min_frac=0, facet=F, mutations=F, labe
     get_unique_muts_labels(clusters=highlight, label=label)
   color_palette = highlight_palette(x, highlight, label)
 
-  p = pop_df %>% dplyr::filter(Identity %in% highlight) %>%
+  p = pop_df %>% filter(Identity %in% highlight) %>%
     ggplot(aes(x=Generation, y=Population, color=Identity)) +
     geom_point(alpha=.3) + my_ggplot_theme() + ylab("")
 
@@ -158,8 +174,8 @@ exp_fit_util = function(p, pop_df, cl) {
   lineages = pop_df %>% dplyr::filter(Identity == cl) %>% dplyr::pull(Lineage) %>% unique()
   exp_df = data.frame()
   for(ll in lineages) {
-    lm_a = (pop_df %>% dplyr::filter(Identity==cl, Lineage==ll))$lm_a %>% unique()
-    lm_r = (pop_df %>% dplyr::filter(Identity==cl, Lineage==ll))$lm_r %>% unique()
+    lm_a = (pop_df %>% filter(Identity==cl, Lineage==ll))$lm_a %>% unique()
+    lm_r = (pop_df %>% filter(Identity==cl, Lineage==ll))$lm_r %>% unique()
 
     xx = 1:max(pop_df$Generation)
     yy = exp(lm_a)*exp(lm_r*xx)
