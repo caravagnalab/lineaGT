@@ -35,9 +35,6 @@ fit_mutations = function(x,
                                  cluster=cluster,
                                  infer_phylo=infer_phylo)
 
-    print(cluster)
-    # print(x.muts.k)
-
     vaf.df.fit = rbind(vaf.df.fit, x.muts.k$df)
     x.muts[[cluster]] = x.muts.k$fit
     if (infer_phylo)
@@ -70,12 +67,12 @@ fit_cluster_viber = function(input, cluster, infer_phylo=TRUE) {
                                       K=k,
                                       data=data_annotations)
 
-    if (x.muts.k$K * 0.01 < 1) pi_cutoff = 0.005 else pi_cutoff = 0.01
-    x.muts.k = VIBER::choose_clusters(x.muts.k,
-                                    binomial_cutoff=0,
-                                    dimensions_cutoff=0,
-                                    pi_cutoff=pi_cutoff,
-                                    re_assign=T)
+    # if (x.muts.k$K * 0.01 < 1) pi_cutoff = 0.005 else pi_cutoff = 0.01
+    # x.muts.k = VIBER::choose_clusters(x.muts.k,
+    #                                 binomial_cutoff=0,
+    #                                 dimensions_cutoff=0,
+    #                                 pi_cutoff=pi_cutoff,
+    #                                 re_assign=T)
 
     labels = x.muts.k$labels$cluster.Binomial
 
@@ -85,7 +82,7 @@ fit_cluster_viber = function(input, cluster, infer_phylo=TRUE) {
     if (infer_phylo)
       tree = fit_trees(x.muts.k)
 
-  }, silent = T)
+  }, silent = F)
 
   if (purrr::is_empty(x.muts.k)) {
     input.k$vaf.df$labels_viber = "C1"

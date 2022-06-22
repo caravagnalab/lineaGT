@@ -1,10 +1,9 @@
-get_muller_edges = function(x, mutations=FALSE, label="") {
+get_muller_edges = function(x, mutations=FALSE, label="", tree_score=1) {
   edges = data.frame("Parent"="P", "Identity"=get_unique_labels(x))
 
   if (!mutations) return(edges)
 
   edges = x %>%
-    # get_binomial_theta(label=label) %>%
     get_vaf_dataframe(label=label) %>%
     inner_join(x %>% get_mean_long(), by=c("labels", "timepoints", "lineage")) %>%
     dplyr::rename(Parent=labels, Identity=labels_mut) %>%
@@ -13,7 +12,7 @@ get_muller_edges = function(x, mutations=FALSE, label="") {
 
   return(
     x %>%
-      get_parents(label=label) %>%
+      get_parents(label=label, tree_score=tree_score) %>%
       dplyr::full_join(edges, by=c("Parent", "Identity")) %>%
       mutate(Parent=ifelse(is.na(Label), Parent, Label)) %>%
       dplyr::select(-Label)
@@ -21,7 +20,7 @@ get_muller_edges = function(x, mutations=FALSE, label="") {
 }
 
 
-get_parents = function(x, highlight=c(), label="") {
+get_parents = function(x, highlight=c(), label="", tree_score=1) {
   if (purrr::is_empty(highlight)) highlight = get_unique_labels(x)
 
   # create an empty dataset with colnames
@@ -36,7 +35,7 @@ get_parents = function(x, highlight=c(), label="") {
     if (!purrr::is_empty(tree))
       edges = edges %>%
         dplyr::add_row(
-          tree[[1]] %>%
+          tree[[tree_score]] %>%
             get_adj() %>%
             as.data.frame() %>%
             rownames_to_column(var="Label") %>%
@@ -63,7 +62,6 @@ get_muller_pop = function(x, map_tp_time=list("init"=0,"early"=60,"mid"=140,"lat
   if (mutations)
     # the means dataframe must contain also the subclones
     means = x %>%
-      # get_binomial_theta(label=label) %>%
       get_vaf_dataframe(label=label) %>%
       dplyr::select(theta, dplyr::contains("labels"), timepoints, lineage) %>%
       dplyr::select(-labels_init, -labels_viber) %>%
@@ -174,4 +172,50 @@ filter_muller_df = function(df, highlight=highlight) {
       dplyr::select(-"labels", -"labels_mut")
   )
 }
+
+
+pop_df_add_empty = function(mullerdf) {
+  totals = mullerdf %>%
+    dplyr::group_by(Generation, Lineage) %>%
+    dplyr::summarise(tot=sum(Population)) %>%
+    ungroup()
+  max_tot = max(totals$tot)
+  mullerdf$Group_id = as.character(mullerdf$Group_id)
+
+  new_rows1 = mullerdf %>%
+    dplyr::group_by(Generation, Lineage) %>%
+    dplyr::summarise(Identity=NA,
+                     Population=-sum(Population)/2 + 1.1 * max_tot/2) %>%
+    unique() %>%
+    mutate(Frequency=NA,
+           Group_id="___special_empty",
+           Unique_id=paste0("___special_empty_", Generation))
+
+  new_rows2 = mullerdf %>%
+    dplyr::group_by(Generation, Lineage) %>%
+    dplyr::summarise(Identity=NA,
+                     Population=dplyr::first(Population)) %>%
+    mutate(Frequency=NA,
+           Group_id="___special_emptya",
+           Unique_id=paste0("___special_emptya_",Generation))
+
+  mullerdf = new_rows1 %>% dplyr::bind_rows(mullerdf) %>%
+    dplyr::arrange(Generation) %>%
+    ungroup() %>%
+    dplyr::bind_rows(new_rows2) %>%
+    dplyr::arrange(Generation) %>%
+    ungroup() %>%
+    dplyr::group_by(Generation, Lineage) %>%
+    dplyr::mutate(Frequency=Population/sum(Population)) %>%
+    ungroup()
+
+  mullerdf$Group_id = factor(mullerdf$Group_id,
+                             levels=rev(unlist(
+                               as.data.frame(mullerdf %>%
+                                               dplyr::filter_(~Generation == max(Generation)) %>%
+                                               dplyr::select_(~Group_id)),
+                               use.names=FALSE) %>% unique()))
+  return(mullerdf)
+}
+
 

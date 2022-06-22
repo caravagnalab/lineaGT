@@ -4,7 +4,13 @@
 \alias{plot_scatter_density}
 \title{2D scatterplot and density}
 \usage{
-plot_scatter_density(x, plot_density = T, facet = FALSE, highlight = c())
+plot_scatter_density(
+  x,
+  plot_density = T,
+  facet = FALSE,
+  highlight = c(),
+  params = list()
+)
 }
 \arguments{
 \item{x}{a mvnmm object.}

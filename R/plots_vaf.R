@@ -1,12 +1,14 @@
-#' VAF scatterplot
+#' VAF 2D scatterplot
 #'
 #' @description Function to plot the VAFs of the mutations one timepoint against the other
 #'
 #' @param x a \code{mvnmm} object.
-#' @param min_fracc value in \code{[0,1]} to show only the clusters with a minimum CCF of
+#' @param min_frac value in \code{[0,1]} to show only the clusters with a minimum CCF of
 #' \code{min_frac} in at least one timepoint.
 #' @param highlight a list of labels ID to show. All the clusters in the list are shown,
 #' even if the CCF is lower than \code{min_frac}.
+#' @param wrap a Boolean to wrap the scatterplots of multiple lineages in a unique plot.
+#' @param label a character corresponding to the label of the fit to visualize, if more than one.
 #'
 #' @return list of VAF scatterplots.
 #'
@@ -20,8 +22,7 @@
 #'
 #' @export plot_vaf
 
-
-plot_vaf = function(x, min_frac=0, highlight=c(), label="", wrap=T) {
+plot_vaf = function(x, min_frac=0, highlight=c(), wrap=T, label="") {
   if (label != "")
     dataframe = x %>% add_lineage_vaf(label=label)
   else
@@ -66,7 +67,6 @@ plot_vaf_2D = function(dataframe, dims.vaf, dims.theta, color_palette) {
     dplyr::select(starts_with("vaf"), starts_with("theta"), labels, lineage, labels_mut, mutation, pi_viber) %>%
     ggplot() +
     geom_point(aes_string(x=dims.vaf[1], y=dims.vaf[2], color="labels_mut"), alpha=.5, size=.7) +
-    # geom_point(data=theta, aes_string(x=dim1, y=dim2, color="labels_mut"), shape=15, inherit.aes=F, size=1.5) +
     geom_point(aes_string(x=dims.theta[1], y=dims.theta[2], color="labels_mut"), shape=15, inherit.aes=F, size=1.5) +
     facet_grid(lineage ~ labels) +
     scale_color_manual(values=color_palette) +
@@ -81,9 +81,34 @@ plot_vaf_2D = function(dataframe, dims.vaf, dims.theta, color_palette) {
 }
 
 
-# TODO add reference and export
-plot_vaf_time = function(x, min_frac=0, highlight=c(), label="",
-                         timepoints_to_int=list("init"=0,"early"=60,"mid"=140,"late"=280)) {
+
+#' VAF over time
+#'
+#' @description Function to plot the VAFs of the mutations along time
+#'
+#' @param x a \code{mvnmm} object.
+#' @param min_frac value in \code{[0,1]} to show only the clusters with a minimum CCF of
+#' \code{min_frac} in at least one timepoint.
+#' @param highlight a list of labels ID to show. All the clusters in the list are shown,
+#' even if the CCF is lower than \code{min_frac}.
+#' @param timepoints_to_int a list to map each \code{timepoint} value to an integer.
+#' @param label a character corresponding to the label of the fit to visualize, if more than one.
+#'
+#' @return a \code{ggplot} object.
+#'
+#' @examples
+#' if (FALSE) plot_vaf_time(x, min_frac=0.1)
+#'
+#' @import ggplot2
+#' @importFrom dplyr select starts_with
+#' @importFrom purrr is_empty
+#' @importFrom patchwork wrap_plots
+#'
+#' @export plot_vaf_time
+
+plot_vaf_time = function(x, min_frac=0, highlight=c(),
+                         timepoints_to_int=list("init"=0,"early"=60,"mid"=140,"late"=280),
+                         label="") {
 
   highlight.c = get_highlight(x, min_frac, highlight, mutations=F)
   highlight.m = get_unique_muts_labels(x, clusters=highlight.c, label=label)
@@ -96,6 +121,8 @@ plot_vaf_time = function(x, min_frac=0, highlight=c(), label="",
       mutate(timepoints=as.numeric(timepoints)) %>%
       ggplot() +
       geom_point(aes(x=timepoints, y=vaf, color=labels_mut), alpha=.5, size=.7) +
+      geom_line(aes(x=timepoints, y=vaf, color=labels_mut, group=mutation),
+                alpha=.5, size=.4, linetype="solid") +
       geom_point(aes(x=timepoints, y=theta*100, color=labels_mut), shape=15, size=1.5) +
       facet_wrap(labels~lineage, ncol=x %>% get_lineages() %>% length()) +
       scale_color_manual(values=get_color_palette(x,label=label)[highlight.m]) +

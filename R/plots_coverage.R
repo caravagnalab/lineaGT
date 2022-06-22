@@ -16,7 +16,7 @@
 #' @importFrom dplyr select all_of
 #' @export plot_scatter_density
 
-plot_scatter_density = function(x, plot_density=T, facet=FALSE, highlight=c()) {
+plot_scatter_density = function(x, plot_density=T, facet=FALSE, highlight=c(), params=list()) {
   dataset = x %>% get_cov_dataframe() %>% long_to_wide_cov()
 
   color_palette = highlight_palette(x, highlight)
