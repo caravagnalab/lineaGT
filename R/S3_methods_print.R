@@ -22,7 +22,6 @@ print.mvnmm = function(x, ...) {
     right = paste(crayon::bold("Python:"), pylog %>% crayon::silver())
     )
 
-  which_conda_env()
   cat("\n")
   cli::cli_text(clisymbols::symbol$arrow_right, " Lineages: {.field {get_lineages(x) %>% sort()}}.")
   cli::cli_text(clisymbols::symbol$arrow_right, " Timepoints: {.field {get_timepoints(x)}}.")
