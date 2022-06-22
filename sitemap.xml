@@ -40,6 +40,12 @@
     <loc>caravagnalab.github.io/lineaGT/reference/fit.html</loc>
   </url>
   <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/fit_mutations.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/fit_phylogenies.html</loc>
+  </url>
+  <url>
     <loc>caravagnalab.github.io/lineaGT/reference/get_cov_dataframe.html</loc>
   </url>
   <url>
@@ -106,10 +112,16 @@
     <loc>caravagnalab.github.io/lineaGT/reference/plot_mullerplot.html</loc>
   </url>
   <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/plot_phylogeny.html</loc>
+  </url>
+  <url>
     <loc>caravagnalab.github.io/lineaGT/reference/plot_scatter_density.html</loc>
   </url>
   <url>
     <loc>caravagnalab.github.io/lineaGT/reference/plot_vaf.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/plot_vaf_time.html</loc>
   </url>
   <url>
     <loc>caravagnalab.github.io/lineaGT/reference/print.mvnmm.html</loc>
