@@ -11,7 +11,7 @@ reference:
   contents:
   - fit
   - fit_mutations
-  - fit_phylognies
+  - fit_phylogenies
   - filter_dataset
 
 - title: Getter functions
