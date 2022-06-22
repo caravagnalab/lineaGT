@@ -19,13 +19,56 @@ plot_phylogeny = function(x, score_diff=1, show_best=1, min_frac=0, highlight=c(
     if (!purrr::is_empty(trees[[cluster]])) {
       tree = trees[[cluster]] %>% get_best_scores(show_best=show_best, score_diff=score_diff)
 
+      color_palette = x %>% get_color_palette()
+      color_palette = color_palette[x %>% get_unique_muts_labels(clusters=cluster)]
+      names(color_palette) = names(color_palette) %>%
+        str_replace_all(cluster, "") %>%
+        str_replace_all("[.]", "")
+
       for (tt in 1:length(tree))
-        tree_plots[[cluster]][[tt]] = ctree:::plot.ctree(tree[[tt]]) + labs(title=cluster)
+        tree_plots[[cluster]][[tt]] = plot_ctree_mod(tree[[tt]],
+                                                     node_palette=color_palette,
+                                                     cluster_id=cluster)
     }
   }
 
   return(tree_plots[[cluster]] %>% patchwork::wrap_plots())
 }
+
+
+
+plot_ctree_mod = function (x.tree,
+                           cluster_id="",
+                           node_palette=c(),
+                           tree_layout="tree", ...) {
+  if (purrr::is_empty(node_palette))
+    node_palette = colorRampPalette(RColorBrewer::brewer.pal(n = 9, "Set1"))
+
+  tree = x.tree
+  cex = 1
+  tb_tree = tree$tb_adj_mat
+  clusters = tree$CCF %>% dplyr::pull(cluster) %>% unique()
+  node_palette[setdiff(clusters, names(node_palette))] = "gainsboro"
+
+  layout = ggraph::create_layout(tb_tree, layout=tree_layout)
+  return(
+    ggraph(layout) +
+      geom_edge_link(arrow=arrow(length=unit(2 * cex, "mm")), end_cap=circle(5 * cex, "mm"),
+                     start_cap=circle(5 * cex, "mm")) +
+      geom_node_point(aes(colour=cluster, size=nMuts), alpha=.6, na.rm=TRUE) +
+      geom_node_text(aes(label=cluster), colour="black", vjust=0.4) +
+      coord_cartesian(clip="off") +
+      scale_color_manual(values=node_palette) +
+      scale_size(range=c(3, 10) * cex) +
+      guides(color=FALSE, size=guide_legend("Clone size", nrow=1)) +
+      labs(title=paste(cluster_id),
+           subtitle=paste0("Scores ", format(tree$score, scientific=T), ".")) +
+      theme_void() + theme(legend.position="bottom")
+    )
+}
+
+
+
 
 
 get_best_scores = function(trees, show_best=0, score_diff=1) {

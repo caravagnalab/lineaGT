@@ -113,19 +113,25 @@ plot_vaf_time = function(x, min_frac=0, highlight=c(),
   highlight.c = get_highlight(x, min_frac, highlight, mutations=F)
   highlight.m = get_unique_muts_labels(x, clusters=highlight.c, label=label)
 
+  vaf.df = x %>% add_lineage_vaf(label=label) %>%
+    filter(labels %in% highlight.c) %>%
+    mutate(timepoints=timepoints_to_int[timepoints]) %>%
+    mutate(timepoints=unlist(timepoints)) %>%
+    mutate(timepoints=as.numeric(timepoints))
+
+  color_palette = get_color_palette(x,label=label)[highlight.m]
+  color_palette[paste(vaf.df %>% dplyr::pull(timepoints) %>% unique())] = "black"
+
   return(
-    x %>% add_lineage_vaf(label=label) %>%
-      filter(labels %in% highlight.c) %>%
-      mutate(timepoints=timepoints_to_int[timepoints]) %>%
-      mutate(timepoints=unlist(timepoints)) %>%
-      mutate(timepoints=as.numeric(timepoints)) %>%
+    vaf.df %>%
       ggplot() +
       geom_point(aes(x=timepoints, y=vaf, color=labels_mut), alpha=.5, size=.7) +
       geom_line(aes(x=timepoints, y=vaf, color=labels_mut, group=mutation),
-                alpha=.5, size=.4, linetype="solid") +
+                alpha=.6, size=.5, linetype="solid") +
       geom_point(aes(x=timepoints, y=theta*100, color=labels_mut), shape=15, size=1.5) +
+      geom_vline(xintercept=vaf.df$timepoints %>% unique(), linetype="dashed", size=.4, alpha=.5) +
       facet_wrap(labels~lineage, ncol=x %>% get_lineages() %>% length()) +
-      scale_color_manual(values=get_color_palette(x,label=label)[highlight.m]) +
+      scale_color_manual(values=color_palette, breaks=highlight.m) +
       ylab("VAF") + xlab("Time") + labs(color="Clusters") +
       ylim(0,100) + my_ggplot_theme()
   )
