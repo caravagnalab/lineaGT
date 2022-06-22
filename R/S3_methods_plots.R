@@ -1,6 +1,6 @@
-#' 2D scatter and density plot
+#' Mullerplot
 #'
-#' @description 2D scatter and density plot for each pair of dimensions
+#' @description Mullerplot showing the longitudinal clonal evolution per lineage.
 #'
 #' @param x An object of class mvnmm
 #' @param ... Default extra paramaters
@@ -12,7 +12,7 @@
 
 
 plot.mvnmm = function(x, ...) {
-  plot_mullerplot(x, wrap=T)
+  plot_mullerplot(x, wrap=T, ...)
 }
 
 my_ggplot_theme = function(cex=1, legend.pos="right") {

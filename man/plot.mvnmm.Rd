@@ -2,7 +2,7 @@
 % Please edit documentation in R/S3_methods_plots.R
 \name{plot.mvnmm}
 \alias{plot.mvnmm}
-\title{2D scatter and density plot}
+\title{Mullerplot}
 \usage{
 \method{plot}{mvnmm}(x, ...)
 }
@@ -15,5 +15,5 @@
 
 }
 \description{
-2D scatter and density plot for each pair of dimensions
+Mullerplot showing the longitudinal clonal evolution per lineage.
 }
