@@ -75,9 +75,9 @@ get_muller_pop = function(x, map_tp_time=list("init"=0,"early"=60,"mid"=140,"lat
   pop_df = means %>%
     format_means_df() %>%  # to format the dataframe with correct colnames ecc
     add_parent(x=x) %>%  # add common parent "P" data
-    add_time_0(x=x) %>%
+    add_time_0(x=x, value="init") %>%
     convert_tp(mapping=map_tp_time) %>%  # convert timepoints to numeric values
-    add_exp_fit_coeff() %>%
+    add_exp_fit_coeff(x=x) %>%
     dplyr::select(Identity, Generation, Lineage, Population, Frequency, dplyr::starts_with("lm"))
 
   return(pop_df)
@@ -111,9 +111,11 @@ add_parent = function(pop_df, x=x) {
 }
 
 
-add_time_0 = function(pop_df, x=x) {
+add_time_0 = function(pop_df, x=x, force=F, value="init") {
   n_tp = x %>% get_timepoints() %>% length()
-  if (n_tp > 1) return(pop_df)
+  if (n_tp > 1 && !force) return(pop_df)
+
+  print(value)
 
   ids = pop_df %>% filter(Identity!="P") %>% dplyr::pull(Identity) %>% unique()
   n_ids = length(ids)
@@ -124,14 +126,14 @@ add_time_0 = function(pop_df, x=x) {
         Identity=rep( ids, times = n_lins ),
         Population=rep( 0, times = n_ids * n_lins ),
         Frequency=rep( 0, times = n_ids * n_lins ),
-        Generation=rep( "init", times = n_ids * n_lins ),
+        Generation=rep( value, times = n_ids * n_lins ),
         Lineage=rep( x$lineages, each = n_ids )
       ) %>%
       dplyr::add_row(
         Identity=rep( "P", times = n_lins ),
         Population=rep( 1, times = n_lins ),
         Frequency=rep( 1, times = n_lins ),
-        Generation=rep( "init", times = n_lins ),
+        Generation=rep( value, times = n_lins ),
         Lineage=x$lineages
       )
   )
@@ -151,14 +153,18 @@ convert_tp = function(pop_df, mapping=list("init"="0","early"="60","mid"="140","
 }
 
 
-add_exp_fit_coeff = function(pop_df) {
+add_exp_fit_coeff = function(pop_df, x) {
   if (pop_df$Generation %>% unique() %>% length() == 1) return(pop_df)
   return(
     pop_df %>%
+      add_time_0(x=x, force=T, value=as.numeric(0)) %>%
+      dplyr::mutate(Generation=ifelse(Generation=="init", 0, Generation)) %>%
       dplyr::group_by(Identity, Lineage) %>%
+      dplyr::arrange(Generation, .by_group=T) %>%
       dplyr::mutate(lm_a=coef(lm(log1p(Population)~Generation))[1],
                     lm_r=coef(lm(log1p(Population)~Generation))[2]) %>%
-      dplyr::ungroup()
+      dplyr::ungroup() %>%
+      dplyr::filter(Generation != 0)
   )
 }
 
