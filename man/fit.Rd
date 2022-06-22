@@ -42,6 +42,9 @@ the returned object the phylogenetic trees for each cluster.}
 
 \item{lr}{Learning rate used in the inference.}
 
+\item{p}{Numeric value in \code{[0,1]} used to check the convergence of the parameters. If from one to the next
+iterationthe value of the parameters vary less than \code{p}% for \code{n} iterations, the inference stops.}
+
 \item{convergence}{A Boolean. If set to \code{TRUE}, the function will check for early convergence,
 otherwise it will perform \code{steps} iterations.}
 

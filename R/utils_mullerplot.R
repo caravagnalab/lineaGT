@@ -56,7 +56,7 @@ get_parents = function(x, highlight=c(), label="", tree_score=1) {
 
 # means format must be a dataframe with columns: labels, timepoints, lineage, mean_cov
 get_muller_pop = function(x, map_tp_time=list("init"=0,"early"=60,"mid"=140,"late"=280),
-                          mutations=FALSE, label="") {
+                          mutations=FALSE, label="", exp_coef=T) {
   means = x %>% get_mean_long()
 
   if (mutations)
@@ -77,7 +77,7 @@ get_muller_pop = function(x, map_tp_time=list("init"=0,"early"=60,"mid"=140,"lat
     add_parent(x=x) %>%  # add common parent "P" data
     add_time_0(x=x, value="init") %>%
     convert_tp(mapping=map_tp_time) %>%  # convert timepoints to numeric values
-    add_exp_fit_coeff(x=x) %>%
+    add_exp_fit_coeff(x=x, add_exp_coef=exp_coef) %>%
     dplyr::select(Identity, Generation, Lineage, Population, Frequency, dplyr::starts_with("lm"))
 
   return(pop_df)
@@ -115,8 +115,6 @@ add_time_0 = function(pop_df, x=x, force=F, value="init") {
   n_tp = x %>% get_timepoints() %>% length()
   if (n_tp > 1 && !force) return(pop_df)
 
-  print(value)
-
   ids = pop_df %>% filter(Identity!="P") %>% dplyr::pull(Identity) %>% unique()
   n_ids = length(ids)
   n_lins = x %>% get_lineages() %>% length()
@@ -153,8 +151,10 @@ convert_tp = function(pop_df, mapping=list("init"="0","early"="60","mid"="140","
 }
 
 
-add_exp_fit_coeff = function(pop_df, x) {
+add_exp_fit_coeff = function(pop_df, x, add_exp_coef=TRUE) {
+  if (!add_exp_coef) return(pop_df)
   if (pop_df$Generation %>% unique() %>% length() == 1) return(pop_df)
+
   return(
     pop_df %>%
       add_time_0(x=x, force=T, value=as.numeric(0)) %>%

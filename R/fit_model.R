@@ -15,8 +15,8 @@
 #' @param n_runs Number of runs to perform for each K.
 #' @param steps Maximum number of steps for the inference.
 #' @param lr Learning rate used in the inference.
-#' @param p Numeric value in \code{[0,1]} used to check the convergence of the parameters. If from one to the next iteration
-#' the value of the parameters vary less than \code{p%} for \code{n} iterations, the inference stops.
+#' @param p Numeric value in \code{[0,1]} used to check the convergence of the parameters. If from one to the next
+#' iterationthe value of the parameters vary less than \code{p}% for \code{n} iterations, the inference stops.
 #' @param convergence A Boolean. If set to \code{TRUE}, the function will check for early convergence,
 #' otherwise it will perform \code{steps} iterations.
 #' @param covariance Covariance type for the Multivariate Gaussian.
@@ -46,7 +46,7 @@
 #'
 #' @export fit
 
-# @param hyperparameters A list of hyperparameters to set. Available values are:
+# hyperparameters A list of hyperparameters to set. Available values are:
 # \code{mean_loc}, the center of the mean prior (default set to the sample mean),
 # \code{mean_scale}, the variance of the mean prior (default set to the sample variance),
 # \code{var_scale}, the variance of the variance prior (default set to \code{400}),
@@ -67,7 +67,7 @@ fit = function(cov.df,
                show_progr=FALSE,
                store_grads=TRUE,
                store_losses=TRUE,
-               # timepoints_to_int=list(),  # like list('early'=0, ...)
+               # timepoints_to_int=list(),  # like list(early=0, ...)
                random_state=25) {
 
   # TODO add in Python function the way to modify the hyperparameters

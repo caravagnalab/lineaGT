@@ -1,7 +1,21 @@
-# TODO add reference and export function
 # `label` is to give a label to the run
 # `lineages` is to select on which lineages to run the inference,
 # otherwise it will be performed on all of them
+
+#' Fit the mutations clustering
+#'
+#' @param x add
+#' @param vaf.df add
+#' @param infer_phylo add
+#' @param min_frac add
+#' @param highlight add
+#' @param do_filter add
+#' @param lineages add
+#' @param label add
+#'
+#' @return
+#' @export fit_mutations
+
 fit_mutations = function(x,
                          vaf.df=NULL,
                          infer_phylo=TRUE,

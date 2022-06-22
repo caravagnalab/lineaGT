@@ -10,6 +10,8 @@ reference:
   desc: Main function to perform the fit of the model.
   contents:
   - fit
+  - fit_mutations
+  - fit_phylognies
   - filter_dataset
 
 - title: Getter functions
@@ -38,6 +40,8 @@ reference:
   - plot_exp_fit
   - plot_exp_rate
   - plot_vaf
+  - plot_vaf_time
+  - plot_phylogeny
 
 - title: S3 object methods
   desc: Print and plot methods for the fitted object.

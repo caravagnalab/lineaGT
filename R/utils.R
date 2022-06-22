@@ -32,7 +32,7 @@ get_highlight = function(x, min_frac=0, highlight=c(), mutations=F, label="") {
 select_relevant_clusters = function(x, min_frac) {
   return(
     x %>%
-      get_muller_pop(map_tp_time=NULL) %>%
+      get_muller_pop(map_tp_time=NULL, exp_coef=F) %>%
       group_by(Identity) %>%
       filter(any(Frequency > min_frac), Identity!="P") %>%
       dplyr::pull(Identity) %>%

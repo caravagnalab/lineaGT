@@ -1,4 +1,14 @@
-## TODO add reference and export
+#' Clonal evolution trees
+#'
+#' @param x add
+#' @param score_diff add
+#' @param show_best add
+#' @param min_frac add
+#' @param highlight add
+#' @param label add
+#'
+#' @return
+#' @export plot_phylogeny
 
 plot_phylogeny = function(x, score_diff=1, show_best=1, min_frac=0, highlight=c(), label="") {
   clusters_joined = get_highlight(x, min_frac, highlight)

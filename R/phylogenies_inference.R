@@ -1,5 +1,19 @@
 # TODO add reference and export the function
 # function to infer the phylogenies on a fit object
+#' Fit the phylogenetic trees
+#'
+#' @param x add
+#' @param vaf.df add
+#' @param min_frac add
+#' @param highlight add
+#' @param do_filter add
+#' @param label add
+#' @param fit_viber add
+#' @param lineages add
+#'
+#' @return
+#' @export fit_phylogenies
+
 fit_phylogenies = function(x, vaf.df=NULL, min_frac=0, highlight=list(), do_filter=FALSE,
                            label="", fit_viber=FALSE, lineages=c()) {
 
