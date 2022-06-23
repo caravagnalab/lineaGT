@@ -33,7 +33,8 @@ plot_mullerplot = function(x, which="frac", highlight=c(), min_frac=0,
   color_palette = highlight_palette(x, highlight, label)
 
   pop_df = get_muller_pop(x, mutations=mutations, map_tp_time=timepoints_to_int, label=label)
-  edges_df = get_muller_edges(x, mutations=mutations, label=label, tree_score=tree_score)
+  edges_df = get_muller_edges(x, mutations=mutations, label=label,
+                              tree_score=tree_score, highlight=highlight.cov)
 
   if (single_clone && mutations) {
     pop_df = pop_df %>% filter_muller_df(highlight=highlight.cov)

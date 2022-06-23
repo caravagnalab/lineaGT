@@ -32,7 +32,7 @@ plot_phylogeny = function(x, score_diff=1, show_best=1, min_frac=0, highlight=c(
     }
   }
 
-  return(tree_plots[[cluster]] %>% patchwork::wrap_plots())
+  return(tree_plots[[cluster]])
 }
 
 
@@ -63,7 +63,8 @@ plot_ctree_mod = function (x.tree,
       guides(color=FALSE, size=guide_legend("Clone size", nrow=1)) +
       labs(title=paste(cluster_id),
            subtitle=paste0("Scores ", format(tree$score, scientific=T), ".")) +
-      theme_void() + theme(legend.position="bottom")
+      theme_void(base_size=10*cex) +
+      theme(legend.position="bottom", text=element_text(size=9))
     )
 }
 
@@ -86,7 +87,6 @@ get_best_scores = function(trees, show_best=0, score_diff=1) {
   for (idx in 2:max_n) {
     if (abs(trees[[idx]]$score - best_score) < score_diff)
       ret_trees[[idx]] = trees[[idx]]
-    # ret_trees[[idx]] = trees[[idx]]
   }
 
   return(ret_trees)

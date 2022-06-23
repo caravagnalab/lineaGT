@@ -1,4 +1,4 @@
-get_muller_edges = function(x, mutations=FALSE, label="", tree_score=1) {
+get_muller_edges = function(x, mutations=FALSE, label="", tree_score=1, highlight=c()) {
   edges = data.frame("Parent"="P", "Identity"=get_unique_labels(x))
 
   if (!mutations) return(edges)
@@ -12,7 +12,7 @@ get_muller_edges = function(x, mutations=FALSE, label="", tree_score=1) {
 
   return(
     x %>%
-      get_parents(label=label, tree_score=tree_score) %>%
+      get_parents(label=label, tree_score=tree_score, highlight=highlight) %>%
       dplyr::full_join(edges, by=c("Parent", "Identity")) %>%
       mutate(Parent=ifelse(is.na(Label), Parent, Label)) %>%
       dplyr::select(-Label)
