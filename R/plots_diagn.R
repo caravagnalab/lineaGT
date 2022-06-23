@@ -42,12 +42,28 @@ plot_gradient_norms = function(x) {
 plot_IC = function(x) {
   ic = x %>% get_IC()
 
-  return(ic %>%
-           ggplot() +
-           geom_point(aes(x=K, y=value, color=method)) +
-           facet_wrap(method~run, scales="free_y", nrow=ic$method %>% unique() %>% length()) +
-           xlab("K") + ylab("Value")
-         )
+  # ic %>%
+  #   ggplot() +
+  #   geom_point(aes(x=K, y=value, color=method)) +
+  #   facet_grid(method~run, scales="free_y") +
+  #   xlab("K") + ylab("Value") +
+  #   scale_x_discrete(limits = ic$K %>% unique %>% sort)
+
+  ic %>%
+    ggplot() +
+    geom_line(aes(x=K, y=value, color=method)) +
+    geom_point(aes(x=K, y=value, color=method)) +
+    facet_wrap(~method, scales="free_y") +
+    xlab("K") + ylab("Value") +
+    scale_x_discrete(limits = ic$K %>% unique %>% sort) +
+    my_ggplot_theme()
+
+  # return(ic %>%
+  #          ggplot() +
+  #          geom_point(aes(x=K, y=value, color=method)) +
+  #          facet_grid(method~run, scales="free_y", nrow=ic$method %>% unique() %>% length()) +
+  #          xlab("K") + ylab("Value")
+  #        )
 
 }
 
