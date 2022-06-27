@@ -19,7 +19,8 @@ plot_losses = function(x, train=FALSE) {
            geom_point(aes(x=index, y=losses, color=K)) +
            facet_wrap(~run) +
            scale_x_continuous(breaks=function(x) unique(floor(pretty(seq(0, (max(x) + 1) * 1.1))))) +
-           ylab("ELBO") + xlab("Iterations")
+           ylab("ELBO") + xlab("Iterations") +
+           my_ggplot_theme()
          )
 
 }
@@ -48,6 +49,13 @@ plot_IC = function(x) {
   #   facet_grid(method~run, scales="free_y") +
   #   xlab("K") + ylab("Value") +
   #   scale_x_discrete(limits = ic$K %>% unique %>% sort)
+  #
+  # return(ic %>%
+  #          ggplot() +
+  #          geom_point(aes(x=K, y=value, color=method)) +
+  #          facet_grid(method~run, scales="free_y", nrow=ic$method %>% unique() %>% length()) +
+  #          xlab("K") + ylab("Value")
+  #        )
 
   ic %>%
     ggplot() +
@@ -57,14 +65,6 @@ plot_IC = function(x) {
     xlab("K") + ylab("Value") +
     scale_x_discrete(limits = ic$K %>% unique %>% sort) +
     my_ggplot_theme()
-
-  # return(ic %>%
-  #          ggplot() +
-  #          geom_point(aes(x=K, y=value, color=method)) +
-  #          facet_grid(method~run, scales="free_y", nrow=ic$method %>% unique() %>% length()) +
-  #          xlab("K") + ylab("Value")
-  #        )
-
 }
 
 

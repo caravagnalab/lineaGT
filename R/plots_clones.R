@@ -25,14 +25,17 @@
 #' @export plot_mullerplot
 
 plot_mullerplot = function(x, which="frac", highlight=c(), min_frac=0,
-                           timepoints_to_int=list("init"=0,"early"=60,"mid"=140,"late"=280),
+                           # timepoints_to_int=list("early"=60,"mid"=140,"late"=280),
+                           timepoints_to_int=list(),
                            mutations=F, single_clone=T, tree_score=1, label="",
                            legend.pos="right", wrap=F) {
+  if (purrr::is_empty(timepoints_to_int)) timepoints_to_int = map_timepoints_int(x)
+
   highlight.cov = get_highlight(x, min_frac=min_frac, highlight=highlight)
   highlight = get_highlight(x, min_frac, highlight.cov, mutations=mutations, label=label)
   color_palette = highlight_palette(x, highlight, label)
 
-  pop_df = get_muller_pop(x, mutations=mutations, map_tp_time=timepoints_to_int, label=label)
+  pop_df = get_muller_pop(x, mutations=mutations, timepoints_to_int=timepoints_to_int, label=label)
   edges_df = get_muller_edges(x, mutations=mutations, label=label,
                               tree_score=tree_score, highlight=highlight.cov)
 
@@ -128,8 +131,11 @@ mullerplot_util = function(mullerdf, which, color_palette, highlight, legend.pos
 #' @export plot_exp_fit
 
 plot_exp_fit = function(x, highlight=c(), min_frac=0, facet=F, mutations=F, label="",
-                        timepoints_to_int=list("init"=0,"early"=60,"mid"=140,"late"=280)) {
-  pop_df = get_muller_pop(x, mutations=mutations, label=label, map_tp_time=timepoints_to_int)
+                        # timepoints_to_int=list("early"=60,"mid"=140,"late"=280)
+                        timepoints_to_int=list()) {
+  if (purrr::is_empty(timepoints_to_int)) timepoints_to_int = map_timepoints_int(x)
+
+  pop_df = get_muller_pop(x, mutations=mutations, label=label, timepoints_to_int=timepoints_to_int)
   highlight = get_highlight(x, min_frac, highlight)
   if (mutations) highlight = x %>%
     get_unique_muts_labels(clusters=highlight, label=label)
@@ -186,7 +192,9 @@ exp_fit_util = function(p, pop_df, cl) {
 #' @export plot_exp_rate
 
 plot_exp_rate = function(x, highlight=c(), min_frac=0, mutations=F, label="",
-                         timepoints_to_int=list("init"=0,"early"=60,"mid"=140,"late"=280)) {
+                         # timepoints_to_int=list("init"=0,"early"=60,"mid"=140,"late"=280)) {
+                         timepoints_to_int=list()) {
+  if (purrr::is_empty(timepoints_to_int)) timepoints_to_int = map_timepoints_int(x)
 
   highlight = get_highlight(x, min_frac, highlight, mutations=mutations, label=label) %>%
     color_palette = highlight_palette(x, highlight, label)
@@ -195,7 +203,7 @@ plot_exp_rate = function(x, highlight=c(), min_frac=0, mutations=F, label="",
     names(color_palette) = names(color_palette) %>% stringr::str_replace("C_||C", "")
 
     p = x %>%
-      get_muller_pop(map_tp_time=timepoints_to_int, mutations=mutations, label=label) %>%
+      get_muller_pop(timepoints_to_int=timepoints_to_int, mutations=mutations, label=label) %>%
       dplyr::mutate(Identity=Identity %>% stringr::str_replace("C_||C","")) %>%
       dplyr::filter(Identity %in% highlight) %>%
       dplyr::arrange(lm_r) %>%

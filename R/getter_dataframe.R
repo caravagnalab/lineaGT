@@ -92,6 +92,12 @@ get_timepoints = function(x) {
 }
 
 
+get_tp_to_int = function(x) {
+  if ("tp_to_int" %in% names(x)) return(x$tp_to_int)
+  return(list())
+}
+
+
 get_muts_fit = function(x, label="") {
   if (label == "") return(x$viber_run)
   return(x[[paste("viber_run", label, sep=".")]])

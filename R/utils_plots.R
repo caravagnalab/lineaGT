@@ -65,5 +65,48 @@ highlight_palette = function(x, highlight=c(), label="") {
 }
 
 
+map_timepoints_int = function(x) {
+  if (!purrr::is_empty(x %>% get_tp_to_int())) return(x %>% get_tp_to_int())
+
+  tp = x %>% get_timepoints()
+  names(tp) = as.character(tp)
+
+  # if is numeric or integer
+  if (is.numeric(tp)) {
+    tp = tp %>% sort() %>% as.list()
+    x$tp_to_int = tp
+    return(tp)
+  }
+  else {
+    tryCatch(expr =
+               {
+                 tp = as.numeric(tp) %>% sort() %>% as.list()
+                 names(tp) = as.character(tp)
+                 x$tp_to_int = tp
+                 return(tp)
+               },
+             warning = function(w) {} )
+  }
+
+  if (is.factor(tp)) {
+    names(tp) = tp %>% levels()
+    cli::cli_warn("The provided timepoints are Factors.
+                  They will be converted to integer, with time unit of 50.")
+    tp = seq(from=50, to=50*length(tp), length.out=length(tp)) %>% as.list()
+    x$tp_to_int = tp
+    return(tp)
+  }
+
+  if (is.character(tp)) {
+    cli::cli_warn("The provided timepoints are character.
+                  If you want to provide a temporal order, insert them as numeric or factors.
+                  They will be converted to integer, with time unit of 50.")
+    tp = seq(from=50, to=50*length(tp), length.out=length(tp)) %>% as.list()
+    names(tp) = x %>% get_timepoints()
+    x$tp_to_int = tp
+    return(tp)
+  }
+}
+
 
 

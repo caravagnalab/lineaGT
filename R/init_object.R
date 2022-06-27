@@ -9,6 +9,7 @@ get_object = function(py_model, timepoints=list(), lineages=list()) {
 
   x$dimensions = py_model$dimensions
   x$timepoints = timepoints
+  x$tp_to_int = map_timepoints_int(x)
   x$lineages = lineages
 
   x$py_model = py_model

@@ -1,4 +1,9 @@
-get_muller_edges = function(x, mutations=FALSE, label="", tree_score=1, highlight=c()) {
+get_muller_edges = function(x,
+                            mutations=FALSE,
+                            label="",
+                            tree_score=1,
+                            highlight=c()) {
+
   edges = data.frame("Parent"="P", "Identity"=get_unique_labels(x))
 
   if (!mutations) return(edges)
@@ -20,7 +25,11 @@ get_muller_edges = function(x, mutations=FALSE, label="", tree_score=1, highligh
 }
 
 
-get_parents = function(x, highlight=c(), label="", tree_score=1) {
+get_parents = function(x,
+                       highlight=c(),
+                       label="",
+                       tree_score=1) {
+
   if (purrr::is_empty(highlight)) highlight = get_unique_labels(x)
 
   # create an empty dataset with colnames
@@ -55,8 +64,15 @@ get_parents = function(x, highlight=c(), label="", tree_score=1) {
 
 
 # means format must be a dataframe with columns: labels, timepoints, lineage, mean_cov
-get_muller_pop = function(x, map_tp_time=list("init"=0,"early"=60,"mid"=140,"late"=280),
-                          mutations=FALSE, label="", exp_coef=T) {
+get_muller_pop = function(x,
+                          mutations=FALSE,
+                          label="",
+                          exp_coef=T,
+                          timepoints_to_int=list()) {
+
+  if (purrr::is_empty(timepoints_to_int) && !is.null(timepoints_to_int))
+    timepoints_to_int = map_timepoints_int(x)
+
   means = x %>% get_mean_long()
 
   if (mutations)
@@ -72,11 +88,17 @@ get_muller_pop = function(x, map_tp_time=list("init"=0,"early"=60,"mid"=140,"lat
       dplyr::rename(parent=labels, labels=labels_mut) %>%
       dplyr::add_row( means %>% mutate(parent="P") )
 
+  value = "init"
+  if (!0 %in% timepoints_to_int && !is.null(timepoints_to_int))
+    timepoints_to_int$init = 0
+  else if (!is.null(timepoints_to_int))
+    value = which(timepoints_to_int==0) %>% names
+
   pop_df = means %>%
     format_means_df() %>%  # to format the dataframe with correct colnames ecc
     add_parent(x=x) %>%  # add common parent "P" data
-    add_time_0(x=x, value="init") %>%
-    convert_tp(mapping=map_tp_time) %>%  # convert timepoints to numeric values
+    add_time_0(x=x, value=value) %>%
+    convert_tp(mapping=timepoints_to_int) %>%  # convert timepoints to numeric values
     add_exp_fit_coeff(x=x, add_exp_coef=exp_coef) %>%
     dplyr::select(Identity, Generation, Lineage, Population, Frequency, dplyr::starts_with("lm"))
 
@@ -97,7 +119,8 @@ format_means_df = function(mean_df) {
 }
 
 
-add_parent = function(pop_df, x=x) {
+add_parent = function(pop_df,
+                      x=x) {
   return(
     pop_df %>%
       dplyr::add_row(
@@ -111,9 +134,15 @@ add_parent = function(pop_df, x=x) {
 }
 
 
-add_time_0 = function(pop_df, x=x, force=F, value="init") {
+add_time_0 = function(pop_df,
+                      x=x,
+                      force=F,
+                      value="init") {
+
   n_tp = x %>% get_timepoints() %>% length()
   if (n_tp > 1 && !force) return(pop_df)
+
+  if (value %in% (pop_df$Generation %>% unique())) return(pop_df)
 
   ids = pop_df %>% filter(Identity!="P") %>% dplyr::pull(Identity) %>% unique()
   n_ids = length(ids)
@@ -138,10 +167,9 @@ add_time_0 = function(pop_df, x=x, force=F, value="init") {
 }
 
 
-convert_tp = function(pop_df, mapping=list("init"="0","early"="60","mid"="140","late"="280")) {
+convert_tp = function(pop_df,
+                      mapping) {
   if (is.null(mapping)) return(pop_df)
-
-  mapping$init = "0"
   return(
     pop_df %>%
       mutate(Generation=mapping[Generation]) %>%
@@ -151,9 +179,14 @@ convert_tp = function(pop_df, mapping=list("init"="0","early"="60","mid"="140","
 }
 
 
-add_exp_fit_coeff = function(pop_df, x, add_exp_coef=TRUE) {
+add_exp_fit_coeff = function(pop_df,
+                             x,
+                             add_exp_coef=TRUE) {
+
   if (!add_exp_coef) return(pop_df)
-  if (pop_df$Generation %>% unique() %>% length() == 1) return(pop_df)
+  if ((pop_df$Generation %>% unique() %>% length()) == 1) return(pop_df)
+
+  generation_list = pop_df$Generation %>% unique()
 
   return(
     pop_df %>%
@@ -164,12 +197,14 @@ add_exp_fit_coeff = function(pop_df, x, add_exp_coef=TRUE) {
       dplyr::mutate(lm_a=coef(lm(log1p(Population)~Generation))[1],
                     lm_r=coef(lm(log1p(Population)~Generation))[2]) %>%
       dplyr::ungroup() %>%
-      dplyr::filter(Generation != 0)
+      dplyr::filter(Generation %in% generation_list)
   )
 }
 
 
-filter_muller_df = function(df, highlight=highlight) {
+filter_muller_df = function(df,
+                            highlight=highlight) {
+
   return(
     df %>%
       dplyr::mutate(labels=Identity) %>%
@@ -181,6 +216,7 @@ filter_muller_df = function(df, highlight=highlight) {
 
 
 pop_df_add_empty = function(mullerdf) {
+
   totals = mullerdf %>%
     dplyr::group_by(Generation, Lineage) %>%
     dplyr::summarise(tot=sum(Population)) %>%

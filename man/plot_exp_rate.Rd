@@ -10,7 +10,7 @@ plot_exp_rate(
   min_frac = 0,
   mutations = F,
   label = "",
-  timepoints_to_int = list(init = 0, early = 60, mid = 140, late = 280)
+  timepoints_to_int = list()
 )
 }
 \arguments{
