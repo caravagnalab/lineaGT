@@ -33,7 +33,8 @@ Imports:
     easypar,
     patchwork,
     ctree,
-    ggraph
+    ggraph,
+    RColorBrewer
 Remotes:
     caravagn/VIBER,
     caravagn/easypar,
