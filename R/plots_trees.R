@@ -8,6 +8,10 @@
 #' @param label add
 #'
 #' @return
+#'
+#' @importFrom ggraph create_layout ggraph geom_edge_link geom_node_point geom_node_text circle
+#' @importFrom RColorBrewer brewer.pal
+#'
 #' @export plot_phylogeny
 
 plot_phylogeny = function(x, score_diff=1, show_best=1, min_frac=0, highlight=c(), label="") {
@@ -52,11 +56,12 @@ plot_ctree_mod = function (x.tree,
 
   layout = ggraph::create_layout(tb_tree, layout=tree_layout)
   return(
-    ggraph(layout) +
-      geom_edge_link(arrow=arrow(length=unit(2 * cex, "mm")), end_cap=circle(5 * cex, "mm"),
-                     start_cap=circle(5 * cex, "mm")) +
-      geom_node_point(aes(colour=cluster, size=nMuts), alpha=.6, na.rm=TRUE) +
-      geom_node_text(aes(label=cluster), colour="black", vjust=0.4) +
+    ggraph::ggraph(layout) +
+      ggraph::geom_edge_link(arrow=arrow(length=unit(2 * cex, "mm")),
+                             end_cap=ggraph::circle(5 * cex, "mm"),
+                             start_cap=ggraph::circle(5 * cex, "mm")) +
+      ggraph::geom_node_point(aes(colour=cluster, size=nMuts), alpha=.6, na.rm=TRUE) +
+      ggraph::geom_node_text(aes(label=cluster), colour="black", vjust=0.4) +
       coord_cartesian(clip="off") +
       scale_color_manual(values=node_palette) +
       scale_size(range=c(3, 10) * cex) +
@@ -67,9 +72,6 @@ plot_ctree_mod = function (x.tree,
       theme(legend.position="bottom", text=element_text(size=9))
     )
 }
-
-
-
 
 
 get_best_scores = function(trees, show_best=0, score_diff=1) {

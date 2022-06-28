@@ -32,7 +32,8 @@ Imports:
     Polychrome,
     easypar,
     patchwork,
-    ctree
+    ctree,
+    ggraph
 Remotes:
     caravagn/VIBER,
     caravagn/easypar,
