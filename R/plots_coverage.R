@@ -79,11 +79,18 @@ plot_2D = function(x, dim1, dim2, color_palette, highlight, dens=NULL, facet=F, 
 #'
 #' @export plot_marginal
 
-plot_marginal = function(x, min_frac=0, highlight=c(), binwidth=5) {
+plot_marginal = function(x, min_frac=0, highlight=c(), binwidth=5, timepoints_to_int=list()) {
+  if (purrr::is_empty(timepoints_to_int)) timepoints_to_int = map_timepoints_int(x)
+
+  tp = timepoints_to_int %>% unlist() %>% sort() %>% names()
+
   highlight = get_highlight(x, min_frac, highlight)
   color_palette = highlight_palette(x, highlight)
 
-  dd = x %>% get_cov_dataframe() %>% filter(labels %in% highlight)
+  dd = x %>%
+    get_cov_dataframe() %>%
+    mutate(timepoints=factor(timepoints, levels=tp)) %>%
+    filter(labels %in% highlight)
 
   p = list()
   lineages = x %>% get_lineages()

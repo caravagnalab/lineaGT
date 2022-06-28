@@ -29,14 +29,16 @@ plot_phylogeny = function(x, score_diff=1, show_best=1, min_frac=0, highlight=c(
         str_replace_all(cluster, "") %>%
         str_replace_all("[.]", "")
 
+      cluster_plots = list()
       for (tt in 1:length(tree))
-        tree_plots[[cluster]][[tt]] = plot_ctree_mod(tree[[tt]],
-                                                     node_palette=color_palette,
-                                                     cluster_id=cluster)
+        cluster_plots[[tt]] = plot_ctree_mod(tree[[tt]],
+                                             node_palette=color_palette,
+                                             cluster_id=cluster)
+      tree_plots[[cluster]] = patchwork::wrap_plots(cluster_plots, guides="collect") & theme(legend.position = "bottom")
     }
   }
 
-  return(tree_plots[[cluster]])
+  return(tree_plots)
 }
 
 
@@ -75,11 +77,11 @@ plot_ctree_mod = function (x.tree,
 
 
 get_best_scores = function(trees, show_best=0, score_diff=1) {
-  if (show_best == 1 && score_diff == 1)
+  if ((show_best == 1 && score_diff == 1) || length(trees)==1)
     return(trees[1])
 
   if (show_best == 0 || score_diff < 1)
-    show_best = length(trees)
+    show_best = min(length(trees), 3)
 
   ret_trees = list()
   ret_trees[[1]] = trees[[1]]

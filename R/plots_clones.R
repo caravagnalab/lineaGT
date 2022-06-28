@@ -25,7 +25,6 @@
 #' @export plot_mullerplot
 
 plot_mullerplot = function(x, which="frac", highlight=c(), min_frac=0,
-                           # timepoints_to_int=list("early"=60,"mid"=140,"late"=280),
                            timepoints_to_int=list(),
                            mutations=F, single_clone=T, tree_score=1, label="",
                            legend.pos="right", wrap=F) {
