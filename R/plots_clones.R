@@ -77,7 +77,7 @@ mullerplot_util = function(mullerdf, which, color_palette, highlight, legend.pos
         geom_area(aes_string(x="Generation", y="Frequency", group="Group_id", fill="lm_r")) +
         geom_vline(xintercept=mullerdf$Generation %>% unique(), linetype="dashed") +
         guides(linetype="none", color="none") +
-        facet_wrap(~Lineage) +
+        facet_wrap(~Lineage, nrow=1) +
         xlab("Time") +
         labs(fill="Exp rate") +
         my_ggplot_theme(legend.pos=legend.pos) +
@@ -99,7 +99,7 @@ mullerplot_util = function(mullerdf, which, color_palette, highlight, legend.pos
       geom_area(aes_string(x="Generation", y=y, group="Group_id", fill=fill, colour="Identity")) +
       geom_vline(xintercept=mullerdf$Generation %>% unique(), linetype="dashed") +
       guides(linetype="none", color="none") +
-      facet_wrap(~Lineage) +
+      facet_wrap(~Lineage, nrow=1) +
       scale_fill_manual(name="Clusters", values=color_palette, na.value="#FFFFFF00", breaks=highlight) +
       scale_color_manual(values=color_palette, na.value="#FFFFFF00", breaks=highlight) +
       xlab("Time") +
