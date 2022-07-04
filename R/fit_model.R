@@ -77,21 +77,21 @@ fit = function(cov.df,
   max_k = cov.df %>% check_max_k()
   k_interval = check_k_interval(k_interval, max_k)
 
-  out = py_pkg$run_inference(cov_df=cov.df %>% long_to_wide_cov(),
-                             lineages=cov.df$lineage %>% unique(),
-                             k_interval=list(as.integer(k_interval[1]), as.integer(k_interval[2])),
-                             n_runs=as.integer(n_runs),
-                             steps=as.integer(steps),
-                             lr=as.numeric(lr),
-                             p=as.numeric(p),
-                             convergence=convergence,
-                             covariance=covariance,
-                             hyperparameters=reticulate::py_dict(keys=names(hyperparameters),
-                                                                 values=as.numeric(hyperparameters)),
-                             show_progr=show_progr,
-                             store_grads=store_grads,
-                             store_losses=store_losses,
-                             random_state=as.integer(random_state))
+  out = py_pkg$run$run_inference(cov_df=cov.df %>% long_to_wide_cov(),
+                                 lineages=cov.df$lineage %>% unique(),
+                                 k_interval=list(as.integer(k_interval[1]), as.integer(k_interval[2])),
+                                 n_runs=as.integer(n_runs),
+                                 steps=as.integer(steps),
+                                 lr=as.numeric(lr),
+                                 p=as.numeric(p),
+                                 convergence=convergence,
+                                 covariance=covariance,
+                                 hyperparameters=reticulate::py_dict(keys=names(hyperparameters),
+                                                                     values=as.numeric(hyperparameters)),
+                                 show_progr=show_progr,
+                                 store_grads=store_grads,
+                                 store_losses=store_losses,
+                                 random_state=as.integer(random_state))
 
   selection = list("ic"=out[[1]], "losses"=out[[2]], "grads"=out[[3]], "params"=out[[4]])
   best_k = get_best_k(selection, method="BIC")
