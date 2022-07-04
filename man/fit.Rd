@@ -15,9 +15,11 @@ fit(
   p = 0.01,
   convergence = TRUE,
   covariance = "diag",
+  hyperparameters = list(),
   show_progr = FALSE,
   store_grads = TRUE,
   store_losses = TRUE,
+  store_params = FALSE,
   random_state = 25
 )
 }
@@ -57,6 +59,8 @@ iteration will be stored.}
 
 \item{store_losses}{A Boolean. If \code{TRUE}, the computed losses for the parameters at each
 iteration will be stored.}
+
+\item{store_params}{A Boolean. If \code{TRUE}, the estimated parameters at each iteration will be stored.}
 
 \item{random_state}{Value of the seed.}
 }

@@ -6,6 +6,7 @@ fit_singleK = function(k,
                        lr=0.001,
                        p=0.01,
                        convergence=TRUE,
+                       store_params=FALSE,
                        random_state=25,
                        py_pkg=NULL) {
 
@@ -16,6 +17,7 @@ fit_singleK = function(k,
                     lr=as.numeric(lr),
                     p=as.numeric(p),
                     convergence=convergence,
+                    store_params=store_params,
                     random_state=random_state)
   x = classifier(x)
 
@@ -81,13 +83,15 @@ check_timepoints = function(cov.df) {
 
 
 run_inference = function(x, steps=500, covariance="diag", lr=0.005,
-                         p=0.01, convergence=TRUE, random_state=25) {
+                         p=0.01, convergence=TRUE, store_params=FALSE, random_state=25) {
   x$py_model$fit(steps=as.integer(steps),
                  cov_type=covariance,
                  lr=as.numeric(lr),
                  p=as.numeric(p),
                  convergence=convergence,
+                 store_params=store_params,
                  random_state=as.integer(random_state))
+
   return(update_params(x))
 }
 

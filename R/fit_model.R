@@ -25,6 +25,7 @@
 #' iteration will be stored.
 #' @param store_losses A Boolean. If \code{TRUE}, the computed losses for the parameters at each
 #' iteration will be stored.
+#' @param store_params A Boolean. If \code{TRUE}, the estimated parameters at each iteration will be stored.
 #' @param random_state Value of the seed.
 #' @return a \code{mvnmm} object, containing the input dataset, annotated with IS_values, N, K, T
 #' specific of the dataset, the input IS and column names, a list params that will contain the
@@ -63,14 +64,13 @@ fit = function(cov.df,
                p=0.01,
                convergence=TRUE,
                covariance="diag",
-               # hyperparameters=list(),
+               hyperparameters=list(),
                show_progr=FALSE,
                store_grads=TRUE,
                store_losses=TRUE,
+               store_params=FALSE,
                # timepoints_to_int=list(),  # like list(early=0, ...)
                random_state=25) {
-
-  # TODO add in Python function the way to modify the hyperparameters
 
   py_pkg = reticulate::import("pylineaGT")
 
@@ -86,18 +86,19 @@ fit = function(cov.df,
                              p=as.numeric(p),
                              convergence=convergence,
                              covariance=covariance,
-                             # hyperparameters=hyperparameters,
+                             hyperparameters=reticulate::py_dict(keys=names(hyperparameters),
+                                                                 values=as.numeric(hyperparameters)),
                              show_progr=show_progr,
                              store_grads=store_grads,
                              store_losses=store_losses,
                              random_state=as.integer(random_state))
 
-  selection = list("ic"=out[[1]], "losses"=out[[2]], "grads"=out[[3]])
+  selection = list("ic"=out[[1]], "losses"=out[[2]], "grads"=out[[3]], "params"=out[[4]])
   best_k = get_best_k(selection, method="BIC")
 
   cat(paste("Found", best_k, "clones!"))
 
-  x = fit_singleK(best_k, cov.df, steps=steps, lr=lr, py_pkg=py_pkg)
+  x = fit_singleK(best_k, cov.df, steps=steps, lr=lr, py_pkg=py_pkg, store_params=store_params)
   x$runs = selection
 
   if (!is.null(vaf.df))

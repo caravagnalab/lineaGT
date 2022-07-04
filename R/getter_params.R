@@ -1,7 +1,8 @@
-get_params = function(x=NULL, py_model=NULL) {
-  if (!is.null(x)) return(x$params)
+get_params = function(x=NULL, py_model=NULL, train=FALSE) {
+  if (!is.null(x) && !train) return(x$params)
+  else if (!is.null(x) && train) return(x$params_train)
 
-  if(!is.null(py_model)) return(get_python_params(py_model))
+  if(!is.null(py_model)) return(get_python_params(py_model, train=train))
 }
 
 
@@ -106,7 +107,7 @@ get_covariance_Sigma = function(x) {
     expr = {
       covar = list()
       for (k in 0:(x$K-1)) {
-        name = paste("C_", k, sep="")
+        name = paste("C", k, sep="")
         covar[[name]] = py_model$params$sigma[k]$detach()$numpy()
         covar[[name]] = covar[[name]] %*% t(covar[[name]])
         colnames(covar[[name]]) = rownames(covar[[name]]) = py_model$dimensions
@@ -146,6 +147,36 @@ get_z_probs = function(x) {
 }
 
 
+#' Get the number of ISs per cluster.
+#'
+#' @param x the fitted object
+#' @param highlight the clusters to retrieve
+#'
+#' @return an array with as names the clusters in \code{highlight} and as values the number of ISs assigned
+#' to each cluster
+#' @export
+#'
+
+get_ISs = function(x, highlight=c()) {
+  if (purrr::is_empty(highlight))
+    highlight = get_unique_labels(x)
+
+  return(sapply(highlight, get_ISs_single_cluster, x=x))
+}
+
+
+get_ISs_single_cluster = function(x, cluster) {
+  return(
+    x %>%
+      get_cov_dataframe() %>%
+      dplyr::filter(labels==cluster) %>%
+      dplyr::pull(IS) %>%
+      unique() %>%
+      length()
+  )
+}
+
+
 #' Extract the observations labels.
 #'
 #' @description Returns a list with \code{N} elements, corresponding to the labels for each
@@ -165,7 +196,7 @@ get_labels = function(x, initial_lab=F) {
     tryCatch(
       expr = {
         clusters_sort = get_unique_labels(py_model)
-        labels = factor(paste("C_", py_model$params$clusters$detach()$numpy(), sep=""), levels=clusters_sort)
+        labels = factor(paste("C", py_model$params$clusters$detach()$numpy(), sep=""), levels=clusters_sort)
         return(labels) },
       error = function(e) return(list()) ) }
 
@@ -173,7 +204,7 @@ get_labels = function(x, initial_lab=F) {
     tryCatch(
       expr = {
         clusters_sort = get_unique_labels(py_model)
-        labels = factor(paste("C_", py_model$init_params$clusters$detach()$numpy(), sep=""), levels=clusters_sort)
+        labels = factor(paste("C", py_model$init_params$clusters$detach()$numpy(), sep=""), levels=clusters_sort)
         return(labels) },
       error = function(e) return(list()) ) }
 
@@ -199,7 +230,7 @@ get_unique_labels = function(x) {
   py_model = get_model(x)
   tryCatch(
     expr = {
-      clusters_sort = paste("C_", py_model$params$clusters$detach()$numpy() %>% unique() %>% sort(), sep="")
+      clusters_sort = paste("C", py_model$params$clusters$detach()$numpy() %>% unique() %>% sort(), sep="")
       return(clusters_sort) },
     error = function(e) return(0:(py_model$params$K - 1)) )
 }
