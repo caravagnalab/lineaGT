@@ -50,12 +50,12 @@ get_parents = function(x,
             rownames_to_column(var="Label") %>%
             reshape2::melt(id="Label", variable.name="Identity") %>%
             filter(value==1) %>%
-            filter(!Label %in% c("GL"), !Identity %in% c("GL", "P")) %>%
+            filter(!Label %in% c("GL"), !Identity %in% c("GL", "P", cluster)) %>%
             dplyr::select(-value) %>%
             dplyr::mutate(Label=paste(cluster, Label, sep="."),
                           Identity=paste(cluster, Identity, sep="."),
                           Parent=cluster) %>%
-            dplyr::mutate(Label=ifelse(grepl("P",Label), cluster, Label)) %>%
+            dplyr::mutate(Label=ifelse(grepl(cluster,Label), cluster, Label)) %>%
             tibble::as_tibble()
         )
   }
