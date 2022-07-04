@@ -25,8 +25,10 @@ print.mvnmm = function(x, ...) {
   cat("\n")
   cli::cli_text(clisymbols::symbol$arrow_right, " Lineages: {.field {get_lineages(x) %>% sort()}}.")
   cli::cli_text(clisymbols::symbol$arrow_right, " Timepoints: {.field {get_timepoints(x)}}.")
+  cli::cli_text(clisymbols::symbol$arrow_right, " Number of Insertion Sites: {.field {x$N}}.")
 
   pi = x %>% lineaGT::get_weights() %>% round(2) %>% sort(decreasing = TRUE)
+  n_IS = x %>% get_ISs()
 
   cli::cli_h3("Optimal IS model with {.field k = {pi %>% length}}.")
   cat("\n")
@@ -34,10 +36,13 @@ print.mvnmm = function(x, ...) {
   for(cluster in names(pi))
   {
     starting =
-      sprintf("%25s", paste0(
-        crayon::yellow(cluster),
-        ' (', pi[cluster] * 100, '%)'
-      ))
+      sprintf("%25s", paste0(crayon::yellow(cluster),
+                             " (",
+                             pi[cluster] * 100,
+                             "% - ",
+                             n_IS[cluster],
+                             " ISs)")
+              )
 
     # Gaussian means
     mus = (x %>% get_mean())[cluster, ] %>% round(0)
