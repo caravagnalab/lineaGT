@@ -40,7 +40,7 @@ fit_phylogenies = function(x, vaf.df=NULL, min_frac=0, highlight=list(), do_filt
 
   for (cluster in clusters_joined) {
     viber_run = viber_run_all[[cluster]]
-    tt = fit_trees(viber_run)
+    tt = fit_trees(viber_run, cluster)
     trees[[cluster]] = tt
   }
 
@@ -51,9 +51,9 @@ fit_phylogenies = function(x, vaf.df=NULL, min_frac=0, highlight=list(), do_filt
 
 
 # to infer the tree on a single cluster
-fit_trees = function(fit_viber) {
+fit_trees = function(fit_viber, clonal) {
   if (length(fit_viber$labels$cluster.Binomial %>% unique) > 1)
-    tree = run_ctree(fit_viber)
+    tree = run_ctree(fit_viber, clonal)
   else
     tree = list()
 
@@ -61,7 +61,7 @@ fit_trees = function(fit_viber) {
 }
 
 
-run_ctree = function(viber_run) {
+run_ctree = function(viber_run, clonal) {
   # viber_run here is a viber fit
   if (all(is.null(viber_run$data)))
     stop("Your input object should have a data field; recreate the VIBER input.")
@@ -84,18 +84,15 @@ run_ctree = function(viber_run) {
   cx = viber_run$x %>% dplyr::select(-starts_with("cluster"))
   cy = viber_run$y %>% dplyr::select(-starts_with("cluster"))
 
-  if (clonal_cluster %>% unique() %>% length() == 1)
-    clonal_cluster = which.max(table(clonal_cluster)) %>% names
-  else {
-    clonal_cluster = "P"
-    theta = theta %>% as.data.frame()
-    theta$P = 1.0
-    cluster_table = cluster_table %>%
-      dplyr::add_row(cluster="P", nMuts=1) %>%
-      replace(is.na(.), 1)
-    cx = cx %>% dplyr::add_row() %>% replace(is.na(.), max(cy))
-    cy = cy %>% dplyr::add_row() %>% replace(is.na(.), max(cy))
-  }
+  clonal_cluster = clonal
+  theta = theta %>% as.data.frame()
+  theta$P = 1.0
+  cluster_table = cluster_table %>%
+    dplyr::add_row(cluster=clonal, nMuts=1) %>%
+    replace(is.na(.), 1)
+  cx = cx %>% dplyr::add_row() %>% replace(is.na(.), max(cy))
+  cy = cy %>% dplyr::add_row() %>% replace(is.na(.), max(cy))
+
   cluster_table$is.clonal = FALSE
   cluster_table$is.clonal[cluster_table$cluster %in% clonal_cluster] = TRUE
   viber_run$data$cluster = paste(unlist(viber_run$labels))
@@ -117,8 +114,10 @@ run_ctree = function(viber_run) {
   drivers_table = drivers_table %>% dplyr::select(patientID,
                                                   variantID, is.driver, is.clonal, cluster, colnames(cx),
                                                   dplyr::everything())
-  tt = ctree::ctrees(CCF_clusters = cluster_table, drivers = drivers_table,
-                     samples = colnames(cx), patient = patientID)
+  tt = ctree::ctrees(CCF_clusters=cluster_table,
+                     drivers=drivers_table,
+                     samples=colnames(cx),
+                     patient=patientID)
   return(tt)
 }
 

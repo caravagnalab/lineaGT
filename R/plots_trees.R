@@ -23,11 +23,13 @@ plot_phylogeny = function(x, score_diff=1, show_best=1, min_frac=0, highlight=c(
     if (!purrr::is_empty(trees[[cluster]])) {
       tree = trees[[cluster]] %>% get_best_scores(show_best=show_best, score_diff=score_diff)
 
-      color_palette = x %>% get_color_palette()
-      color_palette = color_palette[x %>% get_unique_muts_labels(clusters=cluster)]
+      color_palette = get_color_palette(x)[x %>% get_unique_muts_labels(clusters=cluster)]
       names(color_palette) = names(color_palette) %>%
         str_replace_all(cluster, "") %>%
         str_replace_all("[.]", "")
+
+      color_palette = c(color_palette, get_color_palette(x)[cluster])
+
 
       cluster_plots = list()
       for (tt in 1:length(tree))
@@ -54,7 +56,7 @@ plot_ctree_mod = function (x.tree,
   cex = 1
   tb_tree = tree$tb_adj_mat
   clusters = tree$CCF %>% dplyr::pull(cluster) %>% unique()
-  node_palette[setdiff(clusters, names(node_palette))] = "gainsboro"
+  # node_palette[setdiff(clusters, names(node_palette))] = "gainsboro"
 
   layout = ggraph::create_layout(tb_tree, layout=tree_layout)
   return(
