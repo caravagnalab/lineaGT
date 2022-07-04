@@ -22,7 +22,7 @@ get_losses = function(x, train=FALSE) {
                      dplyr::as_tibble() %>%
                      dplyr::mutate(K=as.integer(K), run=as.integer(run)))
   return(
-    x.e$losses %>%
+    x$losses %>%
       tibble::as_tibble() %>%
       dplyr::rename(losses=value) %>%
       tibble::rownames_to_column(var="index") %>%
