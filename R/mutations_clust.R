@@ -82,11 +82,14 @@ fit_cluster_viber = function(input, cluster, infer_phylo=TRUE) {
                                       data=data_annotations)
 
     # if (x.muts.k$K * 0.01 < 1) pi_cutoff = 0.005 else pi_cutoff = 0.01
-    # x.muts.k = VIBER::choose_clusters(x.muts.k,
-    #                                 binomial_cutoff=0,
-    #                                 dimensions_cutoff=0,
-    #                                 pi_cutoff=pi_cutoff,
-    #                                 re_assign=T)
+    x.muts.k = VIBER::choose_clusters(x.muts.k,
+                                      binomial_cutoff=0,
+                                      dimensions_cutoff=0,
+                                      pi_cutoff=0,
+                                      re_assign=T)
+
+    x.muts.k = x.muts.k %>%
+      replace_labels_muts(pattern="C", replacement="S")
 
     labels = x.muts.k$labels$cluster.Binomial
 
@@ -94,12 +97,12 @@ fit_cluster_viber = function(input, cluster, infer_phylo=TRUE) {
     input.k$vaf.df$pi_viber = x.muts.k$pi_k[labels] %>% as.vector()
 
     if (infer_phylo)
-      tree = fit_trees(x.muts.k)
+      tree = fit_trees(x.muts.k, cluster)
 
   }, silent = F)
 
   if (purrr::is_empty(x.muts.k)) {
-    input.k$vaf.df$labels_viber = "C1"
+    input.k$vaf.df$labels_viber = "S1"
     input.k$vaf.df$pi_viber = NA
   }
 
@@ -110,4 +113,41 @@ fit_cluster_viber = function(input, cluster, infer_phylo=TRUE) {
   return(list("df"=input.k$vaf.df, "fit"=x.muts.k, "tree"=tree))
 }
 
+
+
+replace_labels_muts = function(x.muts.k, pattern, replacement) {
+  x.muts.k$x$cluster.Binomial = x.muts.k$x$cluster.Binomial %>%
+    str_replace_all(pattern, replacement)
+  x.muts.k$y$cluster.Binomial = x.muts.k$y$cluster.Binomial %>%
+    str_replace_all(pattern, replacement)
+
+  names(x.muts.k$pi_k) = names(x.muts.k$pi_k) %>%
+    str_replace_all(pattern, replacement)
+
+  colnames(x.muts.k$theta_k) = colnames(x.muts.k$theta_k) %>%
+    str_replace_all(pattern, replacement)
+
+  names(x.muts.k$alpha) = names(x.muts.k$alpha) %>%
+    str_replace_all(pattern, replacement)
+  names(x.muts.k$alpha_0) = names(x.muts.k$b_0) %>%
+    str_replace_all(pattern, replacement)
+
+  colnames(x.muts.k$r_nk) = colnames(x.muts.k$r_nk) %>%
+    str_replace_all(pattern, replacement)
+
+  x.muts.k$labels$cluster.Binomial = x.muts.k$labels$cluster.Binomial %>%
+    str_replace_all(pattern, replacement)
+
+  colnames(x.muts.k$a) = colnames(x.muts.k$a) %>%
+    str_replace_all(pattern, replacement)
+  colnames(x.muts.k$a_0) = colnames(x.muts.k$a_0) %>%
+    str_replace_all(pattern, replacement)
+
+  colnames(x.muts.k$b) = colnames(x.muts.k$b) %>%
+    str_replace_all(pattern, replacement)
+  colnames(x.muts.k$b_0) = colnames(x.muts.k$b_0) %>%
+    str_replace_all(pattern, replacement)
+
+  return(x.muts.k)
+}
 
