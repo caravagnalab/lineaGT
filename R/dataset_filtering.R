@@ -24,9 +24,14 @@ filter_dataset = function(cov.df,
                           metric="calinski_harabasz_score",
                           random_state=25) {
 
+  cov.df = cov.df %>%
+    dplyr::group_by(timepoints, IS) %>%
+    dplyr::filter(any(coverage>=min_cov)) %>%
+    dplyr::ungroup()
+
   py_pkg = reticulate::import("pylineaGT")
   x = initialize_object(K=as.integer(1), cov.df=cov.df, py_pkg)
-  x$py_model$filter_dataset(min_cov=as.integer(min_cov),
+  x$py_model$filter_dataset(min_cov=as.integer(0),
                             min_ccf=as.numeric(min_frac),
                             metric=metric,
                             k_interval=as.integer(k_interval),
