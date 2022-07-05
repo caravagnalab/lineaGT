@@ -1,5 +1,3 @@
-# TODO add reference and export the function
-# function to infer the phylogenies on a fit object
 #' Fit the phylogenetic trees
 #'
 #' @param x add

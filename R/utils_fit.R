@@ -50,10 +50,10 @@ initialize_object = function(K,
   IS = df$IS
 
   py_model = py_pkg$mvnmm$MVNMixtureModel(K=as.integer(K),
-                                          data=df %>% dplyr::select(all_of(columns)),
-                                          lineages=lineages,
-                                          IS=IS,
-                                          columns=columns)
+                                    data=df %>% dplyr::select(all_of(columns)),
+                                    lineages=lineages,
+                                    IS=IS,
+                                    columns=columns)
 
   return(get_object(py_model, timepoints=timepoints, lineages=lineages))
 }
