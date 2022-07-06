@@ -9,6 +9,7 @@ plot_marginal(
   min_frac = 0,
   highlight = c(),
   binwidth = 5,
+  show_mean = F,
   timepoints_to_int = list()
 )
 }

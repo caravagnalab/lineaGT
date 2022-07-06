@@ -79,7 +79,7 @@ plot_2D = function(x, dim1, dim2, color_palette, highlight, dens=NULL, facet=F, 
 #'
 #' @export plot_marginal
 
-plot_marginal = function(x, min_frac=0, highlight=c(), binwidth=5, timepoints_to_int=list()) {
+plot_marginal = function(x, min_frac=0, highlight=c(), binwidth=5, show_mean=F, timepoints_to_int=list()) {
   if (purrr::is_empty(timepoints_to_int)) timepoints_to_int = map_timepoints_int(x)
 
   tp = timepoints_to_int %>% unlist() %>% sort() %>% names()
@@ -89,6 +89,11 @@ plot_marginal = function(x, min_frac=0, highlight=c(), binwidth=5, timepoints_to
 
   dd = x %>%
     get_cov_dataframe() %>%
+    mutate(timepoints=factor(timepoints, levels=tp)) %>%
+    filter(labels %in% highlight)
+
+  means = x %>%
+    get_mean_long() %>%
     mutate(timepoints=factor(timepoints, levels=tp)) %>%
     filter(labels %in% highlight)
 
@@ -106,6 +111,12 @@ plot_marginal = function(x, min_frac=0, highlight=c(), binwidth=5, timepoints_to
       xlab("Coverage") +
       labs(fill="Clusters", subtitle=ll) +
       my_ggplot_theme()
+
+    if (show_mean)
+      p[[ll]] = p[[ll]] + geom_vline(data=(means %>% filter(lineage==ll)),
+                                     aes(xintercept=mean_cov),
+                                     linetype="dashed", size=.4, alpha=.5)
+
   }
 
   return(p)

@@ -44,6 +44,17 @@ get_mean_long = function(x) {
 }
 
 
+get_mean_wide = function(x, arrange=T) {
+  return(
+    x %>%
+      get_mean_long() %>%
+      group_by(labels) %>%
+      dplyr::arrange(desc(mean_cov)) %>%
+      pivot_wider(id_cols="labels", names_from=c("timepoints","lineage"), values_from="mean_cov")
+  )
+}
+
+
 check_dp = function(x, thr=5, label="") {
   vaf.df = x %>% get_vaf_dataframe(label=label)
   means = x %>% get_mean_long()
