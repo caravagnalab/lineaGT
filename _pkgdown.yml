@@ -30,6 +30,7 @@ reference:
   - get_covariance_Sigma
   - get_weights
   - get_z_probs
+  - get_ISs
 
 - title: Visualization functions
   desc: Functions to visualize the fit results.
