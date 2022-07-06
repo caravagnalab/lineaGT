@@ -82,11 +82,11 @@ fit_cluster_viber = function(input, cluster, infer_phylo=TRUE) {
                                       data=data_annotations)
 
     # if (x.muts.k$K * 0.01 < 1) pi_cutoff = 0.005 else pi_cutoff = 0.01
-    x.muts.k = VIBER::choose_clusters(x.muts.k,
-                                      binomial_cutoff=0,
-                                      dimensions_cutoff=0,
-                                      pi_cutoff=0,
-                                      re_assign=T)
+    # x.muts.k = VIBER::choose_clusters(x.muts.k,
+    #                                   binomial_cutoff=0,
+    #                                   dimensions_cutoff=0,
+    #                                   pi_cutoff=0,
+    #                                   re_assign=T)
 
     x.muts.k = x.muts.k %>%
       replace_labels_muts(pattern="C", replacement="S")
