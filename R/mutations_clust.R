@@ -99,7 +99,7 @@ fit_cluster_viber = function(input, cluster, infer_phylo=TRUE) {
     if (infer_phylo)
       tree = fit_trees(x.muts.k, cluster)
 
-  }, silent = F)
+  }, silent = T)
 
   if (purrr::is_empty(x.muts.k)) {
     input.k$vaf.df$labels_viber = "S1"
