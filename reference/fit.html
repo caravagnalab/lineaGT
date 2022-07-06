@@ -68,9 +68,11 @@
   p <span class="op">=</span> <span class="fl">0.01</span>,
   convergence <span class="op">=</span> <span class="cn">TRUE</span>,
   covariance <span class="op">=</span> <span class="st">"diag"</span>,
+  hyperparameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
   show_progr <span class="op">=</span> <span class="cn">FALSE</span>,
   store_grads <span class="op">=</span> <span class="cn">TRUE</span>,
   store_losses <span class="op">=</span> <span class="cn">TRUE</span>,
+  store_params <span class="op">=</span> <span class="cn">FALSE</span>,
   random_state <span class="op">=</span> <span class="fl">25</span>
 <span class="op">)</span></code></pre></div>
     </div>
@@ -122,6 +124,7 @@ otherwise it will perform <code>steps</code> iterations.</p>
 iteration will be stored.</p>
 <p>store_lossesA Boolean. If <code>TRUE</code>, the computed losses for the parameters at each
 iteration will be stored.</p>
+<p>store_paramsA Boolean. If <code>TRUE</code>, the estimated parameters at each iteration will be stored.</p>
 <p>random_stateValue of the seed.</p></dd>
 
 </dl><p>a <code>mvnmm</code> object, containing the input dataset, annotated with IS_values, N, K, T
