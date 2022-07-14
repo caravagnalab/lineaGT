@@ -88,31 +88,31 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/caravagnalab/lineaGT" class="external-link">lineaGT</a></span><span class="op">)</span>
-<span class="co">#&gt; Warning: replacing previous import 'cli::num_ansi_colors' by</span>
-<span class="co">#&gt; 'crayon::num_ansi_colors' when loading 'VIBER'</span>
-<span class="co">#&gt; Warning: replacing previous import 'cli::num_ansi_colors' by</span>
-<span class="co">#&gt; 'crayon::num_ansi_colors' when loading 'easypar'</span>
-<span class="co">#&gt; <span style="color: #00BB00;">✔</span> Loading <span style="color: #00BB00;">ctree</span>, <span style="font-style: italic;">'Clone trees in cancer'</span>. Support : <span style="color: #0000BB; font-style: italic;">&lt;https://caravagn.github.io/ctree/&gt;</span></span>
-<span class="co">#&gt; Warning: replacing previous import 'crayon::%+%' by 'ggplot2::%+%' when loading</span>
-<span class="co">#&gt; 'VIBER'</span>
-<span class="co">#&gt; <span style="color: #00BB00;">✔</span> Loading <span style="color: #00BB00;">VIBER</span>, <span style="font-style: italic;">'Variational inference for multivariate Binomial mixtures'</span>. Support : <span style="color: #0000BB; font-style: italic;">&lt;https://caravagn.github.io/VIBER/&gt;</span></span>
-<span class="co">#&gt; <span style="color: #00BB00;">✔</span> Loading <span style="color: #00BB00;">lineaGT</span>, <span style="font-style: italic;">'Lineage inference from gene therapy'</span>. Support : <span style="color: #0000BB; font-style: italic;">&lt;https://caravagnalab.github.io/lineaGT/&gt;</span></span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/caravagnalab/lineaGT" class="external-link">lineaGT</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: replacing previous import 'cli::num_ansi_colors' by</span></span>
+<span><span class="co">#&gt; 'crayon::num_ansi_colors' when loading 'VIBER'</span></span>
+<span><span class="co">#&gt; Warning: replacing previous import 'cli::num_ansi_colors' by</span></span>
+<span><span class="co">#&gt; 'crayon::num_ansi_colors' when loading 'easypar'</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Loading <span style="color: #00BB00;">ctree</span>, <span style="font-style: italic;">'Clone trees in cancer'</span>. Support : <span style="color: #0000BB; font-style: italic;">&lt;https://caravagn.github.io/ctree/&gt;</span></span></span>
+<span><span class="co">#&gt; Warning: replacing previous import 'crayon::%+%' by 'ggplot2::%+%' when loading</span></span>
+<span><span class="co">#&gt; 'VIBER'</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Loading <span style="color: #00BB00;">VIBER</span>, <span style="font-style: italic;">'Variational inference for multivariate Binomial mixtures'</span>. Support : <span style="color: #0000BB; font-style: italic;">&lt;https://caravagn.github.io/VIBER/&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Loading <span style="color: #00BB00;">lineaGT</span>, <span style="font-style: italic;">'Lineage inference from gene therapy'</span>. Support : <span style="color: #0000BB; font-style: italic;">&lt;https://caravagnalab.github.io/lineaGT/&gt;</span></span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># reticulate::use_condaenv("lineaGT", required=TRUE)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># reticulate::use_condaenv("lineaGT", required=TRUE)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="fitting-the-model">Fitting the model<a class="anchor" aria-label="anchor" href="#fitting-the-model"></a>
 </h2>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># x_fit = fit(</span>
-<span class="co">#   data_filt,</span>
-<span class="co">#   vaf,</span>
-<span class="co">#   steps = 500,</span>
-<span class="co">#   n_runs = 2,</span>
-<span class="co">#   k_interval = c(10, 12),</span>
-<span class="co">#   min_frac=0.1</span>
-<span class="co">#   )</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># x_fit = fit(</span></span>
+<span><span class="co">#   data_filt,</span></span>
+<span><span class="co">#   vaf,</span></span>
+<span><span class="co">#   steps = 500,</span></span>
+<span><span class="co">#   n_runs = 2,</span></span>
+<span><span class="co">#   k_interval = c(10, 12),</span></span>
+<span><span class="co">#   min_frac=0.1</span></span>
+<span><span class="co">#   )</span></span></code></pre></div>
 </div>
   </main>
 </div>

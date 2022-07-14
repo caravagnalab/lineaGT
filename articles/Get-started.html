@@ -92,10 +92,10 @@
 </h3>
 <p>You can install LineaGT from GitHub using <code>devtools</code>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"caravagnalab/lineaGT"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"caravagnalab/lineaGT"</span><span class="op">)</span></span></code></pre></div>
 <p>Load the package.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/caravagnalab/lineaGT" class="external-link">lineaGT</a></span><span class="op">)</span> </code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/caravagnalab/lineaGT" class="external-link">lineaGT</a></span><span class="op">)</span> </span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="python-dependencies-installation">Python dependencies installation<a class="anchor" aria-label="anchor" href="#python-dependencies-installation"></a>
@@ -107,8 +107,8 @@
 <li><p>to use an existing <code>conda</code> environment, it can be loaded <strong>before</strong> loading the package, either through the <code>reticulate</code> function <code><a href="https://rstudio.github.io/reticulate/reference/use_python.html" class="external-link">reticulate::use_condaenv()</a></code> or by using the <code>lineaGT</code> function <code><a href="../reference/load_conda_env.html">load_conda_env()</a></code>:</p></li>
 </ul>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/use_python.html" class="external-link">use_condaenv</a></span><span class="op">(</span><span class="st">"env-name"</span>, required<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
-<span class="fu"><a href="../reference/load_conda_env.html">load_conda_env</a></span><span class="op">(</span>envname<span class="op">=</span><span class="st">"env-name"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/use_python.html" class="external-link">use_condaenv</a></span><span class="op">(</span><span class="st">"env-name"</span>, required<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/load_conda_env.html">load_conda_env</a></span><span class="op">(</span>envname<span class="op">=</span><span class="st">"env-name"</span><span class="op">)</span></span></code></pre></div>
 <ul>
 <li>eventually, if the required <code>Python</code> dependencies are not installed in the loaded environment, they will be installed.</li>
 </ul>
@@ -118,7 +118,7 @@
 </h3>
 <p>The function ‘pylineaGT’ can also be used interactively to manually configure an existing environment, or to create one from scratch.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/configure_environment.html">configure_environment</a></span><span class="op">(</span>env_name<span class="op">=</span><span class="st">"lineaget-env"</span>, use_default<span class="op">=</span><span class="cn">F</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/configure_environment.html">configure_environment</a></span><span class="op">(</span>env_name<span class="op">=</span><span class="st">"lineaget-env"</span>, use_default<span class="op">=</span><span class="cn">F</span><span class="op">)</span></span></code></pre></div>
 <p>The function will first check if a Anaconda or Miniconda installation is available, otherwise it will prompt a Miniconda installation. The input name of the environment is either the name of an existing environment or the name of the environment to be created. The environment will be loaded or created, and the required <code>Python</code> dependencies will be installed.</p>
 </div>
 <div class="section level3">

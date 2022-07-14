@@ -88,30 +88,30 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/caravagnalab/lineaGT" class="external-link">lineaGT</a></span><span class="op">)</span>
-<span class="co">#&gt; <span style="color: #00BB00;">✔</span> Loading <span style="color: #00BB00;">ctree</span>, <span style="font-style: italic;">'Clone trees in cancer'</span>. Support : <span style="color: #0000BB; font-style: italic;">&lt;https://caravagn.github.io/ctree/&gt;</span></span>
-<span class="co">#&gt; <span style="color: #00BB00;">✔</span> Loading <span style="color: #00BB00;">VIBER</span>, <span style="font-style: italic;">'Variational inference for multivariate Binomial mixtures'</span>. Support : <span style="color: #0000BB; font-style: italic;">&lt;https://caravagn.github.io/VIBER/&gt;</span></span>
-<span class="co">#&gt; <span style="color: #00BB00;">✔</span> Loading <span style="color: #00BB00;">lineaGT</span>, <span style="font-style: italic;">'Lineage inference from gene therapy'</span>. Support : <span style="color: #0000BB; font-style: italic;">&lt;https://caravagnalab.github.io/lineaGT/&gt;</span></span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/caravagnalab/lineaGT" class="external-link">lineaGT</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Loading <span style="color: #00BB00;">ctree</span>, <span style="font-style: italic;">'Clone trees in cancer'</span>. Support : <span style="color: #0000BB; font-style: italic;">&lt;https://caravagn.github.io/ctree/&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Loading <span style="color: #00BB00;">VIBER</span>, <span style="font-style: italic;">'Variational inference for multivariate Binomial mixtures'</span>. Support : <span style="color: #0000BB; font-style: italic;">&lt;https://caravagn.github.io/VIBER/&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Loading <span style="color: #00BB00;">lineaGT</span>, <span style="font-style: italic;">'Lineage inference from gene therapy'</span>. Support : <span style="color: #0000BB; font-style: italic;">&lt;https://caravagnalab.github.io/lineaGT/&gt;</span></span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span></span></code></pre></div>
 <p>The dataset can be filtered calling the <code><a href="../reference/filter_dataset.html">filter_dataset()</a></code> function.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">data_filt</span> <span class="op">=</span> <span class="va">data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/filter_dataset.html">filter_dataset</a></span><span class="op">(</span><span class="op">)</span>
-
-<span class="va">data_filt</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 1,200 × 4</span></span>
-<span class="co">#&gt;    IS    timepoints lineage coverage</span>
-<span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> IS.1  early      L2            12</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> IS.1  early      L1             2</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> IS.1  early      L4             7</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> IS.1  early      L3            10</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> IS.1  mid        L2             9</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> IS.1  mid        L1            10</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> IS.1  mid        L4             8</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> IS.1  mid        L3             6</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> IS.1  late       L2             3</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">10</span> IS.1  late       L1             4</span>
-<span class="co">#&gt; <span style="color: #949494;"># … with 1,190 more rows</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">data_filt</span> <span class="op">=</span> <span class="va">data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/filter_dataset.html">filter_dataset</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">data_filt</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1,200 × 4</span></span></span>
+<span><span class="co">#&gt;    IS    timepoints lineage coverage</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> IS.1  early      L2            12</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> IS.1  early      L1             2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> IS.1  early      L4             7</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> IS.1  early      L3            10</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> IS.1  mid        L2             9</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> IS.1  mid        L1            10</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> IS.1  mid        L4             8</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> IS.1  mid        L3             6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> IS.1  late       L2             3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> IS.1  late       L1             4</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># … with 1,190 more rows</span></span></span></code></pre></div>
   </main>
 </div>
 
