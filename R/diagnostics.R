@@ -1,11 +1,17 @@
 get_best_k = function(selection, method="BIC") {
-  return(selection$ic %>%
-           reshape2::melt(id=c("K","run"), variable.name="mm") %>%
-           dplyr::as_tibble() %>%
-           dplyr::mutate(K=as.integer(K), run=as.integer(run)) %>%
-           dplyr::filter(mm==method) %>%
-           dplyr::slice(which.min(value)) %>%
-           .$K)
+  return(
+    selection$ic %>%
+      reshape2::melt(id=c("K","run"), variable.name="mm") %>%
+      dplyr::as_tibble() %>%
+      dplyr::mutate(K=as.integer(K), run=as.integer(run)) %>%
+      dplyr::filter(mm==method) %>%
+      # dplyr::group_by(mm, K) %>%
+      # dplyr::summarise(mean_value=mean(value)) %>%
+      # dplyr::ungroup() %>%
+      # dplyr::filter(mean_value==min(mean_value)) %>%
+      dplyr::filter(value==min(value)) %>%
+      dplyr::pull(K) %>% unique()
+    )
 }
 
 
@@ -13,7 +19,8 @@ get_IC = function(x) {
   return(x$runs$ic %>%
            reshape2::melt(id=c("K","run"), variable.name="method") %>%
            dplyr::as_tibble() %>%
-           dplyr::mutate(K=as.integer(K), run=as.integer(run)))
+           dplyr::mutate(K=as.integer(K), run=as.integer(run))
+         )
 }
 
 
