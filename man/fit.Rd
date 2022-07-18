@@ -12,7 +12,9 @@ fit(
   n_runs = 2,
   steps = 500,
   lr = 0.005,
-  p = 0.01,
+  p = 1,
+  min_frac = 0,
+  max_IS = NULL,
   convergence = TRUE,
   covariance = "diag",
   hyperparameters = list(),
@@ -20,7 +22,8 @@ fit(
   store_grads = TRUE,
   store_losses = TRUE,
   store_params = FALSE,
-  random_state = 25
+  random_state = 25,
+  sample_id = ""
 )
 }
 \arguments{
@@ -47,6 +50,10 @@ the returned object the phylogenetic trees for each cluster.}
 \item{p}{Numeric value in \code{[0,1]} used to check the convergence of the parameters. If from one to the next
 iterationthe value of the parameters vary less than \code{p}% for \code{n} iterations, the inference stops.}
 
+\item{min_frac}{add}
+
+\item{max_IS}{add}
+
 \item{convergence}{A Boolean. If set to \code{TRUE}, the function will check for early convergence,
 otherwise it will perform \code{steps} iterations.}
 
@@ -63,6 +70,8 @@ iteration will be stored.}
 \item{store_params}{A Boolean. If \code{TRUE}, the estimated parameters at each iteration will be stored.}
 
 \item{random_state}{Value of the seed.}
+
+\item{sample_id}{add}
 }
 \value{
 a \code{mvnmm} object, containing the input dataset, annotated with IS_values, N, K, T

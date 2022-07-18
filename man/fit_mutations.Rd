@@ -9,8 +9,8 @@ fit_mutations(
   vaf.df = NULL,
   infer_phylo = TRUE,
   min_frac = 0,
+  max_IS = NULL,
   highlight = list(),
-  do_filter = FALSE,
   lineages = c(),
   label = ""
 )
@@ -24,9 +24,9 @@ fit_mutations(
 
 \item{min_frac}{add}
 
-\item{highlight}{add}
+\item{max_IS}{add}
 
-\item{do_filter}{add}
+\item{highlight}{add}
 
 \item{lineages}{add}
 
