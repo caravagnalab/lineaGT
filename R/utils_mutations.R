@@ -78,9 +78,51 @@ check_dp = function(x, thr=5, label="") {
 }
 
 
+# Function to check if dimensions found in the coverage dataset (as combinations
+# of lineages and timepoints) are missing in the mutation data
+check_vaf_dimensions = function(vaf.df, x) {
+  vaf.df = vaf.df %>%
+    ungroup() %>%
+    long_to_wide_muts() %>%
+    wide_to_long_muts()
+
+  vaf.dims = vaf.df %>%
+    group_by(lineage, timepoints) %>%
+    dplyr::summarise(nn=dplyr::n()) %>%
+    mutate(dimensions=paste("cov",timepoints,lineage,sep=".")) %>%
+    dplyr::pull(dimensions) %>%
+    ungroup
+  cov.dims = x %>% get_dimensions()
+
+  missing = setdiff(cov.dims, vaf.dims) %>%
+    reshape2::melt() %>%
+    separate(value, into=c("else","timepoints","lineage")) %>%
+    dplyr::mutate("else"=NULL)
+
+  if (purrr::is_empty(missing))
+    return(
+      vaf.df
+    )
+
+  return(
+    vaf.df %>%
+      dplyr::add_row(
+        missing %>%
+          dplyr::mutate(mutation=vaf.df[1,] %>% dplyr::pull(mutation),
+                        IS=vaf.df[1,] %>% dplyr::pull(IS),
+                        dp=0, dp_locus=0, alt=0, ref=0, vaf=0.0)
+        ) %>%
+      long_to_wide_muts() %>%
+      wide_to_long_muts()
+    )
+}
+
+
 # returns the object x with the annotated vaf dataframe
 annotate_vaf_df = function(x, vaf.df, min_frac=0, label="") {
   highlight = get_highlight(x, min_frac=min_frac)
+
+  vaf.df = vaf.df %>% check_vaf_dimensions(x=x)
 
   dataframe = x %>%
     get_cov_dataframe() %>%
@@ -143,57 +185,3 @@ get_data_annotation = function(k) {
 }
 
 
-# # As input a mvnmm object with already a viber_run performed
-# get_binomial_theta = function(x, label="") {
-#   x.muts = x %>% get_viber_run(label=label)
-#   theta = data.frame()
-#
-#   for(cluster in x.muts %>% names()) {
-#     if (!purrr::is_empty(x.muts[[cluster]])) {
-#       theta.k = get_binomial_theta_cluster(x.muts[[cluster]], cluster)
-#       theta = rbind(theta, theta.k)
-#     }
-#   }
-#
-#   if (!purrr::is_empty(theta))
-#     return(
-#       theta %>%
-#         tidyr::pivot_longer(cols=starts_with("v."), names_to="v.timepoints.lineage", values_to="theta") %>%
-#         tidyr::separate(v.timepoints.lineage, into=c("else","timepoints","lineage")) %>%
-#         dplyr::mutate("else"=NULL, theta=theta*100)
-#     )
-# }
-
-
-# filter_muts = function(vaf.df) {
-#   vaf.df %>%
-#     group_by(mutation, lineage, labels) %>%
-#     dplyr::mutate(vaf_diff=vaf-dplyr::lag(vaf), vaf_diff=ifelse(is.na(vaf_diff),0,vaf_diff)) %>%
-#     dplyr::filter(any(abs(vaf_diff)>40))
-# }
-
-
-# # Functions used to obtain and reshape some datasets
-# # works with our vaf files
-# vaf_df_from_file = function(vaf_file) {
-#   vaf_df = read.csv(vaf_file)
-#   try(expr = { vaf_df = vaf_df  %>%
-#     dplyr::rename_with(.cols=all_of(dplyr::starts_with("dp_")),
-#                        .fn=~paste0("cov_", str_replace_all(.x,"dp_",""))) }, silent = T)
-#
-#   vaf_df = vaf_df %>%
-#     tidyr::pivot_longer(cols=starts_with("dp.ref.alt"), names_to="timepoint", values_to="dp:ref:alt") %>%
-#     mutate(timepoint=stringr::str_replace_all(timepoint, "dp.ref.alt_", "")) %>%
-#     filter(!timepoint %in% c("over","steady")) %>%
-#     separate("dp:ref:alt", into=c("dp", "ref", "alt"), sep=":") %>%
-#     mutate(ref=as.integer(ref), alt=as.integer(alt), dp=ref+alt) %>%
-#     tidyr::pivot_wider(values_from=c("dp","ref","alt"), names_from="timepoint", values_fn=as.integer)
-#
-#   vaf_df = vaf_df %>%
-#     dplyr::select(-starts_with("cov")) %>%
-#     tidyr::pivot_longer(cols=c(starts_with("alt"),starts_with("dp"),starts_with("vaf"),starts_with("ref"))) %>%
-#     separate(name, into=c("type","timepoints")) %>%
-#     tidyr::pivot_wider(names_from = "type", values_from = "value")
-#
-#   return(vaf_df)
-# }

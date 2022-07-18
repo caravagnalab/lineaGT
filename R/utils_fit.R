@@ -3,8 +3,9 @@ fit_singleK = function(k,
                        cov.df,
                        steps=500,
                        covariance="diag",
+                       hyperparameters=list(),
                        lr=0.001,
-                       p=0.01,
+                       p=1,
                        convergence=TRUE,
                        store_params=FALSE,
                        random_state=25,
@@ -16,6 +17,7 @@ fit_singleK = function(k,
                     covariance=covariance,
                     lr=as.numeric(lr),
                     p=as.numeric(p),
+                    hyperparameters=hyperparameters,
                     convergence=convergence,
                     store_params=store_params,
                     random_state=random_state)
@@ -82,8 +84,20 @@ check_timepoints = function(cov.df) {
 }
 
 
-run_inference = function(x, steps=500, covariance="diag", lr=0.005,
-                         p=0.01, convergence=TRUE, store_params=FALSE, random_state=25) {
+run_inference = function(x,
+                         steps=500,
+                         covariance="diag",
+                         hyperparameters=list(),
+                         lr=0.005,
+                         p=2,
+                         convergence=TRUE,
+                         store_params=FALSE,
+                         random_state=25) {
+
+  # modify the hyperparameters as given in input
+  for (hyperpar in names(hyperparameters))
+    x$py_model$set_hyperparameters(hyperpar, as.numeric(hyperparameters[[hyperpar]]))
+
   x$py_model$fit(steps=as.integer(steps),
                  cov_type=covariance,
                  lr=as.numeric(lr),

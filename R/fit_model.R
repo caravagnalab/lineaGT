@@ -17,6 +17,8 @@
 #' @param lr Learning rate used in the inference.
 #' @param p Numeric value in \code{[0,1]} used to check the convergence of the parameters. If from one to the next
 #' iterationthe value of the parameters vary less than \code{p}% for \code{n} iterations, the inference stops.
+#' @param min_frac add
+#' @param max_IS add
 #' @param convergence A Boolean. If set to \code{TRUE}, the function will check for early convergence,
 #' otherwise it will perform \code{steps} iterations.
 #' @param covariance Covariance type for the Multivariate Gaussian.
@@ -27,6 +29,8 @@
 #' iteration will be stored.
 #' @param store_params A Boolean. If \code{TRUE}, the estimated parameters at each iteration will be stored.
 #' @param random_state Value of the seed.
+#' @param sample_id add
+#'
 #' @return a \code{mvnmm} object, containing the input dataset, annotated with IS_values, N, K, T
 #' specific of the dataset, the input IS and column names, a list params that will contain the
 #' inferred parameters, the python object
@@ -61,7 +65,9 @@ fit = function(cov.df,
                n_runs=2,
                steps=500,
                lr=0.005,
-               p=0.01,
+               p=1,
+               min_frac=0,
+               max_IS=NULL,
                convergence=TRUE,
                covariance="diag",
                hyperparameters=list(),
@@ -70,7 +76,8 @@ fit = function(cov.df,
                store_losses=TRUE,
                store_params=FALSE,
                # timepoints_to_int=list(),  # like list(early=0, ...)
-               random_state=25) {
+               random_state=25,
+               sample_id="") {
 
   py_pkg = reticulate::import("pylineaGT")
 
@@ -98,11 +105,14 @@ fit = function(cov.df,
 
   cat(paste("Found", best_k, "clones!"))
 
-  x = fit_singleK(best_k, cov.df, steps=steps, lr=lr, py_pkg=py_pkg, store_params=store_params)
+  x = fit_singleK(best_k, cov.df, steps=steps, lr=lr, py_pkg=py_pkg,
+                  store_params=store_params, hyperparameters=hyperparameters)
   x$runs = selection
 
   if (!is.null(vaf.df))
-    x = fit_mutations(x, vaf.df, infer_phylo=infer_phylogenies)
+    x = fit_mutations(x, vaf.df, infer_phylo=infer_phylogenies, min_frac=min_frac, max_IS=max_IS)
+
+  x$sample_id = sample_id
 
   return(x)
 }

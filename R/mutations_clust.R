@@ -8,8 +8,8 @@
 #' @param vaf.df add
 #' @param infer_phylo add
 #' @param min_frac add
+#' @param max_IS add
 #' @param highlight add
-#' @param do_filter add
 #' @param lineages add
 #' @param label add
 #'
@@ -20,8 +20,9 @@ fit_mutations = function(x,
                          vaf.df=NULL,
                          infer_phylo=TRUE,
                          min_frac=0,
+                         max_IS=NULL,
                          highlight=list(),
-                         do_filter=FALSE,
+                         # do_filter=FALSE,
                          lineages=c(),
                          label="") {
 
@@ -47,7 +48,9 @@ fit_mutations = function(x,
   for (cluster in clusters_joined) {
     x.muts.k = fit_cluster_viber(input_viber,
                                  cluster=cluster,
-                                 infer_phylo=infer_phylo)
+                                 infer_phylo=infer_phylo,
+                                 max_IS=max_IS,
+                                 x=x)
 
     vaf.df.fit = rbind(vaf.df.fit, x.muts.k$df)
     x.muts[[cluster]] = x.muts.k$fit
@@ -62,31 +65,33 @@ fit_mutations = function(x,
   color_palette = update_color_palette(x, clusters_joined, label=label)
   x = add_color_palette(x, color_palette, label=label)
 
-  x = add_phylo(x, x.trees, label=label)
+  if (infer_phylo)
+    x = add_phylo(x, x.trees, label=label)
 
   return(x)
 }
 
 
-fit_cluster_viber = function(input, cluster, infer_phylo=TRUE) {
+fit_cluster_viber = function(input, cluster, infer_phylo=TRUE, max_IS=NULL, x=NULL){
   input.k = input %>% filter_viber_input(cluster=cluster)
 
   k = input.k$successes %>% nrow  # max n of clusters
   x.muts.k = tree = list()
 
-  try(expr = {
+  # fit the bmm only for the clones with number of IS <= max_IS
+  if (is.null(max_IS) | get_ISs_single_cluster(x, cluster) <= max_IS) {
+    try(expr = {
     data_annotations = get_data_annotation(k)
     x.muts.k = VIBER::variational_fit(input.k$successes,
                                       input.k$trials,
                                       K=k,
                                       data=data_annotations)
 
-    # if (x.muts.k$K * 0.01 < 1) pi_cutoff = 0.005 else pi_cutoff = 0.01
-    # x.muts.k = VIBER::choose_clusters(x.muts.k,
-    #                                   binomial_cutoff=0,
-    #                                   dimensions_cutoff=0,
-    #                                   pi_cutoff=0,
-    #                                   re_assign=T)
+    pi_cutoff = .5 / k  # we are not reducing the clusters but it changes the labels
+    x.muts.k = VIBER::choose_clusters(x.muts.k,
+                                      binomial_cutoff=0,
+                                      dimensions_cutoff=0,
+                                      pi_cutoff=pi_cutoff)
 
     x.muts.k = x.muts.k %>%
       replace_labels_muts(pattern="C", replacement="S")
@@ -100,6 +105,8 @@ fit_cluster_viber = function(input, cluster, infer_phylo=TRUE) {
       tree = fit_trees(x.muts.k, cluster)
 
   }, silent = T)
+
+  }
 
   if (purrr::is_empty(x.muts.k)) {
     input.k$vaf.df$labels_viber = "S1"
@@ -115,6 +122,7 @@ fit_cluster_viber = function(input, cluster, infer_phylo=TRUE) {
 
 
 
+# function to change the VIBER labels from "C..." to "S..."
 replace_labels_muts = function(x.muts.k, pattern, replacement) {
   x.muts.k$x$cluster.Binomial = x.muts.k$x$cluster.Binomial %>%
     str_replace_all(pattern, replacement)
