@@ -99,7 +99,7 @@ get_tp_to_int = function(x) {
 
 
 get_muts_fit = function(x, label="") {
-  if (label == "") return(x$viber_run)
+  if (label == "") return(x$x.muts)
   return(x[[paste("viber_run", label, sep=".")]])
 }
 

@@ -19,7 +19,8 @@ long_to_wide_muts = function(vaf.df) {
                          values_from=c(dplyr::starts_with("alt"),
                                        dplyr::starts_with("dp"),
                                        dplyr::starts_with("vaf"),
-                                       dplyr::starts_with("theta")))
+                                       dplyr::starts_with("theta")),
+                         values_fill=0)
   )
 }
 
