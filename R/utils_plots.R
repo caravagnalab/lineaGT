@@ -65,7 +65,9 @@ highlight_palette = function(x, highlight=c(), label="") {
 }
 
 
-map_timepoints_int = function(x) {
+map_timepoints_int = function(x, timepoints_to_int=list()) {
+  if (!purrr::is_empty(timepoints_to_int)) return(timepoints_to_int)
+
   if (!purrr::is_empty(x %>% get_tp_to_int())) return(x %>% get_tp_to_int())
 
   tp = x %>% get_timepoints()

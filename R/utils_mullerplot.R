@@ -5,23 +5,12 @@ get_muller_edges = function(x,
                             highlight=c()) {
 
   edges = data.frame("Parent"="P", "Identity"=get_unique_labels(x))
-
   if (!mutations) return(edges)
 
-  edges = x %>%
-    get_vaf_dataframe(label=label) %>%
-    inner_join(x %>% get_mean_long(), by=c("labels", "timepoints", "lineage")) %>%
-    dplyr::rename(Parent=labels, Identity=labels_mut) %>%
-    dplyr::select(Parent, Identity) %>% unique() %>%
-    dplyr::add_row(edges)
+  edges_mut = x %>% get_parents(tree_score=tree_score)
+  missed = setdiff(get_unique_muts_labels(x), edges_mut %>% dplyr::pull(Identity))
 
-  return(
-    x %>%
-      get_parents(label=label, tree_score=tree_score, highlight=highlight) %>%
-      dplyr::full_join(edges, by=c("Parent", "Identity")) %>%
-      mutate(Parent=ifelse(is.na(Label), Parent, Label)) %>%
-      dplyr::select(-Label)
-  )
+  return(edges_mut %>% dplyr::add_row(edges))
 }
 
 
@@ -33,13 +22,14 @@ get_parents = function(x,
   if (purrr::is_empty(highlight)) highlight = get_unique_labels(x)
 
   # create an empty dataset with colnames
-  edges = setNames(data.frame(matrix(ncol=3, nrow=0)), c("Parent", "Identity", "Label")) %>%
+  edges = setNames(data.frame(matrix(ncol=2, nrow=0)), c("Parent", "Identity")) %>%
     tibble::as_tibble() %>%
-    mutate(Parent=as.character(Parent), Identity=as.character(Identity), Label=as.character(Label))
+    mutate(Parent=as.character(Parent), Identity=as.character(Identity))
 
   trees = get_trees(x, label)
   for (cluster in highlight) {
     tree = trees[[cluster]]
+    muts = x %>% get_unique_muts_labels(cluster=cluster)
 
     if (!purrr::is_empty(tree))
       edges = edges %>%
@@ -49,14 +39,18 @@ get_parents = function(x,
             as.data.frame() %>%
             rownames_to_column(var="Label") %>%
             reshape2::melt(id="Label", variable.name="Identity") %>%
-            filter(value==1) %>%
-            filter(!Label %in% c("GL"), !Identity %in% c("GL", "P", cluster)) %>%
+            dplyr::filter(value==1) %>%
+            dplyr::filter(!Label %in% c("GL"), !Identity %in% c("GL", "P", cluster)) %>%
             dplyr::select(-value) %>%
-            dplyr::mutate(Label=paste(cluster, Label, sep="."),
-                          Identity=paste(cluster, Identity, sep="."),
-                          Parent=cluster) %>%
-            dplyr::mutate(Label=ifelse(grepl(cluster,Label), cluster, Label)) %>%
+            dplyr::rename(Parent=Label) %>%
+            dplyr::mutate(Parent=ifelse(Parent==cluster, Parent, paste(cluster, Parent, sep="."))) %>%
+            dplyr::mutate(Identity=paste(cluster,Identity,sep=".")) %>%
             tibble::as_tibble()
+        )
+    else if (length(muts) > 0)
+      edges = edges %>%
+        dplyr::add_row(
+          data.frame(Parent=cluster, Identity=muts)
         )
   }
   return(edges)
@@ -98,6 +92,9 @@ get_muller_pop = function(x,
     format_means_df() %>%  # to format the dataframe with correct colnames ecc
     add_parent(x=x) %>%  # add common parent "P" data
     add_time_0(x=x, value=value) %>%
+    dplyr::group_by(Generation, Lineage) %>%
+    dplyr::mutate(Frequency=Population/sum(Population)) %>%
+    dplyr::ungroup() %>%
     convert_tp(mapping=timepoints_to_int) %>%  # convert timepoints to numeric values
     add_exp_fit_coeff(x=x, add_exp_coef=exp_coef) %>%
     dplyr::select(Identity, Generation, Lineage, Population, Frequency, dplyr::starts_with("lm"))
@@ -111,22 +108,17 @@ format_means_df = function(mean_df) {
     mean_df %>%
       dplyr::rename(Identity=labels, Generation=timepoints, Lineage=lineage, Population=mean_cov) %>%
       dplyr::mutate(Identity=as.character(Identity)) %>%
-      dplyr::mutate(Population=ifelse(Population==0, 0.001, Population)) %>%
-      dplyr::group_by(Generation, Lineage) %>%
-      dplyr::mutate(Frequency=Population/sum(Population)) %>%
-      dplyr::ungroup()
+      dplyr::mutate(Population=ifelse(Population==0, 0.001, Population))
   )
 }
 
 
-add_parent = function(pop_df,
-                      x=x) {
+add_parent = function(pop_df, x=x) {
   return(
     pop_df %>%
       dplyr::add_row(
         Identity=rep( "P", times = x$`T` ),
-        Population=rep( 1, times = x$`T` ),
-        Frequency=rep( 1, times = x$`T` ),
+        Population=rep( 0, times = x$`T` ),
         Generation=rep( get_timepoints(x), times = get_lineages(x) %>% length() ),
         Lineage=rep( x$lineages, each = get_timepoints(x) %>% length() )
       )
@@ -140,7 +132,6 @@ add_time_0 = function(pop_df,
                       value="init") {
 
   n_tp = x %>% get_timepoints() %>% length()
-  if (n_tp > 1 && !force) return(pop_df)
 
   if (value %in% (pop_df$Generation %>% unique())) return(pop_df)
 
@@ -152,14 +143,12 @@ add_time_0 = function(pop_df,
       dplyr::add_row(
         Identity=rep( ids, times = n_lins ),
         Population=rep( 0, times = n_ids * n_lins ),
-        Frequency=rep( 0, times = n_ids * n_lins ),
         Generation=rep( value, times = n_ids * n_lins ),
         Lineage=rep( x$lineages, each = n_ids )
       ) %>%
       dplyr::add_row(
         Identity=rep( "P", times = n_lins ),
         Population=rep( 1, times = n_lins ),
-        Frequency=rep( 1, times = n_lins ),
         Generation=rep( value, times = n_lins ),
         Lineage=x$lineages
       )
