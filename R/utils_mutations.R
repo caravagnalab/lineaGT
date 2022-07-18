@@ -72,7 +72,7 @@ check_dp = function(x, thr=5, label="") {
     dplyr::mutate(dp=ifelse(dp < thr, mean(dp) %>% as.integer(), dp)) %>%
     dplyr::ungroup() %>%
 
-    dplyr::select(-original_dp)
+    dplyr::select(-original_dp, dp, alt, ref, vaf, mutation, IS, lineage, timepoints, labels)
 
   return(add_vaf(x, joined, label))
 }
@@ -90,8 +90,7 @@ check_vaf_dimensions = function(vaf.df, x) {
     group_by(lineage, timepoints) %>%
     dplyr::summarise(nn=dplyr::n()) %>%
     mutate(dimensions=paste("cov",timepoints,lineage,sep=".")) %>%
-    dplyr::pull(dimensions) %>%
-    ungroup
+    dplyr::pull(dimensions)
   cov.dims = x %>% get_dimensions()
 
   missing = setdiff(cov.dims, vaf.dims) %>%
@@ -133,7 +132,11 @@ annotate_vaf_df = function(x, vaf.df, min_frac=0, label="") {
     dplyr::filter(IS %in% IS_keep,
                   lineage %in% (x %>% get_lineages()),
                   timepoints %in% (x %>% get_timepoints())) %>%
-    dplyr::select(alt, dp, vaf, mutation, IS, lineage, timepoints)
+    dplyr::select(dplyr::starts_with("alt"),
+                  dplyr::starts_with("ref"),
+                  dplyr::starts_with("dp"),
+                  dplyr::starts_with("vaf"),
+                  mutation, IS, lineage, timepoints)
 
   vaf.ann = dplyr::inner_join(vaf.df_filt, dataframe, by=c("IS", "lineage", "timepoints"))
 
@@ -151,11 +154,11 @@ get_input_viber = function(x, lineages=c(), label="") {
     long_to_wide_muts()
 
   trials = vaf.df_wide %>%
-    dplyr::select(starts_with("dp"), labels) %>%
+    dplyr::select(starts_with("dp."), labels) %>%
     rename_with(.fn = ~str_replace_all(.x, "dp.", ""))
 
   successes = vaf.df_wide %>%
-    dplyr::select(starts_with("alt"), labels) %>%
+    dplyr::select(starts_with("alt."), labels) %>%
     rename_with(.fn = ~str_replace_all(.x, "alt.", ""))
 
   return(list("successes"=successes, "trials"=trials, "vaf.df"=vaf.df_wide))
