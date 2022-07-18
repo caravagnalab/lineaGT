@@ -106,7 +106,7 @@ fit = function(cov.df,
   cat(paste("Found", best_k, "clones!"))
 
   x = fit_singleK(best_k, cov.df, steps=steps, lr=lr, py_pkg=py_pkg,
-                  store_params=store_params, hyperparameters=hyperparameters)
+                  store_params=store_params, hyperparameters=hyperparameters, covariance=covariance)
   x$runs = selection
 
   if (!is.null(vaf.df))
