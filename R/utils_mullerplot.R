@@ -67,7 +67,9 @@ get_muller_pop = function(x,
   if (purrr::is_empty(timepoints_to_int) && !is.null(timepoints_to_int))
     timepoints_to_int = map_timepoints_int(x)
 
-  means = x %>% get_mean_long()
+  means = x %>%
+    get_mean_long() #%>%
+    # compute_mean_small_populations(x=x)
 
   if (mutations)
     # the means dataframe must contain also the subclones
@@ -100,6 +102,11 @@ get_muller_pop = function(x,
     dplyr::select(Identity, Generation, Lineage, Population, Frequency, dplyr::starts_with("lm"))
 
   return(pop_df)
+}
+
+
+compute_mean_small_populations = function(mean, x) {
+
 }
 
 

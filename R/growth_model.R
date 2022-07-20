@@ -12,7 +12,7 @@ fit_growth = function(x,
     get_muller_pop(mutations=T, timepoints_to_int=timepoints_to_int)
 
   rates.df = x %>% get_growth_rates() # data.frame()
-  evaluated = c()
+  evaluated = list()
   if (!purrr::is_empty(rates.df)) evaluated = rates.df$Identity %>% unique()
 
   if (force & !purrr::is_empty(rates.df)) {
@@ -85,7 +85,7 @@ fit_growth_multiple_clones = function(rates.df,
                                       timepoints_to_int) {
   for (subcl in clusters) {
 
-    if (!subcl %in% (rates.df$Identity)) {
+    if (!subcl %in% (rates.df$Identity) && (subcl %in% pop_df$Identity)) {
 
       if (purrr::is_empty(rates.df))
         rates.df = fit_growth_single_clone(pop_df=pop_df,

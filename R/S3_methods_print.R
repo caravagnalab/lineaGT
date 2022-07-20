@@ -28,18 +28,18 @@ print.mvnmm = function(x, ...) {
   cli::cli_text(clisymbols::symbol$arrow_right, " Number of Insertion Sites: {.field {x$N}}.")
 
   pi = x %>% lineaGT::get_weights() %>% round(2) %>% sort(decreasing = TRUE)
-  n_IS = x %>% get_ISs()
+  n_IS = x %>% get_ISs() %>% sort(decreasing=T)
 
   cli::cli_h3("Optimal IS model with {.field k = {pi %>% length}}.")
   cat("\n")
 
-  for(cluster in names(pi))
+  for(cluster in names(n_IS))
   {
     starting =
       sprintf("%25s", paste0(crayon::yellow(cluster),
                              " (",
-                             pi[cluster] * 100,
-                             "% - ",
+                             # pi[cluster] * 100,
+                             # "% - ",
                              n_IS[cluster],
                              " ISs)")
               )

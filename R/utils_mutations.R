@@ -161,7 +161,15 @@ get_input_viber = function(x, lineages=c(), label="") {
     dplyr::select(starts_with("alt."), labels) %>%
     rename_with(.fn = ~str_replace_all(.x, "alt.", ""))
 
-  return(list("successes"=successes, "trials"=trials, "vaf.df"=vaf.df_wide))
+  alpha_0 = x %>%
+    get_vaf_dataframe(label) %>%
+    group_by(labels, lineage, timepoints) %>%
+    dplyr::summarise(mean_vaf=mean(vaf)) %>%
+    dplyr::mutate(alpha_0=ifelse(mean_vaf==0, 0.01,1)) %>%
+    dplyr::select(-mean_vaf) %>%
+    tidyr::pivot_wider(names_from=c("timepoints","lineage"), values_from="alpha_0", names_sep=".")
+
+  return(list("successes"=successes, "trials"=trials, "vaf.df"=vaf.df_wide, "alpha_0"=alpha_0))
 }
 
 
@@ -176,6 +184,9 @@ filter_viber_input = function(input, cluster) {
            dplyr::select(-labels),
 
          "vaf.df"=input$vaf.df %>%
+           dplyr::filter(labels==cluster),
+
+         "alpha_0"=input$alpha_0 %>%
            dplyr::filter(labels==cluster))
   )
 }

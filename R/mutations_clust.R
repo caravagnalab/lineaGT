@@ -22,7 +22,6 @@ fit_mutations = function(x,
                          min_frac=0,
                          max_IS=NULL,
                          highlight=list(),
-                         # do_filter=FALSE,
                          lineages=c(),
                          label="") {
 
@@ -76,15 +75,17 @@ fit_cluster_viber = function(input, cluster, infer_phylo=TRUE, max_IS=NULL, x=NU
   input.k = input %>% filter_viber_input(cluster=cluster)
 
   k = input.k$successes %>% nrow  # max n of clusters
+  colnames.list = input.k$successes %>% colnames
   x.muts.k = tree = list()
 
   # fit the bmm only for the clones with number of IS <= max_IS
-  if (is.null(max_IS) | get_ISs_single_cluster(x, cluster) <= max_IS) {
+  if (is.null(max_IS) || (get_ISs_single_cluster(x, cluster) <= max_IS)) {
     try(expr = {
     data_annotations = get_data_annotation(k)
-    x.muts.k = VIBER::variational_fit(input.k$successes,
-                                      input.k$trials,
+    x.muts.k = VIBER::variational_fit(input.k$successes[,colnames.list],
+                                      input.k$trials[,colnames.list],
                                       K=k,
+                                      # a_0=input.k$alpha_0[,colnames.list] %>% list() %>% unlist(),
                                       data=data_annotations)
 
     pi_cutoff = .5 / k  # we are not reducing the clusters but it changes the labels
@@ -110,7 +111,8 @@ fit_cluster_viber = function(input, cluster, infer_phylo=TRUE, max_IS=NULL, x=NU
 
   if (purrr::is_empty(x.muts.k)) {
     input.k$vaf.df$labels_viber = "S1"
-    input.k$vaf.df$pi_viber = NA
+    input.k$vaf.df$pi_viber = 1
+    input.k$vaf.df$theta = NA
   }
 
   input.k$vaf.df = input.k$vaf.df %>%

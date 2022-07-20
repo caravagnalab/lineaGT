@@ -106,16 +106,21 @@ plot_vaf_2D = function(dataframe, dims.vaf, dims.theta, color_palette) {
 #'
 #' @export plot_vaf_time
 
-plot_vaf_time = function(x, min_frac=0, highlight=c(),
-                         timepoints_to_int=list("init"=0,"early"=60,"mid"=140,"late"=280),
+plot_vaf_time = function(x,
+                         min_frac=0,
+                         highlight=c(),
+                         timepoints_to_int=list(),
+                         # timepoints_to_int=list("init"=0,"early"=60,"mid"=140,"late"=280),
                          label="") {
+
+  if (purrr::is_empty(timepoints_to_int)) timepoints_to_int = x %>% map_timepoints_int()
 
   highlight.c = get_highlight(x, min_frac, highlight, mutations=F)
   highlight.m = get_unique_muts_labels(x, clusters=highlight.c, label=label)
 
   vaf.df = x %>% add_lineage_vaf(label=label) %>%
     filter(labels %in% highlight.c) %>%
-    mutate(timepoints=timepoints_to_int[timepoints]) %>%
+    mutate(timepoints=timepoints_to_int[as.character(timepoints)]) %>%
     mutate(timepoints=unlist(timepoints)) %>%
     mutate(timepoints=as.numeric(timepoints))
 

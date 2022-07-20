@@ -32,20 +32,38 @@ plot_exp_fit = function(x,
   if (fit)
     x = fit_growth(x, highlight=highlight, timepoints_to_int=timepoints_to_int, force=F)
 
+  # keep only the clusters with growth model fitted
   highlight = intersect(highlight, x %>% get_growth_rates() %>% dplyr::pull(Identity))
 
   pop_df = get_muller_pop(x, mutations=mutations, label=label, timepoints_to_int=timepoints_to_int) %>%
     filter(Identity %in% highlight)
-  regr.df = get_regression_df(x, highlight=highlight)
+  regr.df = get_regression_df(x, highlight=highlight) %>%
+    tidyr::pivot_longer(starts_with("y."), names_to=c("else","type"), names_sep="[.]", values_to="y", names_repair="minimal") %>%
+    dplyr::mutate(sigma=ifelse(type=="log", sigma.log, sigma.exp),
+                  init_t=ifelse(type=="log", init_t.log, init_t.exp),
+                  rate=ifelse(type=="log", rate.log, rate.exp),
+                  K=ifelse(type=="log", K.log, NA)) %>%
+    dplyr::mutate(y.min=ifelse(type=="log",
+                               K / ( 1 + (K-1) * exp( -(rate-sigma)*(x-init_t) ) ),
+                               exp( (rate-sigma) * (x-init_t) ))) %>%
+    dplyr::mutate(y.max=ifelse(type=="log",
+                               K / ( 1 + (K-1) * exp( -(rate+sigma)*(x-init_t) ) ),
+                               exp( (rate+sigma) * (x-init_t) ))) %>%
+    dplyr::select(-"else",-dplyr::ends_with("exp"),-dplyr::ends_with("log")) %>%
+    dplyr::mutate(type=ifelse(type=="log", "Logistic", "Exponential"))
 
+
+  color_palette = c("forestgreen","darkred"); names(color_palette) = c("Exponential","Logistic")
+  color_palette = c(color_palette, x$color_palette)
   p = pop_df %>%
     ggplot() +
-    geom_point(aes(x=Generation, y=Population, color=Lineage)) +
-    geom_line(data=regr.df, aes(x=x, y=y.exp, color=Lineage), linetype="dashed") +
-    geom_line(data=regr.df, aes(x=x, y=y.log, color=Lineage), linetype="solid") +
-    geom_vline(data=regr.df, aes(xintercept=init_t.exp), linetype="dashed", size=.1) +
-    geom_vline(data=regr.df, aes(xintercept=init_t.log), linetype="solid", size=.1) +
+    geom_point(aes(x=Generation, y=Population), alpha=.5, size=.7) +
+    geom_line(data=regr.df, aes(x=x, y=y, color=type), size=.2, alpha=.5) +
+    geom_vline(data=regr.df, aes(xintercept=init_t, color=type), linetype="dashed", size=.2, alpha=.5) +
+    # geom_errorbar(data=regr.df, aes(x=x, y=y, ymin=y.min, ymax=y.max, color=type), width=.2) +
     facet_grid(rows=vars(Identity), cols=vars(Lineage), scales="free_y") +
+    scale_color_manual(values=color_palette, breaks=c("Exponential","Logistic")) +
+    labs(color="") +
     my_ggplot_theme()
 
   return(p)
@@ -87,6 +105,7 @@ plot_exp_rate = function(x,
 
   p = x %>%
     get_muller_pop(timepoints_to_int=timepoints_to_int, mutations=mutations, label=label) %>%
+    # dplyr::select(-dplyr::contains(select))
     dplyr::mutate(Identity=Identity %>% stringr::str_replace("C_||C","")) %>%
     dplyr::filter(Identity %in% highlight) %>%
     dplyr::arrange(lm_r) %>%
@@ -129,9 +148,12 @@ get_regression_df = function(x, highlight) {
     dplyr::inner_join(rates, by=c("Lineage", "Identity")) %>%
     dplyr::mutate(y.exp=exp( rate.exp * (x-init_t.exp) ),
                   y.log=K.log / ( 1 + (K.log-1) * exp( -rate.log*(x-init_t.log) ) )) %>%
-    dplyr::select(-dplyr::contains("rate"), -dplyr::contains("K.log")) %>%
+    dplyr::select(-dplyr::contains("p_rate")) %>%
+    # dplyr::select(-dplyr::contains("rate"), -dplyr::contains("K.log")) %>%
     tibble::as_tibble() %>%
-    dplyr::arrange(x, Identity)
+    dplyr::arrange(x, Identity) %>%
+    dplyr::mutate(sigma.exp=unlist(sigma.exp)[as.character(x)], sigma.log=unlist(sigma.log)[as.character(x)])
+
 
   return(regr_df)
 }
