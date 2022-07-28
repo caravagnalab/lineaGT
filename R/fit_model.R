@@ -61,6 +61,7 @@
 fit = function(cov.df,
                vaf.df=NULL,
                infer_phylogenies=TRUE,
+               infer_growth=TRUE,
                k_interval=c(10,30),
                n_runs=2,
                steps=500,
@@ -71,6 +72,7 @@ fit = function(cov.df,
                convergence=TRUE,
                covariance="full",
                hyperparameters=list(),
+               timepoints_to_int=list(),
                show_progr=FALSE,
                store_grads=TRUE,
                store_losses=TRUE,
@@ -110,6 +112,9 @@ fit = function(cov.df,
 
   if (!is.null(vaf.df))
     x = fit_mutations(x, vaf.df, infer_phylo=infer_phylogenies, min_frac=min_frac, max_IS=max_IS)
+
+  if (infer_growth)
+    x = fit_growth(x, steps=steps, timepoints_to_int=timepoints_to_int)
 
   x$sample_id = sample_id
 

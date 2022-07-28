@@ -60,7 +60,7 @@ plot_exp_fit = function(x,
     geom_point(aes(x=Generation, y=Population), alpha=.5, size=.7) +
     geom_line(data=regr.df, aes(x=x, y=y, color=type), size=.2, alpha=.5) +
     geom_vline(data=regr.df, aes(xintercept=init_t, color=type), linetype="dashed", size=.2, alpha=.5) +
-    # geom_errorbar(data=regr.df, aes(x=x, y=y, ymin=y.min, ymax=y.max, color=type), width=.2) +
+    geom_errorbar(data=regr.df, aes(x=x, y=y, ymin=y.min, ymax=y.max, color=type), width=.5, position=position_dodge(width=0.5)) +
     facet_grid(rows=vars(Identity), cols=vars(Lineage), scales="free_y") +
     scale_color_manual(values=color_palette, breaks=c("Exponential","Logistic")) +
     labs(color="") +
