@@ -2,7 +2,7 @@
 fit_singleK = function(k,
                        cov.df,
                        steps=500,
-                       covariance="diag",
+                       covariance="full",
                        hyperparameters=list(),
                        lr=0.001,
                        p=1,
@@ -28,7 +28,7 @@ fit_singleK = function(k,
   x$gradients = load_params_gradients(x$py_model)
   x$n_iter = x$py_model$losses_grad_train$losses %>% length
 
-  # x$py_model = NULL
+  x$py_model = NULL
 
   return(x)
 }
@@ -52,10 +52,10 @@ initialize_object = function(K,
   IS = df$IS
 
   py_model = py_pkg$mvnmm$MVNMixtureModel(K=as.integer(K),
-                                    data=df %>% dplyr::select(all_of(columns)),
-                                    lineages=lineages,
-                                    IS=IS,
-                                    columns=columns)
+                                          data=df %>% dplyr::select(all_of(columns)),
+                                          lineages=lineages,
+                                          IS=IS,
+                                          columns=columns)
 
   return(get_object(py_model, timepoints=timepoints, lineages=lineages))
 }
@@ -86,7 +86,7 @@ check_timepoints = function(cov.df) {
 
 run_inference = function(x,
                          steps=500,
-                         covariance="diag",
+                         covariance="full",
                          hyperparameters=list(),
                          lr=0.005,
                          p=2,

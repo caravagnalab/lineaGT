@@ -45,24 +45,21 @@ get_python_dataframe = function(py_model) {
 
 get_python_params = function(py_model, train=FALSE) {
   params = list()
-  if (!train) {
-    params$mean = get_mean(py_model)
-    params$weights = get_weights(py_model)
-    params$sigma = get_sigma(py_model)
-    params$Sigma = get_covariance_Sigma(py_model)
-    params$probabilites = get_z_probs(py_model)
-    params$labels = get_labels(py_model)
-    params$hyperparameters = py_model$hyperparameters
-  } else {
-
-  }
+  params$mean = get_mean(py_model)
+  params$weights = get_weights(py_model)
+  params$sigma = get_sigma(py_model)
+  params$Sigma = get_covariance_Sigma(py_model)
+  params$probabilites = get_z_probs(py_model)
+  params$labels = get_labels(py_model)
+  params$hyperparameters = py_model$hyperparameters
+  params$covariance = py_model$cov_type
   return(params)
 }
 
 
 update_params = function(x) {
   x$params = get_params(py_model=x$py_model)
-  x$params_train = get_params(py_model=x$py_model, train=T)
+  # x$params_train = get_params(py_model=x$py_model, train=T)
   x$K = x$py_model$params$K
   x$N = x$py_model$params$N
   x$`T` = x$py_model$params$`T`

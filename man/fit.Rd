@@ -16,7 +16,7 @@ fit(
   min_frac = 0,
   max_IS = NULL,
   convergence = TRUE,
-  covariance = "diag",
+  covariance = "full",
   hyperparameters = list(),
   show_progr = FALSE,
   store_grads = TRUE,
