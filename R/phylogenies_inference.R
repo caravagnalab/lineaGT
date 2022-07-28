@@ -115,7 +115,8 @@ run_ctree = function(viber_run, clonal) {
   tt = ctree::ctrees(CCF_clusters=cluster_table,
                      drivers=drivers_table,
                      samples=colnames(cx),
-                     patient=patientID)
+                     patient=patientID,
+                     n.sampling=1000)
   return(tt)
 }
 
