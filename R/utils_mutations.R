@@ -55,7 +55,7 @@ get_mean_wide = function(x, arrange=T) {
 }
 
 
-check_dp = function(x, thr=5, label="") {
+check_dp = function(x, thr=10, label="") {
   vaf.df = x %>% get_vaf_dataframe(label=label)
   means = x %>% get_mean_long()
 

@@ -52,7 +52,6 @@ get_python_params = function(py_model, train=FALSE) {
   params$probabilites = get_z_probs(py_model)
   params$labels = get_labels(py_model)
   params$hyperparameters = py_model$hyperparameters
-  params$covariance = py_model$cov_type
   return(params)
 }
 

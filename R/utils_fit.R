@@ -28,6 +28,8 @@ fit_singleK = function(k,
   x$gradients = load_params_gradients(x$py_model)
   x$n_iter = x$py_model$losses_grad_train$losses %>% length
 
+  x$params$covariance = x$py_model$cov_type
+
   x$py_model = NULL
 
   return(x)
