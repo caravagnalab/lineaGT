@@ -193,7 +193,6 @@ get_growth_params = function(timepoints_to_int,
                     "sigma.exp"=list(setNames(object=rates.exp$sigma, nm=c(0, unlist(timepoints_to_int))))) %>%
       tibble::as_tibble()
 
-  print(rates.log)
   if (!is.null(rates.log))
     params.log = params.log %>%
       tibble::add_column("fitness.log"=NA, "K.log"=NA, "init_t.log"=NA, "Lineage"=as.character(NA),

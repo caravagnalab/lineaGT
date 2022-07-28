@@ -44,8 +44,8 @@ wide_to_long_muts = function(vaf.df) {
       tidyr::pivot_longer(cols=c(dplyr::starts_with("alt"),
                                  dplyr::starts_with("ref"),
                                  dplyr::starts_with("dp"),
-                                 dplyr::starts_with("vaf"),
-                                 dplyr::starts_with("theta")),
+                                 # dplyr::starts_with("theta"),
+                                 dplyr::starts_with("vaf")),
                           names_to="type.timepoints.lineage") %>%
       separate(type.timepoints.lineage, into=c("type", "timepoints", "lineage"), sep="[.]") %>%
       tidyr::pivot_wider(names_from="type", values_from="value")

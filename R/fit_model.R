@@ -82,6 +82,8 @@ fit = function(cov.df,
 
   py_pkg = reticulate::import("pylineaGT")
 
+  cov.df = cov.df %>% check_cov_dimensions()
+
   max_k = cov.df %>% check_max_k()
   k_interval = check_k_interval(k_interval, max_k)
 
@@ -119,6 +121,34 @@ fit = function(cov.df,
   x$sample_id = sample_id
 
   return(x)
+}
+
+
+check_cov_dimensions = function(cov.df) {
+  tp = cov.df %>% dplyr::pull(timepoints) %>% unique()
+  lin = cov.df %>% dplyr::pull(lineage) %>% unique()
+  dimensions = apply(expand.grid(tp, lin), 1, paste, collapse=".")
+
+  combs = cov.df %>%
+    long_to_wide_cov() %>%
+    dplyr::select(starts_with("cov")) %>%
+    colnames() %>%
+    str_replace_all("cov.","")
+
+  missing = setdiff(dimensions, combs) %>%
+    tibble::as_tibble() %>%
+    tidyr::separate(value, into=c("timepoints", "lineage"), sep="[.]") %>%
+    dplyr::mutate(coverage=0) %>%
+    dplyr::mutate(IS=cov.df$IS[1])
+
+  return(
+    cov.df %>%
+      dplyr::add_row(
+        missing
+      )
+    )
+
+
 }
 
 
