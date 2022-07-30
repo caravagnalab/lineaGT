@@ -94,6 +94,10 @@ fit_cluster_viber = function(input, cluster, infer_phylo=TRUE, max_IS=NULL, x=NU
                                       dimensions_cutoff=0,
                                       pi_cutoff=pi_cutoff)
 
+    theta_k.mod = check_muts_theta(x.muts.k)
+    x.muts.k$theta_k = NULL
+    x.muts.k$theta_k = theta_k.mod
+
     x.muts.k = x.muts.k %>%
       replace_labels_muts(pattern="C", replacement="S")
 
@@ -105,7 +109,7 @@ fit_cluster_viber = function(input, cluster, infer_phylo=TRUE, max_IS=NULL, x=NU
     if (infer_phylo)
       tree = fit_trees(x.muts.k, cluster)
 
-  }, silent = T)
+  }, silent = F)
 
   }
 
@@ -115,11 +119,45 @@ fit_cluster_viber = function(input, cluster, infer_phylo=TRUE, max_IS=NULL, x=NU
     input.k$vaf.df$theta = NA
   }
 
-  input.k$vaf.df = input.k$vaf.df %>%
+  vaf.df.mod = input.k$vaf.df %>%
     wide_to_long_muts() %>%
     add_theta_to_vaf(x.muts.k=x.muts.k, cluster=cluster)
 
+  input.k$vaf.df = vaf.df.mod
+
   return(list("df"=input.k$vaf.df, "fit"=x.muts.k, "tree"=tree))
+}
+
+
+check_muts_theta = function(x.muts.k) {
+  alt = x.muts.k$x %>%
+    rownames_to_column(var="mut.id") %>%
+    reshape2::melt(id=c("cluster.Binomial","mut.id"), variable.name="tp.lin", value.name="alt")
+
+  ref = x.muts.k$y %>%
+    rownames_to_column(var="mut.id") %>%
+    reshape2::melt(id=c("cluster.Binomial","mut.id"), variable.name="tp.lin", value.name="ref")
+
+  vaf = dplyr::inner_join(alt, ref, by=c("cluster.Binomial","mut.id","tp.lin")) %>%
+    dplyr::mutate(vaf=alt / (alt+ref))
+
+  theta = x.muts.k$theta_k %>%
+    as.data.frame %>% rownames_to_column(var="tp.lin") %>%
+    reshape2::melt(id="tp.lin", variable.name="cluster.Binomial",value.name="theta") %>%
+    dplyr::inner_join(vaf, by=c("cluster.Binomial","tp.lin")) %>%
+    tidyr::separate("tp.lin", into=c("timepoints", "lineage"), sep="[.]") %>%
+    dplyr::group_by(cluster.Binomial, lineage) %>%
+    dplyr::mutate(theta=replace(theta, all(vaf==0), 0)) %>%
+    ungroup() %>%
+    dplyr::mutate(tp.lin=paste(timepoints, lineage, sep="."))
+
+  return(
+    theta %>% dplyr::select(cluster.Binomial, tp.lin, theta) %>% unique() %>%
+      tidyr::pivot_wider(names_from="cluster.Binomial", values_from="theta") %>%
+      tibble::column_to_rownames("tp.lin") %>%
+      as.matrix()
+  )
+
 }
 
 

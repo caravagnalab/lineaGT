@@ -69,7 +69,7 @@ check_dp = function(x, thr=10, label="") {
 
     # check the minimum depth to be at least `thr`, otherwise
     dplyr::group_by(labels) %>%
-    dplyr::mutate(dp=ifelse(dp < thr, mean(dp) %>% as.integer(), dp)) %>%
+    dplyr::mutate(dp=replace(dp, dp < thr, mean(dp) %>% as.integer())) %>%
     dplyr::ungroup() %>%
 
     dplyr::select(-original_dp, dp, alt, ref, vaf, mutation, IS, lineage, timepoints, labels)

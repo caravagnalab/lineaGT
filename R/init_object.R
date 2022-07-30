@@ -60,13 +60,14 @@ get_python_params = function(py_model, train=FALSE) {
 get_hyperpar = function(py_model) {
   hp = list()
 
-  for (hh in names(py_model$hyperparameters)) {
+  for (hh in names(py_model$hyperparameters))
     hp[[hh]] = py_model$hyperparameters[[hh]]$numpy() %>% as.numeric
-  }
 
   return(hp %>%
            tibble::as_tibble() %>%
-           reshape2::melt(value.name="value", variable.name="hyperparameter")
+           t %>% as.data.frame() %>%
+           rownames_to_column(var="hyperparameter") %>%
+           dplyr::rename(value="V1")
          )
 }
 

@@ -120,9 +120,9 @@ plot_vaf_time = function(x,
 
   vaf.df = x %>% add_lineage_vaf(label=label) %>%
     filter(labels %in% highlight.c) %>%
-    mutate(timepoints=timepoints_to_int[as.character(timepoints)]) %>%
-    mutate(timepoints=unlist(timepoints)) %>%
-    mutate(timepoints=as.numeric(timepoints))
+    mutate(timepoints=as.character(timepoints_to_int[timepoints])) %>%
+    # mutate(timepoints=unlist(timepoints)) %>%
+    mutate(timepoints=as.integer(timepoints))
 
   color_palette = get_color_palette(x,label=label)[highlight.m]
   color_palette[paste(vaf.df %>% dplyr::pull(timepoints) %>% unique())] = "black"
