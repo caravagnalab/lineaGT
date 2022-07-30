@@ -10,7 +10,7 @@ filter_dataset(
   min_frac = 0.05,
   k_interval = c(5, 15),
   metric = "calinski_harabasz_score",
-  random_state = 25
+  seed = 25
 )
 }
 \arguments{
@@ -25,7 +25,7 @@ filter_dataset(
 
 \item{metric}{add}
 
-\item{random_state}{add}
+\item{seed}{add}
 }
 \value{
 a dataset of the same shape as the input one, with filtered observations.

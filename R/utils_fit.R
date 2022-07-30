@@ -8,7 +8,8 @@ fit_singleK = function(k,
                        p=1,
                        convergence=TRUE,
                        store_params=FALSE,
-                       random_state=25,
+                       seed=25,
+                       init_seed=10,
                        py_pkg=NULL) {
 
   x = initialize_object(k, cov.df, py_pkg)
@@ -20,7 +21,8 @@ fit_singleK = function(k,
                     hyperparameters=hyperparameters,
                     convergence=convergence,
                     store_params=store_params,
-                    random_state=random_state)
+                    seed=seed,
+                    init_seed=init_seed)
   x = classifier(x)
 
   x$IC = compute_IC(x$py_model)
@@ -93,8 +95,10 @@ run_inference = function(x,
                          lr=0.005,
                          p=2,
                          convergence=TRUE,
+                         initializ=FALSE,
                          store_params=FALSE,
-                         random_state=25) {
+                         seed=25,
+                         init_seed=10) {
 
   # modify the hyperparameters as given in input
   for (hyperpar in names(hyperparameters))
@@ -106,7 +110,9 @@ run_inference = function(x,
                  p=as.numeric(p),
                  convergence=convergence,
                  store_params=store_params,
-                 random_state=as.integer(random_state))
+                 initializ=initializ,
+                 seed=as.integer(seed),
+                 init_seed=as.integer(init_seed))
 
   return(update_params(x))
 }

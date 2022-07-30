@@ -28,7 +28,7 @@
 #' @param store_losses A Boolean. If \code{TRUE}, the computed losses for the parameters at each
 #' iteration will be stored.
 #' @param store_params A Boolean. If \code{TRUE}, the estimated parameters at each iteration will be stored.
-#' @param random_state Value of the seed.
+#' @param seed Value of the seed.
 #' @param sample_id add
 #'
 #' @return a \code{mvnmm} object, containing the input dataset, annotated with IS_values, N, K, T
@@ -77,7 +77,7 @@ fit = function(cov.df,
                store_grads=TRUE,
                store_losses=TRUE,
                store_params=FALSE,
-               random_state=25,
+               seed=25,
                sample_id="") {
 
   py_pkg = reticulate::import("pylineaGT")
@@ -101,16 +101,20 @@ fit = function(cov.df,
                                  show_progr=show_progr,
                                  store_grads=store_grads,
                                  store_losses=store_losses,
-                                 random_state=as.integer(random_state))
+                                 store_params=store_params,
+                                 seed=as.integer(seed))
 
   selection = list("ic"=out[[1]], "losses"=out[[2]], "grads"=out[[3]], "params"=out[[4]])
-  best_k = get_best_k(selection, method="BIC")
+  best_k = get_best_k(selection, method="BIC")$K
+  best_seed = get_best_k(selection, method="BIC")$seed
 
   cat(paste("Found", best_k, "clones!"))
 
   x = fit_singleK(best_k, cov.df, steps=steps, lr=lr, py_pkg=py_pkg,
-                  store_params=store_params, hyperparameters=hyperparameters, covariance=covariance)
-  x$runs = selection
+                  store_params=store_params, hyperparameters=hyperparameters,
+                  covariance=covariance, init_seed=best_seed, seed=seed)
+
+  x$runs = get_selection_df(selection)
 
   if (!is.null(vaf.df))
     x = fit_mutations(x, vaf.df, infer_phylo=infer_phylogenies, min_frac=min_frac, max_IS=max_IS)
@@ -147,7 +151,6 @@ check_cov_dimensions = function(cov.df) {
         missing
       )
     )
-
 
 }
 

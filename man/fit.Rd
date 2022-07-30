@@ -24,7 +24,7 @@ fit(
   store_grads = TRUE,
   store_losses = TRUE,
   store_params = FALSE,
-  random_state = 25,
+  seed = 25,
   sample_id = ""
 )
 }
@@ -71,7 +71,7 @@ iteration will be stored.}
 
 \item{store_params}{A Boolean. If \code{TRUE}, the estimated parameters at each iteration will be stored.}
 
-\item{random_state}{Value of the seed.}
+\item{seed}{Value of the seed.}
 
 \item{sample_id}{add}
 }

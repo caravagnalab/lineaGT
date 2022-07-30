@@ -49,10 +49,25 @@ get_python_params = function(py_model, train=FALSE) {
   params$weights = get_weights(py_model)
   params$sigma = get_sigma(py_model)
   params$Sigma = get_covariance_Sigma(py_model)
+  params$Chol = get_covariance_Cholesky(py_model)
   params$probabilites = get_z_probs(py_model)
   params$labels = get_labels(py_model)
-  params$hyperparameters = py_model$hyperparameters
+  params$hyperparameters = get_hyperpar(py_model)
   return(params)
+}
+
+
+get_hyperpar = function(py_model) {
+  hp = list()
+
+  for (hh in names(py_model$hyperparameters)) {
+    hp[[hh]] = py_model$hyperparameters[[hh]]$numpy() %>% as.numeric
+  }
+
+  return(hp %>%
+           tibble::as_tibble() %>%
+           reshape2::melt(value.name="value", variable.name="hyperparameter")
+         )
 }
 
 

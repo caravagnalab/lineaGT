@@ -8,7 +8,7 @@
 #' @param min_frac add
 #' @param k_interval add
 #' @param metric add
-#' @param random_state add
+#' @param seed add
 #' @return a dataset of the same shape as the input one, with filtered observations.
 #'
 #' @importFrom reticulate import
@@ -22,7 +22,7 @@ filter_dataset = function(cov.df,
                           min_frac=0.05,
                           k_interval=c(5,15),
                           metric="calinski_harabasz_score",
-                          random_state=25) {
+                          seed=25) {
 
   cov.df = cov.df %>%
     dplyr::group_by(IS) %>%
@@ -38,7 +38,7 @@ filter_dataset = function(cov.df,
                             min_ccf=as.numeric(min_frac),
                             metric=metric,
                             k_interval=as.integer(k_interval),
-                            random_state=as.integer(random_state))
+                            seed=as.integer(seed))
   return(get_python_dataframe(x$py_model))
 }
 

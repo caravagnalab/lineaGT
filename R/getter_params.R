@@ -119,6 +119,42 @@ get_covariance_Sigma = function(x) {
 }
 
 
+#' Extract the estimated Cholesky matrices, used to factorise the covariance matrix.
+#'
+#' @description Returns a list with \code{K} dataframes, each of dimension \code{TxT}, corresponding
+#' to the covariance matrices estimated for each clone \code{k}
+#'
+#' @param x a mvnmm object.
+#' @return list of the estimated covariance matrices.
+#'
+#' @examples
+#' if (FALSE) get_covariance_Cholesky(x)
+#'
+#' @export get_covariance_Cholesky
+
+get_covariance_Cholesky = function(x) {
+  py_model = get_model(x)
+  tryCatch(
+    expr = {
+      if (py_model$cov_type=="diag") {
+        chol = py_model$params$sigma_chol$detach()$numpy()
+        colnames(chol) = rownames(chol) = py_model$dimensions
+        return(chol)
+      }
+
+      chol = list()
+      for (k in 0:(x$K-1)) {
+        name = paste("C", k, sep="")
+        chol[[name]] = py_model$params$sigma_chol[k]$detach()$numpy()
+        colnames(chol[[name]]) = rownames(chol[[name]]) = py_model$dimensions
+      }
+      return(chol) },
+    error = function(e) return(list()) )
+
+  try(expr = { chol = x$params$Chol; if (!purrr::is_empty(Chol)) return(Chol) }, silent = T)
+}
+
+
 #' Extract the estimated posterior probabilities.
 #'
 #' @description Returns a dataframe of shape \code{NxK} with the posterior distribution \code{p(k|n)}
