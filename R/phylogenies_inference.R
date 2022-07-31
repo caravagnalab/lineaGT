@@ -117,7 +117,7 @@ run_ctree = function(viber_run, clonal) {
                      patient=patientID,
                      sspace.cutoff=100,
                      store.max=50,
-                     n.sampling=500)
+                     n.sampling=100)
   return(tt)
 }
 
