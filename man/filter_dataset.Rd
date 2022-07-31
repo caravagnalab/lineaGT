@@ -9,8 +9,7 @@ filter_dataset(
   min_cov = 5,
   min_frac = 0.05,
   k_interval = c(10, 20),
-  metric = "calinski_harabasz_score",
-  seed = 25
+  metric = "calinski_harabasz_score"
 )
 }
 \arguments{
@@ -24,8 +23,6 @@ filter_dataset(
 \item{k_interval}{add}
 
 \item{metric}{add}
-
-\item{seed}{add}
 }
 \value{
 a dataset of the same shape as the input one, with filtered observations.

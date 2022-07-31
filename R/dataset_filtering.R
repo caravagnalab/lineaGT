@@ -22,7 +22,7 @@ filter_dataset = function(cov.df,
                           min_frac=0.05,
                           k_interval=c(10,20),
                           metric="calinski_harabasz_score",
-                          seed=25) {
+                          seed=5) {
 
   cov.df = cov.df %>%
     dplyr::group_by(IS) %>%

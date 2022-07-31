@@ -8,7 +8,7 @@ plot_exp_fit(
   x,
   highlight = c(),
   min_frac = 0,
-  mutations = T,
+  mutations = F,
   label = "",
   timepoints_to_int = list(),
   fit = F
