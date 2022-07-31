@@ -58,7 +58,7 @@ plot_IC = function(x) {
            geom_line(aes(x=factor(K), y=value, color=as.factor(run), group=run)) +
            facet_wrap(~method, scales="free_y") +
            xlab("K") + ylab("Value") + labs(color="") +
-           scale_x_discrete(limits=factor(ic$K) %>% unique %>% sort) +
+           scale_x_discrete(limits=factor(ic$K %>% unique %>% sort)) +
            my_ggplot_theme()
          )
 }

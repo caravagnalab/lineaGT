@@ -1,23 +1,22 @@
 get_best_k = function(selection, method="BIC") {
   return(
     selection$ic %>%
-      reshape2::melt(id=c("K","run","seed"), variable.name="mm") %>%
-      dplyr::as_tibble() %>%
+      reshape2::melt(id=c("K","run","init_seed","seed","id"), variable.name="mm") %>% dplyr::as_tibble() %>%
+
       dplyr::mutate(K=as.integer(K), run=as.integer(run), value=as.numeric(value)) %>%
       dplyr::filter(mm==method) %>%
-      # dplyr::group_by(mm, K) %>%
-      # dplyr::summarise(mean_value=mean(value)) %>%
-      # dplyr::ungroup() %>%
-      # dplyr::filter(mean_value==min(mean_value)) %>%
       dplyr::filter(value==min(value)) %>%
-      dplyr::select(K,seed) %>% as.list()
+
+      tidyr::separate("id", into=c("K.init", "else"), sep="[.]") %>%
+      dplyr::mutate(K.init=as.integer(K.init)) %>%
+      dplyr::select(K, seed, init_seed) %>% unique() %>% as.list()
     )
 }
 
 
 get_IC = function(runs) {
   return(runs$ic %>%
-           reshape2::melt(id=c("K","run","id","seed"), variable.name="method") %>%
+           reshape2::melt(id=c("K","run","id","seed","init_seed"), variable.name="method") %>%
            dplyr::as_tibble() %>%
            dplyr::mutate(K=as.integer(K), run=as.integer(run))
          )
