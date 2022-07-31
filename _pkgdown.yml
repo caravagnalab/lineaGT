@@ -12,6 +12,7 @@ reference:
   - fit
   - fit_mutations
   - fit_phylogenies
+  - fit_growth_rates
   - filter_dataset
 
 - title: Getter functions
@@ -28,6 +29,7 @@ reference:
   - get_mean
   - get_sigma
   - get_covariance_Sigma
+  - get_covariance_Cholesky
   - get_weights
   - get_z_probs
   - get_ISs
