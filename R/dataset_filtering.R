@@ -20,7 +20,7 @@
 filter_dataset = function(cov.df,
                           min_cov=5,
                           min_frac=0.05,
-                          k_interval=c(5,15),
+                          k_interval=c(10,20),
                           metric="calinski_harabasz_score",
                           seed=25) {
 
@@ -31,6 +31,9 @@ filter_dataset = function(cov.df,
 
   if (min_frac == 0)
     return(cov.df)
+
+  max_k = cov.df %>% check_max_k()
+  k_interval = check_k_interval(k_interval, max_k)
 
   py_pkg = reticulate::import("pylineaGT")
   x = initialize_object(K=as.integer(1), cov.df=cov.df, py_pkg)

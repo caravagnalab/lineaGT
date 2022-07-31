@@ -66,9 +66,9 @@ run_ctree = function(viber_run, clonal) {
   if (!all(c("driver", "gene") %in% colnames(viber_run$data)))
     stop("Your data should have a logical 'driver' and 'gene' column to annotate driver events, cannot build a ctree otherwise.")
   stopifnot(inherits(viber_run, "vb_bmm"))
-  patientID = ifelse(is.null(viber_run$description), "VIBER dataset",
-                     viber_run$description)
-  patientID = gsub(pattern = " ", replacement = "_", patientID)
+  patientID = ifelse(is.null(viber_run$description), clonal, viber_run$description)
+  patientID = gsub(pattern = " ", replacement = ".", patientID)
+
   pi = viber_run$pi_k[((viber_run$N * viber_run$pi_k) %>% round) > 0]
   theta = viber_run$theta_k[, names(pi), drop = T]
   cluster_table = data.frame(cluster = colnames(theta), stringsAsFactors = FALSE) %>%
@@ -104,8 +104,7 @@ run_ctree = function(viber_run, clonal) {
   drivers_table = viber_run$data %>% tibble::as_tibble() %>% dplyr::filter(driver) %>%
     dplyr::rename(variantID = gene, is.driver = driver) %>%
     dplyr::mutate(patientID = patientID)
-  drivers_table = dplyr::bind_cols(drivers_table, vaf_table[which(viber_run$data$driver),
-                                                     , drop = F])
+  drivers_table = dplyr::bind_cols(drivers_table, vaf_table[which(viber_run$data$driver), , drop = F])
   drivers_table$is.clonal = FALSE
   drivers_table$is.clonal[which(drivers_table$cluster == cluster_table %>%
                                   dplyr::filter(is.clonal) %>% dplyr::pull(cluster))] = TRUE
@@ -116,7 +115,9 @@ run_ctree = function(viber_run, clonal) {
                      drivers=drivers_table,
                      samples=colnames(cx),
                      patient=patientID,
-                     n.sampling=1000)
+                     sspace.cutoff=100,
+                     store.max=50,
+                     n.sampling=500)
   return(tt)
 }
 
