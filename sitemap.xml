@@ -40,6 +40,9 @@
     <loc>caravagnalab.github.io/lineaGT/reference/fit.html</loc>
   </url>
   <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/fit_growth_rates.html</loc>
+  </url>
+  <url>
     <loc>caravagnalab.github.io/lineaGT/reference/fit_mutations.html</loc>
   </url>
   <url>
@@ -50,6 +53,9 @@
   </url>
   <url>
     <loc>caravagnalab.github.io/lineaGT/reference/get_cov_dataframe.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/get_covariance_Cholesky.html</loc>
   </url>
   <url>
     <loc>caravagnalab.github.io/lineaGT/reference/get_covariance_Sigma.html</loc>

@@ -63,7 +63,7 @@
 <span>  infer_phylogenies <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  infer_growth <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  k_interval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">30</span><span class="op">)</span>,</span>
-<span>  n_runs <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  n_runs <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  steps <span class="op">=</span> <span class="fl">500</span>,</span>
 <span>  lr <span class="op">=</span> <span class="fl">0.005</span>,</span>
 <span>  p <span class="op">=</span> <span class="fl">1</span>,</span>
@@ -77,7 +77,8 @@
 <span>  store_grads <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  store_losses <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  store_params <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  random_state <span class="op">=</span> <span class="fl">25</span>,</span>
+<span>  initializ <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  seed <span class="op">=</span> <span class="fl">25</span>,</span>
 <span>  sample_id <span class="op">=</span> <span class="st">""</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -132,7 +133,7 @@ iteration will be stored.</p>
 <p>store_lossesA Boolean. If <code>TRUE</code>, the computed losses for the parameters at each
 iteration will be stored.</p>
 <p>store_paramsA Boolean. If <code>TRUE</code>, the estimated parameters at each iteration will be stored.</p>
-<p>random_stateValue of the seed.</p>
+<p>seedValue of the seed.</p>
 <p>sample_idadd</p></dd>
 
 </dl><p>a <code>mvnmm</code> object, containing the input dataset, annotated with IS_values, N, K, T
