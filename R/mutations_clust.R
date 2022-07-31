@@ -113,14 +113,8 @@ fit_cluster_viber = function(input, cluster, infer_phylo=TRUE, max_IS=NULL, x=NU
     input.k$vaf.df$labels_viber = labels
     input.k$vaf.df$pi_viber = x.muts.k$pi_k[labels] %>% as.vector()
 
-    if (infer_phylo) {
-      try(
-        expr = {
-          tree = withTimeout(fit_trees(x.muts.k, cluster), timeout=300, onTimeout="error")
-          },
-        silent = TRUE
-      )
-    }
+    if (infer_phylo)
+      tree = fit_trees(x.muts.k, cluster)
 
   }, silent = F)
 

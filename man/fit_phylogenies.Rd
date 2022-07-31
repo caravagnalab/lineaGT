@@ -11,7 +11,7 @@ fit_phylogenies(
   highlight = list(),
   do_filter = FALSE,
   label = "",
-  fit_viber = FALSE,
+  fit_muts = FALSE,
   lineages = c()
 )
 }
@@ -28,9 +28,9 @@ fit_phylogenies(
 
 \item{label}{add}
 
-\item{fit_viber}{add}
-
 \item{lineages}{add}
+
+\item{fit_viber}{add}
 }
 \value{
 

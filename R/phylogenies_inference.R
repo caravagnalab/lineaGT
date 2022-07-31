@@ -13,7 +13,7 @@
 #' @export fit_phylogenies
 
 fit_phylogenies = function(x, vaf.df=NULL, min_frac=0, highlight=list(), do_filter=FALSE,
-                           label="", fit_viber=FALSE, lineages=c()) {
+                           label="", fit_muts=FALSE, lineages=c()) {
 
   if (is.null(vaf.df) && !"vaf.dataframe" %in% names(x))
     message("A dataframe with the mutations is required!")
@@ -22,7 +22,7 @@ fit_phylogenies = function(x, vaf.df=NULL, min_frac=0, highlight=list(), do_filt
 
   clusters_joined = get_highlight(x, min_frac, highlight)
   trees = list()
-  if (!"viber_run" %in% names(x) || fit_viber)
+  if (!"x.muts" %in% names(x) || fit_muts)
     return(
       x %>% fit_mutations(vaf.df=vaf.df,
                       highlight=clusters_joined,
@@ -50,10 +50,15 @@ fit_phylogenies = function(x, vaf.df=NULL, min_frac=0, highlight=list(), do_filt
 
 # to infer the tree on a single cluster
 fit_trees = function(fit_viber, clonal) {
-  if (length(fit_viber$labels$cluster.Binomial %>% unique) > 1)
-    tree = run_ctree(fit_viber, clonal)
-  else
-    tree = list()
+  tree = list()
+  if (length(fit_viber$labels$cluster.Binomial %>% unique) > 1) {
+    try(
+      expr = {
+        tree = withTimeout(run_ctree(fit_viber, clonal), timeout=300, onTimeout="error")
+      },
+      silent = F
+    )
+  }
 
   return(tree)
 }
