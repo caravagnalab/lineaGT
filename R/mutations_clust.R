@@ -18,6 +18,7 @@
 #' @importFrom VIBER variational_fit choose_clusters
 #' @importFrom reshape2 melt
 #' @importFrom dplyr inner_join mutate group_by select
+#' @importFrom R.utils withTimeout
 #'
 #' @export fit_mutations
 
@@ -72,6 +73,7 @@ fit_mutations = function(x,
   if (infer_phylo)
     x = add_phylo(x, x.trees, label=label)
 
+
   return(x)
 }
 
@@ -111,8 +113,14 @@ fit_cluster_viber = function(input, cluster, infer_phylo=TRUE, max_IS=NULL, x=NU
     input.k$vaf.df$labels_viber = labels
     input.k$vaf.df$pi_viber = x.muts.k$pi_k[labels] %>% as.vector()
 
-    if (infer_phylo)
-      tree = fit_trees(x.muts.k, cluster)
+    if (infer_phylo) {
+      try(
+        expr = {
+          tree = withTimeout(fit_trees(x.muts.k, cluster), timeout=300, onTimeout="error")
+          },
+        silent = TRUE
+      )
+    }
 
   }, silent = F)
 

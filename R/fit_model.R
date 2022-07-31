@@ -15,19 +15,21 @@
 #' @param n_runs Number of runs to perform for each K.
 #' @param steps Maximum number of steps for the inference.
 #' @param lr Learning rate used in the inference.
-#' @param p Numeric value in \code{[0,1]} used to check the convergence of the parameters. If from one to the next
-#' iterationthe value of the parameters vary less than \code{p}% for \code{n} iterations, the inference stops.
+#' @param p Numeric value used to check the convergence of the parameters.
 #' @param min_frac add
 #' @param max_IS add
 #' @param convergence A Boolean. If set to \code{TRUE}, the function will check for early convergence,
 #' otherwise it will perform \code{steps} iterations.
 #' @param covariance Covariance type for the Multivariate Gaussian.
+#' @param hyperparameters add
+#' @param timepoints_to_int add
 #' @param show_progr A Boolean. If \code{TRUE}, the progression bar will be shown during inference.
 #' @param store_grads A Booolean. If \code{TRUE}, the gradient norms for the parameters at each
 #' iteration will be stored.
 #' @param store_losses A Boolean. If \code{TRUE}, the computed losses for the parameters at each
 #' iteration will be stored.
 #' @param store_params A Boolean. If \code{TRUE}, the estimated parameters at each iteration will be stored.
+#' @param initializ add
 #' @param seed Value of the seed.
 #' @param sample_id add
 #'

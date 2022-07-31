@@ -34,7 +34,8 @@ Imports:
     patchwork,
     ctree,
     ggraph,
-    RColorBrewer
+    RColorBrewer,
+    R.utils
 Remotes:
     caravagn/VIBER,
     caravagn/easypar,

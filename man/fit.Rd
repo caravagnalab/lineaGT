@@ -50,8 +50,7 @@ the returned object the phylogenetic trees for each cluster.}
 
 \item{lr}{Learning rate used in the inference.}
 
-\item{p}{Numeric value in \code{[0,1]} used to check the convergence of the parameters. If from one to the next
-iterationthe value of the parameters vary less than \code{p}% for \code{n} iterations, the inference stops.}
+\item{p}{Numeric value used to check the convergence of the parameters.}
 
 \item{min_frac}{add}
 
@@ -62,6 +61,10 @@ otherwise it will perform \code{steps} iterations.}
 
 \item{covariance}{Covariance type for the Multivariate Gaussian.}
 
+\item{hyperparameters}{add}
+
+\item{timepoints_to_int}{add}
+
 \item{show_progr}{A Boolean. If \code{TRUE}, the progression bar will be shown during inference.}
 
 \item{store_grads}{A Booolean. If \code{TRUE}, the gradient norms for the parameters at each
@@ -71,6 +74,8 @@ iteration will be stored.}
 iteration will be stored.}
 
 \item{store_params}{A Boolean. If \code{TRUE}, the estimated parameters at each iteration will be stored.}
+
+\item{initializ}{add}
 
 \item{seed}{Value of the seed.}
 
