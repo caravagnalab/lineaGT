@@ -20,7 +20,7 @@
 plot_exp_fit = function(x,
                         highlight=c(),
                         min_frac=0,
-                        mutations=T,
+                        mutations=F,
                         label="",
                         timepoints_to_int=list(),
                         fit=F) {
@@ -30,7 +30,7 @@ plot_exp_fit = function(x,
   color_palette = highlight_palette(x, highlight, label)
 
   if (fit)
-    x = fit_growth(x, highlight=highlight, timepoints_to_int=timepoints_to_int, force=F)
+    x = fit_growth_rates(x, highlight=highlight, timepoints_to_int=timepoints_to_int, force=F)
 
   # keep only the clusters with growth model fitted
   highlight = intersect(highlight, x %>% get_growth_rates() %>% dplyr::pull(Identity))
@@ -44,11 +44,11 @@ plot_exp_fit = function(x,
                   rate=ifelse(type=="log", rate.log, rate.exp),
                   K=ifelse(type=="log", K.log, NA)) %>%
     dplyr::mutate(y.min=ifelse(type=="log",
-                               K / ( 1 + (K-1) * exp( -(rate-sigma)*(x-init_t) ) ),
-                               exp( (rate-sigma) * (x-init_t) ))) %>%
+                               K / ( 1 + (K-1) * exp( (-rate*(x-init_t)) - sigma ) ),
+                               exp( rate * (x-init_t) - sigma ))) %>%
     dplyr::mutate(y.max=ifelse(type=="log",
-                               K / ( 1 + (K-1) * exp( -(rate+sigma)*(x-init_t) ) ),
-                               exp( (rate+sigma) * (x-init_t) ))) %>%
+                               K / ( 1 + (K-1) * exp( (-rate*(x-init_t)) + sigma ) ),
+                               exp( rate * (x-init_t) + sigma ))) %>%
     dplyr::select(-"else",-dplyr::ends_with("exp"),-dplyr::ends_with("log")) %>%
     dplyr::mutate(type=ifelse(type=="log", "Logistic", "Exponential"))
 
