@@ -1,4 +1,20 @@
-fit_growth = function(x,
+#' Infer growth rates for each clone and subclone.
+#'
+#' @param x a mvnmm object.
+#' @param steps add
+#' @param highlight add
+#' @param timepoints_to_int add
+#' @param growth add
+#' @param force add
+#'
+#' @return
+#'
+#' @importFrom purrr is_empty
+#' @importFrom dplyr select filter add_row mutate pull contains select
+#'
+#' @export
+
+fit_growth_rates = function(x,
                       steps=500,
                       highlight=list(),
                       timepoints_to_int=list(),
@@ -25,7 +41,7 @@ fit_growth = function(x,
     if (!cluster %in% evaluated) {
 
       pop_df.cl = pop_df %>%
-        filter(grepl(paste(cluster,".",sep=""), Identity) | Identity == cluster) %>%
+        dplyr::filter(grepl(paste(cluster,".",sep=""), Identity) | Identity == cluster) %>%
         dplyr::select(-starts_with("lm"))
       parents = get_parents(x, highlight=cluster)
 

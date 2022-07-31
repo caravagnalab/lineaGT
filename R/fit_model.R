@@ -63,7 +63,7 @@ fit = function(cov.df,
                infer_phylogenies=TRUE,
                infer_growth=TRUE,
                k_interval=c(10,30),
-               n_runs=2,
+               n_runs=1,
                steps=500,
                lr=0.005,
                p=1,
@@ -77,6 +77,7 @@ fit = function(cov.df,
                store_grads=TRUE,
                store_losses=TRUE,
                store_params=FALSE,
+               initializ=TRUE,
                seed=25,
                sample_id="") {
 
@@ -102,25 +103,33 @@ fit = function(cov.df,
                                  store_grads=store_grads,
                                  store_losses=store_losses,
                                  store_params=store_params,
+                                 initializ=initializ,
                                  seed=as.integer(seed))
 
   selection = list("ic"=out[[1]], "losses"=out[[2]], "grads"=out[[3]], "params"=out[[4]])
-  best_k = get_best_k(selection, method="BIC")$K
-  best_seed = get_best_k(selection, method="BIC")$seed
 
-  cat(paste("Found", best_k, "clones!"))
+  best_k = get_best_k(selection, method="BIC")$K
+  best_init_seed = get_best_k(selection, method="BIC")$init_seed
+  best_seed = get_best_k(selection, method="BIC")$seed
 
   x = fit_singleK(best_k, cov.df, steps=steps, lr=lr, py_pkg=py_pkg,
                   store_params=store_params, hyperparameters=hyperparameters,
-                  covariance=covariance, init_seed=best_seed, seed=seed)
+                  covariance=covariance, initializ=FALSE, seed=best_seed)
+
+  cat(paste("Found", x$K, "clones!"))
 
   x$runs = get_selection_df(selection)
 
   if (!is.null(vaf.df))
     x = fit_mutations(x, vaf.df, infer_phylo=infer_phylogenies, min_frac=min_frac, max_IS=max_IS)
 
-  if (infer_growth)
-    x = fit_growth(x, steps=steps, timepoints_to_int=timepoints_to_int)
+  try(
+    expr = {
+      if (infer_growth)
+        x = fit_growth_rates(x, steps=steps, timepoints_to_int=timepoints_to_int)
+    },
+    silent = T
+  )
 
   x$sample_id = sample_id
 

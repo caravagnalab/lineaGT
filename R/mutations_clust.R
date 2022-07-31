@@ -4,7 +4,7 @@
 
 #' Fit the mutations clustering
 #'
-#' @param x add
+#' @param x a mvnmm object.
 #' @param vaf.df add
 #' @param infer_phylo add
 #' @param min_frac add
@@ -14,6 +14,11 @@
 #' @param label add
 #'
 #' @return
+#'
+#' @importFrom VIBER variational_fit choose_clusters
+#' @importFrom reshape2 melt
+#' @importFrom dplyr inner_join mutate group_by select
+#'
 #' @export fit_mutations
 
 fit_mutations = function(x,
