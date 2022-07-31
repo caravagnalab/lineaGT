@@ -10,7 +10,7 @@ fit(
   infer_phylogenies = TRUE,
   infer_growth = TRUE,
   k_interval = c(10, 30),
-  n_runs = 2,
+  n_runs = 1,
   steps = 500,
   lr = 0.005,
   p = 1,
@@ -24,6 +24,7 @@ fit(
   store_grads = TRUE,
   store_losses = TRUE,
   store_params = FALSE,
+  initializ = TRUE,
   seed = 25,
   sample_id = ""
 )

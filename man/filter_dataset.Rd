@@ -8,7 +8,7 @@ filter_dataset(
   cov.df,
   min_cov = 5,
   min_frac = 0.05,
-  k_interval = c(5, 15),
+  k_interval = c(10, 20),
   metric = "calinski_harabasz_score",
   seed = 25
 )

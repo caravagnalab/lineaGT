@@ -16,7 +16,7 @@ fit_mutations(
 )
 }
 \arguments{
-\item{x}{add}
+\item{x}{a mvnmm object.}
 
 \item{vaf.df}{add}
 
