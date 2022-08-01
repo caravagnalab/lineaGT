@@ -40,6 +40,8 @@ fit_growth_rates = function(x,
 
     if (!cluster %in% evaluated) {
 
+      print(cluster)
+
       pop_df.cl = pop_df %>%
         dplyr::filter(grepl(paste(cluster,".",sep=""), Identity) | Identity == cluster) %>%
         dplyr::select(-starts_with("lm"))
@@ -102,6 +104,8 @@ fit_growth_multiple_clones = function(rates.df,
   for (subcl in clusters) {
 
     if (!subcl %in% (rates.df$Identity) && (subcl %in% pop_df$Identity)) {
+
+      print(subcl)
 
       if (purrr::is_empty(rates.df))
         rates.df = fit_growth_single_clone(pop_df=pop_df,

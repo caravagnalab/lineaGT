@@ -31,6 +31,8 @@ plot_growth_regression = function(x,
 
   if (fit)
     x = fit_growth_rates(x, highlight=highlight, timepoints_to_int=timepoints_to_int, force=fit)
+  else if (purrr::is_empty(get_growth_rates(x)))
+    x = fit_growth_rates(x, highlight=highlight, timepoints_to_int=timepoints_to_int, force=T)
 
   # keep only the clusters with growth model fitted
   highlight = intersect(highlight, x %>% get_growth_rates() %>% dplyr::pull(Identity))
