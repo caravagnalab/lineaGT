@@ -30,7 +30,7 @@ plot_growth_regression = function(x,
   color_palette = highlight_palette(x, highlight, label)
 
   if (fit)
-    x = fit_growth_rates(x, highlight=highlight, timepoints_to_int=timepoints_to_int, force=F)
+    x = fit_growth_rates(x, highlight=highlight, timepoints_to_int=timepoints_to_int, force=fit)
 
   # keep only the clusters with growth model fitted
   highlight = intersect(highlight, x %>% get_growth_rates() %>% dplyr::pull(Identity))
@@ -122,7 +122,7 @@ plot_growth_rates = function(x,
     facet_wrap(~Lineage) +
     scale_color_manual(values=color_palette) +
     my_ggplot_theme() +
-    theme(aspect.ratio=1) +
+    # theme(aspect.ratio=1) +
     xlab("Clusters") + ylab("Growth rate") + labs(color="")
 
   return(p)

@@ -75,6 +75,7 @@ get_muller_pop = function(x,
     # the means dataframe must contain also the subclones
     means = x %>%
       get_vaf_dataframe(label=label) %>%
+      dplyr::mutate(theta=ifelse(is.na(theta), vaf, theta)) %>%
       dplyr::select(theta, dplyr::contains("labels"), timepoints, lineage) %>%
       dplyr::select(-labels_init, -labels_viber) %>%
       tidyr::drop_na() %>%
