@@ -40,8 +40,8 @@ reference:
   - plot_scatter_density
   - plot_marginal
   - plot_mullerplot
-  - plot_exp_fit
-  - plot_exp_rate
+  - plot_growth_regression
+  - plot_growth_rates
   - plot_vaf
   - plot_vaf_time
   - plot_phylogeny
