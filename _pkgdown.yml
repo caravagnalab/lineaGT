@@ -45,6 +45,7 @@ reference:
   - plot_vaf
   - plot_vaf_time
   - plot_phylogeny
+  - plot_differentiation_tree
 
 - title: S3 object methods
   desc: Print and plot methods for the fitted object.
