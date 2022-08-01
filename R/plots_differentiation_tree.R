@@ -21,7 +21,7 @@ plot_differentiation_tree = function(x, label="", label.on.node=T, cex=1) {
     dplyr::rename(Identity=name) %>%
     dplyr::left_join(mrca.df, by=c("Identity")) %>%
     dplyr::group_by(Identity) %>%
-    dplyr::mutate(n_clones=ifelse( is.na(n_clones), compute_n_clones(edges.diff,mrca.df,id=Identity), n_clones )) %>%
+    dplyr::mutate(n_clones=compute_n_clones(edges.diff,mrca.df,id=Identity)) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(cluster=ifelse( cluster=="NA", "", cluster )) %>%
     dplyr::select(-from, -to, -dplyr::contains("mrca")) %>%
@@ -71,7 +71,7 @@ plot_differentiation_tree = function(x, label="", label.on.node=T, cex=1) {
 
 
 differentiation_tree = function(return.numeric=F) {
-  edges.diff = data.frame("Parent"=c("GL","P1","P1","P2","P2"), "Identity"=c("P1","P2","Myeloid","B","T"))
+  edges.diff = data.frame("Parent"=c("WT","P1","P1","P2","P2"), "Identity"=c("P1","P2","Myeloid","B","T"))
   if (return.numeric) { edges.diff$from = c(1,2,2,3,3); edges.diff$to = c(2,3,4,5,6) }
   return(edges.diff)
 }

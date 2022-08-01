@@ -45,10 +45,13 @@ is_desc_of = function(edges, desc, anc) {
 }
 
 
-get_mrca_df_single_clone = function(mut, cloneID="") {
+get_mrca_df = function(x, label="") {
   edges.diff = differentiation_tree(return.numeric=T)
 
-  ccf = get_binomial_theta_cluster(mut, cloneID) %>%
+  ccf = x %>% get_vaf_dataframe() %>%
+    dplyr::mutate(theta=ifelse(is.na(theta), vaf, theta)) %>%
+    dplyr::select(labels_mut, theta, lineage, timepoints) %>%
+    # get_binomial_theta_cluster(mut, cloneID) %>%
     dplyr::rename(cluster=labels_mut) %>%
     dplyr::group_by(cluster, lineage) %>%
     dplyr::summarise(is.present=any(theta>0), .groups="keep") %>%
@@ -71,32 +74,14 @@ get_mrca_df_single_clone = function(mut, cloneID="") {
 
   return(
     mrca.list %>%
-      data.frame() %>% t() %>% as.data.frame() %>%
-      rownames_to_column() %>% setNames(c("cluster","Identity")) %>%
-      dplyr::inner_join(edges.diff, by="Identity")
-  )
-}
-
-
-get_mrca_df = function(x, label="") {
-  muts = x %>% get_muts_fit()
-
-  mrca.df = data.frame()
-  for (cl in names(muts)) {
-    mut = muts[[cl]]
-    if (purrr::is_empty(mut)) next
-
-    if (purrr::is_empty(mrca.df)) mrca.df = get_mrca_df_single_clone(mut, cloneID=cl)
-    else mrca.df = mrca.df %>% dplyr::add_row( get_mrca_df_single_clone(mut, cloneID=cl) )
-  }
-
-  return(
-    mrca.df %>%
-      dplyr::rename(mrca.from=Parent, mrca.to=Identity) %>%
-      group_by(mrca.to) %>%
-      dplyr::mutate(n_clones=length(cluster), cluster=paste(cluster, collapse=", ")) %>%
-      ungroup() %>%
-      unique()
+    data.frame() %>% t() %>% as.data.frame() %>%
+    rownames_to_column() %>% setNames(c("cluster","Identity")) %>%
+    dplyr::inner_join(edges.diff, by="Identity") %>%
+    dplyr::rename(mrca.from=Parent, mrca.to=Identity) %>%
+    group_by(mrca.to) %>%
+    dplyr::mutate(n_clones=length(cluster), cluster=paste(cluster, collapse=", ")) %>%
+    ungroup() %>%
+    unique()
   )
 }
 
