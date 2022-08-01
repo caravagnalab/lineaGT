@@ -1,4 +1,4 @@
-#' Exponential fitting
+#' Visualize the regression given the infered growth rates.
 #'
 #' @description Function to visualize the growht of each clone and lineage.
 #'
@@ -15,9 +15,9 @@
 #'
 #' @import ggplot2
 #'
-#' @export plot_exp_fit
+#' @export plot_growth_regression
 
-plot_exp_fit = function(x,
+plot_growth_regression = function(x,
                         highlight=c(),
                         min_frac=0,
                         mutations=F,
@@ -53,12 +53,12 @@ plot_exp_fit = function(x,
     dplyr::mutate(type=ifelse(type=="log", "Logistic", "Exponential"))
 
 
-  color_palette = c("forestgreen","darkred"); names(color_palette) = c("Exponential","Logistic")
+  color_palette = c("firebrick","steelblue"); names(color_palette) = c("Exponential","Logistic")
   color_palette = c(color_palette, x$color_palette)
   p = pop_df %>%
     ggplot() +
     geom_point(aes(x=Generation, y=Population), alpha=.5, size=.7) +
-    geom_line(data=regr.df, aes(x=x, y=y, color=type), size=.2, alpha=.5) +
+    geom_line(data=regr.df, aes(x=x, y=y, color=type), size=.6, alpha=.8) +
     geom_vline(data=regr.df, aes(xintercept=init_t, color=type), linetype="dashed", size=.2, alpha=.5) +
     geom_errorbar(data=regr.df, aes(x=x, y=y, ymin=y.min, ymax=y.max, color=type), width=.5, position=position_dodge(width=0.5)) +
     facet_grid(rows=vars(Identity), cols=vars(Lineage), scales="free_y") +
@@ -70,7 +70,7 @@ plot_exp_fit = function(x,
 }
 
 
-#' Exponential rate
+#' Visualize the infered growth rates.
 #'
 #' @description Function to visualize the growth coefficients for each clone and lineage.
 #'
@@ -80,43 +80,51 @@ plot_exp_fit = function(x,
 #' @param mutations Boolean. If set to \code{TRUE}, the growth will be visualize for each cluster of mutations.
 #' @param label a character corresponding to the label of the run to visualize.
 #' @param timepoints_to_int a list to map each \code{timepoint} value to an integer.
+#' @param fit add
 #'
 #' @examples
-#' if (FALSE) plot_exp_rate(x)
+#' if (FALSE) plot_growth_rates(x)
 #'
 #' @import ggplot2
 #'
-#' @export plot_exp_rate
+#' @export plot_growth_rates
 
-plot_exp_rate = function(x,
+plot_growth_rates = function(x,
                          highlight=c(),
                          min_frac=0,
                          mutations=F,
                          label="",
-                         timepoints_to_int=list()) {
+                         timepoints_to_int=list(),
+                         fit=F) {
 
-  if (purrr::is_empty(timepoints_to_int)) timepoints_to_int = map_timepoints_int(x)
+  if (purrr::is_empty(timepoints_to_int)) timepoints_to_int = map_timepoints_int(x, timepoints_to_int=timepoints_to_int)
+  highlight = get_highlight(x, min_frac, highlight, mutations=mutations)
 
-  highlight = get_highlight(x, min_frac, highlight, mutations=mutations, label=label) %>%
-    color_palette = highlight_palette(x, highlight, label)
+  if (fit)
+    x = fit_growth_rates(x, highlight=highlight, timepoints_to_int=timepoints_to_int, force=F)
 
-  highlight = highlight %>% stringr::str_replace("C_||C", "")
-  names(color_palette) = names(color_palette) %>% stringr::str_replace("C_||C", "")
+  # keep only the clusters with growth model fitted
+  highlight = intersect(highlight, x %>% get_growth_rates() %>% dplyr::pull(Identity))
 
-  p = x %>%
-    get_muller_pop(timepoints_to_int=timepoints_to_int, mutations=mutations, label=label) %>%
+  rates = x %>% get_growth_rates() %>% dplyr::select(dplyr::starts_with("rate"), Identity, Lineage) %>%
+    tidyr::pivot_longer(cols=dplyr::starts_with("rate"), names_to="type", names_prefix="rate.", values_to="rate") %>%
+    dplyr::mutate(type=ifelse(type=="exp", "Exponential", "Logistic"))
+
+  color_palette = c("firebrick","steelblue"); names(color_palette) = c("Exponential","Logistic")
+  p = rates %>%
     # dplyr::select(-dplyr::contains(select))
-    dplyr::mutate(Identity=Identity %>% stringr::str_replace("C_||C","")) %>%
+    # dplyr::mutate(Identity=Identity %>% stringr::str_replace("C_||C","")) %>%
     dplyr::filter(Identity %in% highlight) %>%
-    dplyr::arrange(lm_r) %>%
-    ggplot(aes(x=Identity, y=lm_r, ymax=lm_r, ymin=0, color=Identity)) +
-    geom_linerange(alpha=.3) +
-    geom_point(alpha=.3) +
+    # dplyr::arrange(lm_r) %>%
+    ggplot(aes(x=Identity, y=rate, ymax=rate, ymin=0, color=type)) +
+    geom_linerange(alpha=.8, position=position_dodge2(width=.5)) +
+    geom_point(alpha=.8, position=position_dodge2(width=.5)) +
     facet_wrap(~Lineage) +
-    scale_color_manual(values=color_palette[highlight]) +
+    scale_color_manual(values=color_palette) +
     my_ggplot_theme() +
     theme(aspect.ratio=1) +
-    xlab("Clusters") + ylab("Exp rate") + labs(color="Clusters")
+    xlab("Clusters") + ylab("Growth rate") + labs(color="")
+
   return(p)
 }
 
@@ -149,7 +157,6 @@ get_regression_df = function(x, highlight) {
     dplyr::mutate(y.exp=exp( rate.exp * (x-init_t.exp) ),
                   y.log=K.log / ( 1 + (K.log-1) * exp( -rate.log*(x-init_t.log) ) )) %>%
     dplyr::select(-dplyr::contains("p_rate")) %>%
-    # dplyr::select(-dplyr::contains("rate"), -dplyr::contains("K.log")) %>%
     tibble::as_tibble() %>%
     dplyr::arrange(x, Identity) %>%
     dplyr::mutate(sigma.exp=unlist(sigma.exp)[as.character(x)], sigma.log=unlist(sigma.log)[as.character(x)])
