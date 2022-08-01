@@ -40,8 +40,6 @@ fit_growth_rates = function(x,
 
     if (!cluster %in% evaluated) {
 
-      print(cluster)
-
       pop_df.cl = pop_df %>%
         dplyr::filter(grepl(paste(cluster,".",sep=""), Identity) | Identity == cluster) %>%
         dplyr::select(-starts_with("lm"))
@@ -96,7 +94,6 @@ get_growth_rates = function(x) {
 sort_clusters_edges = function(clusters, parents) {
   # clusters is a list of clusters
   # parents is the edges tibble
-
   nn = c(parents$Parent, parents$Identity) %>% unique() %>% length()
   nodes = c(parents$Parent, parents$Identity) %>% unique()
 
@@ -105,8 +102,6 @@ sort_clusters_edges = function(clusters, parents) {
   cls.sort = c(root)
 
   for (i in 1:nn) {
-    print(node.name)
-
     if (node.name %in% clusters)
       cls.sort = c(cls.sort, node.name)
     node.name = parents %>% dplyr::filter(Identity==node.name) %>% dplyr::pull(Identity)
@@ -126,15 +121,12 @@ fit_growth_multiple_clones = function(rates.df,
                                       steps,
                                       clonal,
                                       timepoints_to_int) {
-
-  clusters = sort_clusters_edges(clusters, parents)
+  if (!clonal & nrow(parents)==0) return(rates.df)
+  if (!clonal) clusters = sort_clusters_edges(clusters, parents)
 
   for (subcl in clusters) {
 
     if (!subcl %in% (rates.df$Identity) && (subcl %in% pop_df$Identity)) {
-
-      print(subcl)
-      print(rates.df)
 
       if (purrr::is_empty(rates.df))
         rates.df = fit_growth_single_clone(pop_df=pop_df,
@@ -168,7 +160,6 @@ fit_growth_single_clone = function(pop_df,
                                    clonal=FALSE,
                                    growth="",
                                    random_state=25) {
-  print(p.rates)
 
   torch = reticulate::import("torch")
   py_pkg = reticulate::import("pylineaGT")
@@ -207,8 +198,7 @@ fit_growth_single_clone = function(pop_df,
 
 
 get_parent_rate = function(parents, rates.df, cluster) {
-  if (!cluster %in% parents$Identity)
-    return(list("exp"=NULL, "log"=NULL))
+  if (!cluster %in% parents$Identity) return(list("exp"=NULL, "log"=NULL))
 
   par = parents %>% filter(Identity==cluster) %>% dplyr::pull(Parent)  ## parent of subcl
   print(par)
@@ -217,8 +207,7 @@ get_parent_rate = function(parents, rates.df, cluster) {
     dplyr::select(dplyr::contains("rate.exp"), dplyr::contains("rate.log"), -dplyr::contains("p_rate")) %>%
     as.list()
 
-  if (NA %in% unlist(par.rates))
-    return(list("exp"=NULL, "log"=NULL))
+  if (NA %in% unlist(par.rates)) return(list("exp"=NULL, "log"=NULL))
 
   print(par.rates)
   return(par.rates)
@@ -263,11 +252,8 @@ get_growth_params = function(timepoints_to_int,
                     "sigma.log"=list(setNames(object=rates.log$sigma, nm=c(0, unlist(timepoints_to_int))))) %>%
       tibble::as_tibble()
 
-  if (is.null(rates.exp))
-    return(params.log)
-
-  if (is.null(rates.log))
-    return(params.exp)
+  if (is.null(rates.exp)) return(params.log)
+  if (is.null(rates.log)) return(params.exp)
 
   return(
     dplyr::inner_join(params.exp, params.log, by=c("Lineage", "Identity"))
