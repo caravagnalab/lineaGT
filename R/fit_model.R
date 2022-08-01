@@ -121,6 +121,7 @@ fit = function(cov.df,
   cat(paste("Found", x$K, "clones!"))
 
   x$runs = get_selection_df(selection)
+  x$tp_to_int = timepoints_to_int
 
   if (!is.null(vaf.df))
     x = fit_mutations(x, vaf.df, infer_phylo=infer_phylogenies, min_frac=min_frac, max_IS=max_IS)
