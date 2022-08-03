@@ -1,3 +1,5 @@
+## Set of functions used to add to the mvnmm object
+
 add_muts_fit = function(x, x.muts, label="") {
   if (label == "") x$x.muts = x.muts
   else x[[paste("x.muts", label, sep=".")]] = x.muts
@@ -25,3 +27,7 @@ add_vaf = function(x, vaf.df, label="") {
   return(x)
 }
 
+
+# add_tp_int = function(x, tp_int) {
+#
+# }

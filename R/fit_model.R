@@ -108,7 +108,8 @@ fit = function(cov.df,
                                  initializ=initializ,
                                  seed=as.integer(seed))
 
-  selection = list("ic"=out[[1]], "losses"=out[[2]], "grads"=out[[3]], "params"=out[[4]])
+  selection = list("ic"=out[[1]], "losses"=out[[2]], "grads"=out[[3]], "params"=out[[4]]) %>%
+    get_selection_df()
 
   best_k = get_best_k(selection, method="BIC")$K
   best_init_seed = get_best_k(selection, method="BIC")$init_seed
@@ -118,13 +119,10 @@ fit = function(cov.df,
                   store_params=store_params, hyperparameters=hyperparameters,
                   covariance=covariance, initializ=FALSE, seed=best_seed)
 
-  cat(paste("Found", x$K, "clones!"))
-
-  x$runs = get_selection_df(selection)
+  x$runs = selection
   x$tp_to_int = timepoints_to_int
 
-  if (!is.null(vaf.df))
-    x = fit_mutations(x, vaf.df, infer_phylo=infer_phylogenies, min_frac=min_frac, max_IS=max_IS)
+  if (!is.null(vaf.df)) x = fit_mutations(x, vaf.df, infer_phylo=infer_phylogenies, min_frac=min_frac, max_IS=max_IS)
 
   try(
     expr = {

@@ -15,21 +15,20 @@
 #' @export
 
 fit_growth_rates = function(x,
-                      steps=500,
-                      highlight=list(),
-                      timepoints_to_int=list(),
-                      growth="",
-                      force=T) {
+                            steps=500,
+                            highlight=list(),
+                            timepoints_to_int=list(),
+                            growth="",
+                            force=T) {
 
-  if (purrr::is_empty(highlight)) highlight = x %>% get_highlight(highlight=highlight, mutations=F)
+  highlight = get_highlight(x, highlight=highlight, mutations=F)
   timepoints_to_int = map_timepoints_int(x, timepoints_to_int)
 
   pop_df = x %>%
     get_muller_pop(mutations=T, timepoints_to_int=timepoints_to_int)
 
-  rates.df = x %>% get_growth_rates() # data.frame()
-  evaluated = list()
-  if (!purrr::is_empty(rates.df)) evaluated = rates.df$Identity %>% unique()
+  rates.df = x %>% get_growth_rates()
+  if (!purrr::is_empty(rates.df)) evaluated = rates.df$Identity %>% unique() else evaluated = list()
 
   if (force & !purrr::is_empty(rates.df)) {
     rates.df = rates.df %>% filter(!Identity %in% highlight)
@@ -45,6 +44,7 @@ fit_growth_rates = function(x,
         dplyr::select(-starts_with("lm"))
       parents = get_parents(x, highlight=cluster)
 
+      # first in the clonal cluster of ISs
       rates.df = rates.df %>%
         fit_growth_multiple_clones(clusters=cluster,
                                    pop_df=pop_df.cl,
@@ -63,6 +63,7 @@ fit_growth_rates = function(x,
                                    steps=steps,
                                    clonal=F,
                                    timepoints_to_int=timepoints_to_int)
+
       # then in all the children
       rates.df = rates.df %>%
         fit_growth_multiple_clones(clusters=parents$Identity %>% unique(),

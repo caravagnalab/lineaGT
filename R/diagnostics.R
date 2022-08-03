@@ -1,9 +1,22 @@
+get_selection_df = function(selection) {
+  runs = list()
+
+  runs$IC = get_IC(selection)
+  runs$losses = get_losses(runs=selection, train=T)
+  runs$grads = get_gradient_norms(selection)
+  runs$params = get_params_train(selection$params)
+
+  return(runs)
+
+}
+
+
 get_best_k = function(selection, method="BIC") {
   return(
-    selection$ic %>%
-      reshape2::melt(id=c("K","run","init_seed","seed","id"), variable.name="mm") %>% dplyr::as_tibble() %>%
+    selection$IC %>%
 
       dplyr::mutate(K=as.integer(K), run=as.integer(run), value=as.numeric(value)) %>%
+      dplyr::rename(mm=method) %>%
       dplyr::filter(mm==method) %>%
       dplyr::filter(value==min(value)) %>%
 
@@ -14,8 +27,8 @@ get_best_k = function(selection, method="BIC") {
 }
 
 
-get_IC = function(runs) {
-  return(runs$ic %>%
+get_IC = function(selection) {
+  return(selection$ic %>%
            reshape2::melt(id=c("K","run","id","seed","init_seed"), variable.name="method") %>%
            dplyr::as_tibble() %>%
            dplyr::mutate(K=as.integer(K), run=as.integer(run))
@@ -23,8 +36,8 @@ get_IC = function(runs) {
 }
 
 
-get_losses = function(x=NULL, runs=NULL, train=FALSE) {
-  if (train) return(runs$losses %>%
+get_losses = function(x=NULL, selection=NULL, train=FALSE) {
+  if (train) return(selection$losses %>%
                      dplyr::as_tibble() %>%
                      dplyr::mutate(K=as.integer(K), run=as.integer(run)))
   return(
@@ -37,49 +50,12 @@ get_losses = function(x=NULL, runs=NULL, train=FALSE) {
 }
 
 
-get_gradient_norms = function(runs) {
-  return(runs$grads %>%
+get_gradient_norms = function(selection) {
+  return(selection$grads %>%
            dplyr::as_tibble() %>%
            dplyr::mutate(K=as.integer(K),
                   run=as.integer(run),
                   param=str_replace_all(param, "_param","")))
-}
-
-
-compute_IC = function(py_model) {
-  IC = list()
-  IC$BIC = py_model$compute_ic(method="BIC")$numpy()
-  IC$AIC = py_model$compute_ic(method="AIC")$numpy()
-  IC$ICL = py_model$compute_ic(method="ICL")$numpy()
-  IC$NLL = py_model$nll$numpy()
-  return(IC)
-}
-
-
-load_losses = function(py_model) {
-  return(py_model$losses_grad_train$losses)
-}
-
-
-load_params_gradients = function(py_model) {
-  gradients = list()
-  gradients$mean = py_model$losses_grad_train$gradients$mean_param
-  gradients$sigma = py_model$losses_grad_train$gradients$sigma_vector_param
-  gradients$weights = py_model$losses_grad_train$gradients$weights_param
-  return(gradients)
-}
-
-
-get_selection_df = function(selection) {
-  runs = list()
-
-  runs$IC = get_IC(selection)
-  runs$losses = get_losses(runs=selection, train=T)
-  runs$grads = get_gradient_norms(selection)
-  runs$params = get_params_train(selection$params)
-
-  return(runs)
-
 }
 
 
@@ -99,3 +75,29 @@ get_params_train = function(params) {
 
   return(df)
 }
+
+
+# compute_IC = function(py_model) {
+#   IC = list()
+#   IC$BIC = py_model$compute_ic(method="BIC")$numpy()
+#   IC$AIC = py_model$compute_ic(method="AIC")$numpy()
+#   IC$ICL = py_model$compute_ic(method="ICL")$numpy()
+#   IC$NLL = py_model$nll$numpy()
+#   return(IC)
+# }
+
+
+load_losses = function(py_model) {
+  return(py_model$losses_grad_train$losses)
+}
+
+
+load_params_gradients = function(py_model) {
+  gradients = list()
+  gradients$mean = py_model$losses_grad_train$gradients$mean_param
+  gradients$sigma = py_model$losses_grad_train$gradients$sigma_vector_param
+  gradients$weights = py_model$losses_grad_train$gradients$weights_param
+  return(gradients)
+}
+
+
