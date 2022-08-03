@@ -22,9 +22,12 @@ print.mvnmm = function(x, ...) {
     right = paste(crayon::bold("Python:"), pylog %>% crayon::silver())
     )
 
+  tp = x %>% get_tp_to_int() %>% unlist() %>% sort() %>% names()
+  if (purrr::is_empty(tp)) tp = x %>% get_timepoints()
+
   cat("\n")
   cli::cli_text(clisymbols::symbol$arrow_right, " Lineages: {.field {get_lineages(x) %>% sort()}}.")
-  cli::cli_text(clisymbols::symbol$arrow_right, " Timepoints: {.field {get_timepoints(x)}}.")
+  cli::cli_text(clisymbols::symbol$arrow_right, " Timepoints: {.field {tp}}.")
   cli::cli_text(clisymbols::symbol$arrow_right, " Number of Insertion Sites: {.field {x$N}}.")
 
   pi = x %>% lineaGT::get_weights() %>% round(2) %>% sort(decreasing = TRUE)
@@ -51,7 +54,8 @@ print.mvnmm = function(x, ...) {
     mus = sapply(mus, function(x) sprintf(paste0("%", n_chars , 's'), x))
 
     lins = get_lineages(x) %>% sort()
-    tmp = get_timepoints(x)
+    # tmp = x %>% get_tp_to_int() %>% unlist() %>% sort() %>% names()
+    tmp = tp
 
     inliners = paste0(
       crayon::blue(lins),
