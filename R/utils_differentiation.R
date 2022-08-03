@@ -45,13 +45,14 @@ is_desc_of = function(edges, desc, anc) {
 }
 
 
-get_mrca_df = function(x, label="") {
+get_mrca_df = function(x, clusters, label="") {
+  if (purrr::is_empty(clusters)) clusters = x %>% get_unique_labels()
   edges.diff = differentiation_tree(return.numeric=T)
 
   ccf = x %>% get_vaf_dataframe() %>%
+    dplyr::filter(labels %in% clusters) %>%
     dplyr::mutate(theta=ifelse(is.na(theta), vaf, theta)) %>%
     dplyr::select(labels_mut, theta, lineage, timepoints) %>%
-    # get_binomial_theta_cluster(mut, cloneID) %>%
     dplyr::rename(cluster=labels_mut) %>%
     dplyr::group_by(cluster, lineage) %>%
     dplyr::summarise(is.present=any(theta>0), .groups="keep") %>%
@@ -61,7 +62,7 @@ get_mrca_df = function(x, label="") {
 
   orig = ccf %>%
     dplyr::group_by(Parent, cluster) %>%
-    dplyr::mutate(is.present.parent=all(is.present)) %>%
+    dplyr::mutate(is.present.parent=is_present_desc(cluster, Parent, edges.diff, ccf) ) %>%  # if is present in all descendants of the parent
     dplyr::ungroup() %>%
     dplyr::mutate(orig=ifelse( (is.present & !is.present.parent), Identity, NA)) %>%
     dplyr::mutate(orig=ifelse( (is.na(orig) & (is.present & is.present.parent)), Parent, orig ))
@@ -83,6 +84,19 @@ get_mrca_df = function(x, label="") {
     ungroup() %>%
     unique()
   )
+}
+
+
+is_present_desc = function(cluster, parent, edges, ccf) {
+  prnt = parent %>% unique()
+  cls = cluster %>% unique()
+  desc = get_desc_list(edges)
+
+  for (dd in desc[[prnt]]) {
+    if ( dd %in% ccf$Identity && !(ccf %>% dplyr::filter(cluster==cls, Identity==dd) %>% dplyr::pull(is.present)) )
+      return(FALSE)
+  }
+  return(TRUE)
 }
 
 
