@@ -12,9 +12,9 @@
 
 get_cov_dataframe = function(x) {
   try(expr = {
-    dataframe = x$cov.dataframe; if (!purrr::is_empty(dataframe)) return(dataframe)
-    },
-    silent = T)
+      dataframe = x$cov.dataframe
+      if (!purrr::is_empty(dataframe)) return(dataframe) else return(cli::cli_alert_warning("No coverage dataframe loaded."))
+    }, silent = T)
 
   py_model = get_model(x)
   return(get_python_dataframe(py_model))
@@ -34,10 +34,11 @@ get_cov_dataframe = function(x) {
 #' @export get_vaf_dataframe
 #'
 
-get_vaf_dataframe = function(x, label="") {
-  if (paste("vaf.dataframe", label, sep=".") %in% names(x))
-    return(x[[paste("vaf.dataframe", label, sep=".")]])
-  return(x$vaf.dataframe)
+get_vaf_dataframe = function(x) {
+  if ("vaf.dataframe" %in% names(x)) return(x$vaf.dataframe) else {
+    cli::cli_alert_warning("No VAF dataframe loaded.")
+    return(list())
+  }
 }
 
 
@@ -54,7 +55,7 @@ get_vaf_dataframe = function(x, label="") {
 #' @export get_dimensions
 
 get_dimensions = function(x) {
-  return(x$dimensions)
+  if ("dimensions" %in% names(x)) return(x$dimensions) else return(cli::cli_alert_warning("No dimensions values."))
 }
 
 
@@ -71,7 +72,7 @@ get_dimensions = function(x) {
 #' @export get_lineages
 
 get_lineages = function(x) {
-  return(x$lineages)
+  if ("lineages" %in% names(x)) return(x$lineages) else return(cli::cli_alert_warning("No lineages values."))
 }
 
 
@@ -88,19 +89,23 @@ get_lineages = function(x) {
 #' @export get_timepoints
 
 get_timepoints = function(x) {
-  return(x$timepoints)
+  if ("timepoints" %in% names(x)) return(x$timepoints) else return(cli::cli_alert_warning("No timepoints values."))
 }
 
 
 get_tp_to_int = function(x) {
-  if ("tp_to_int" %in% names(x)) return(x$tp_to_int)
-  return(list())
+  if ("tp.to.int" %in% names(x)) return(x$tp.to.int) else {
+    cli::cli_alert_warning("Timepoints not mapped to integer values.")
+    return(list())
+  }
 }
 
 
-get_muts_fit = function(x, label="") {
-  if (label == "") return(x$x.muts)
-  return(x[[paste("viber_run", label, sep=".")]])
+get_muts_fit = function(x) {
+  if ("x.muts" %in% names(x)) return(x$x.muts) else {
+    cli::cli_alert_warning("No fitted binomial clusters object.")
+    return(list())
+  }
 }
 
 
@@ -110,22 +115,13 @@ get_model = function(x) {
 }
 
 
-get_color_palette = function(x, label="") {
-  if (label=="") return(x$color_palette)
-
-  if (paste("color_palette", label, sep=".") %in% names(x))
-    return(x[[paste("color_palette", label, sep=".")]])
-  else
-    return(x$color_palette)
+get_color_palette = function(x) {
+  if ("color.palette" %in% names(x)) return(x$color.palette) else return(cli::cli_alert_warning("No color palette."))
 }
 
 
-get_trees = function(x, label="") {
-  if (!any(grepl("trees", x %>% names)))
-    return(list())
-  if (label=="")
-    return(x$trees)
-  return(x[[paste("trees", label, sep=".")]])
+get_trees = function(x) {
+  if ("x.trees" %in% names(x)) return(x$x.trees) else return(cli::cli_alert_warning("No fitted phylogenies object."))
 }
 
 

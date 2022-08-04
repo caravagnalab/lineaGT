@@ -12,34 +12,39 @@
 #' @return
 #' @export fit_phylogenies
 
-fit_phylogenies = function(x, vaf.df=NULL, min_frac=0, highlight=list(), do_filter=FALSE,
-                           label="", fit_muts=FALSE, lineages=c()) {
+fit_phylogenies = function(x, vaf.df=NULL, min_frac=0, highlight=list(), fit_muts=FALSE) {
 
-  if (is.null(vaf.df) && !"vaf.dataframe" %in% names(x))
-    message("A dataframe with the mutations is required!")
-  else if (is.null(vaf.df))
-    vaf.df = x %>% get_vaf_dataframe(label=label)
+  if (!have_muts_fit(x) && !have_vaf_df(x) && is.null(vaf.df))
+    return(cli::cli_alert_warning("An input VAF dataframe is required"))
+
+  if (!is.null(vaf.df) && have_vaf_df(x))
+    cli::cli_alert_warning("Using the input mutation data but a VAF dataframe is already present in the object.")
+  else if (is.null(vaf.df) && have_vaf_df(x))
+    vaf.df = x %>% get_vaf_dataframe()
 
   clusters_joined = get_highlight(x, min_frac, highlight)
   trees = list()
-  if (!"x.muts" %in% names(x) || fit_muts)
+  if (!have_muts_fit(x) || fit_muts)
     return(
       x %>% fit_mutations(vaf.df=vaf.df,
-                      highlight=clusters_joined,
-                      lineages=lineages,
-                      label=label,
-                      infer_phylo=TRUE)
+                          highlight=clusters_joined,
+                          lineages=lineages,
+                          infer_phylo=TRUE)
     )
 
-  viber_run_all = x %>% get_muts_fit(label=label)
+  x.muts.all = x %>% get_muts_fit()
 
-  if (is.null(viber_run_all))
-    return(message("No mutations clustering has been performed with the input label!"))
+  if (purrr::is_empty(x.muts.all))
+    return( cli::cli_alert_warning("No mutations clustering has been performed yet.
+                                    Run again the function with {.field {'fit_muts'} = TRUE}") )
 
+  trees = list()
   for (cluster in clusters_joined) {
-    viber_run = viber_run_all[[cluster]]
-    tt = fit_trees(viber_run, cluster)
-    trees[[cluster]] = tt
+    x.muts.k = x.muts.all[[cluster]]
+    if (!is.null(x.muts.k) && x.muts.k$K > 1) {
+      tt = fit_trees(x.muts.k, cluster)
+      trees[[cluster]] = tt
+    }
   }
 
   x = add_phylo(x, trees, label=label)
@@ -49,28 +54,27 @@ fit_phylogenies = function(x, vaf.df=NULL, min_frac=0, highlight=list(), do_filt
 
 
 # to infer the tree on a single cluster
-fit_trees = function(fit_viber, clonal) {
+fit_trees = function(fit_viber, cluster) {
   tree = list()
-  if (length(fit_viber$labels$cluster.Binomial %>% unique) > 1) {
-    try(
-      expr = {
-        tree = withTimeout(run_ctree(fit_viber, clonal), timeout=300, onTimeout="error")
-      },
-      silent = F
+  if (fit_viber$K > 1)
+    tryCatch(
+      expr = { tree = suppressWarnings(withTimeout(run_ctree(fit_viber, cluster), timeout=300, onTimeout="error")) },
+      error = function(e) {}
     )
-  }
 
   return(tree)
 }
 
 
 run_ctree = function(viber_run, clonal) {
-  # viber_run here is a viber fit
   if (all(is.null(viber_run$data)))
     stop("Your input object should have a data field; recreate the VIBER input.")
+
   if (!all(c("driver", "gene") %in% colnames(viber_run$data)))
     stop("Your data should have a logical 'driver' and 'gene' column to annotate driver events, cannot build a ctree otherwise.")
+
   stopifnot(inherits(viber_run, "vb_bmm"))
+
   patientID = ifelse(is.null(viber_run$description), clonal, viber_run$description)
   patientID = gsub(pattern = " ", replacement = ".", patientID)
 
@@ -116,13 +120,19 @@ run_ctree = function(viber_run, clonal) {
   drivers_table = drivers_table %>% dplyr::select(patientID,
                                                   variantID, is.driver, is.clonal, cluster, colnames(cx),
                                                   dplyr::everything())
+
+  cli::cli_process_start(paste0("Starting phylogeny inference of clone ", clonal))
+
   tt = ctree::ctrees(CCF_clusters=cluster_table,
-                     drivers=drivers_table,
-                     samples=colnames(cx),
-                     patient=patientID,
-                     sspace.cutoff=100,
-                     store.max=50,
-                     n.sampling=100)
+                  drivers=drivers_table,
+                  samples=colnames(cx),
+                  patient=patientID,
+                  sspace.cutoff=100,
+                  store.max=50,
+                  n.sampling=100)
+
+  cli::cli_process_done()
+
   return(tt)
 }
 

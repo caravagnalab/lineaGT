@@ -10,9 +10,11 @@ fit_singleK = function(k,
                        store_params=FALSE,
                        initializ=TRUE,
                        seed=5,
+                       timepoints_to_int=list(),
                        py_pkg=NULL) {
 
-  x = initialize_object(k, cov.df, py_pkg)
+  x = initialize_object(K=k, cov.df=cov.df, py_pkg=py_pkg, timepoints_to_int=timepoints_to_int)
+
   x = run_inference(x,
                     steps=as.integer(steps),
                     covariance=covariance,
@@ -23,7 +25,8 @@ fit_singleK = function(k,
                     store_params=store_params,
                     initializ=initializ,
                     seed=seed)
-  x = classifier(x)
+
+  x = classifier(x, timepoints_to_int=timepoints_to_int)
 
   x$IC = compute_IC(x$py_model)
   x$losses = load_losses(x$py_model)
@@ -42,6 +45,7 @@ fit_singleK = function(k,
 # takes as input the long dataframe
 initialize_object = function(K,
                              cov.df,
+                             timepoints_to_int=list(),
                              py_pkg=NULL) {
   if (is.null(py_pkg))
     py_pkg = reticulate::import("pylineaGT")
@@ -61,7 +65,7 @@ initialize_object = function(K,
                                           IS=IS,
                                           columns=columns)
 
-  return(get_object(py_model, timepoints=timepoints, lineages=lineages))
+  return(get_object(py_model, timepoints=timepoints, lineages=lineages, timepoints_to_int=timepoints_to_int))
 }
 
 
@@ -103,10 +107,6 @@ run_inference = function(x,
   for (hyperpar in names(hyperparameters))
     x$py_model$set_hyperparameters(hyperpar, as.numeric(hyperparameters[[hyperpar]]))
 
-  print(initializ)
-  print(x$K)
-  print(seed)
-
   x$py_model$fit(steps=as.integer(steps),
                  cov_type=covariance,
                  lr=as.numeric(lr),
@@ -120,8 +120,8 @@ run_inference = function(x,
 }
 
 
-classifier = function(x) {
+classifier = function(x, timepoints_to_int=list()) {
   x$py_model$classifier()
-  return(get_object(x$py_model, timepoints=x$timepoints, lineages=x$lineages))
+  return(get_object(x$py_model, timepoints=x$timepoints, lineages=x$lineages, timepoints_to_int=timepoints_to_int))
 }
 

@@ -1,8 +1,9 @@
-get_params = function(x=NULL, py_model=NULL, train=FALSE) {
-  if (!is.null(x) && !train) return(x$params)
-  else if (!is.null(x) && train) return(x$params_train)
-
-  if(!is.null(py_model)) return(get_python_params(py_model, train=train))
+# function to get parameters from either the Python model or the mvnmm object
+get_params = function(x=NULL, py_model=NULL) {
+  if (!is.null(x) && !train) return( x$params )
+  # if (!is.null(x) && train) return( x$params_train )
+  if(!is.null(py_model)) return( get_python_params(py_model) )
+  cli::format_error("Not able to return any 'params' object!")
 }
 
 
@@ -21,16 +22,17 @@ get_params = function(x=NULL, py_model=NULL, train=FALSE) {
 
 get_mean = function(x) {
   py_model = get_model(x)
-  tryCatch(
+  tryCatch(  # case 1 -> we want to get the params from the Python object
     expr = {
       clusters_sort = get_unique_labels(py_model)
       mean = py_model$params$mean$detach()$numpy()
       colnames(mean) = py_model$dimensions
       rownames(mean) = clusters_sort
       return(mean) },
-    error = function(e) return(list()) )
+    error = function(e) { cli::format_warning(""); return(list()) } )
 
-  try(expr = { mean = x$params$mean; if (!purrr::is_empty(mean)) return(mean) }, silent = T)
+  check_params(x)
+  if ("mean" %in% names(x$params)) return(x$params$mean) else return(cli::format_warning("No mean stored in the object."))
 }
 
 
@@ -56,7 +58,8 @@ get_weights = function(x) {
       return(weights) },
     error = function(e) return(list()) )
 
-  try(expr = { weights = x$params$weights; if (!purrr::is_empty(weights)) return(weights) }, silent = T)
+  check_params(x)
+  if ("weights" %in% names(x$params)) return(x$params$weights) else return(cli::format_warning("No weights stored in the object."))
 }
 
 
@@ -84,7 +87,8 @@ get_sigma = function(x) {
       return(sigma) },
     error = function(e) return(list()) )
 
-  try(expr = { sigma = x$params$sigma; if (!purrr::is_empty(sigma)) return(sigma) }, silent = T)
+  check_params(x)
+  if ("sigma" %in% names(x$params)) return(x$params$sigma) else return(cli::format_warning("No variance 'sigma' stored in the object."))
 }
 
 
@@ -115,7 +119,8 @@ get_covariance_Sigma = function(x) {
       return(covar) },
     error = function(e) return(list()) )
 
-  try(expr = { Sigma = x$params$Sigma; if (!purrr::is_empty(Sigma)) return(Sigma) }, silent = T)
+  check_params(x)
+  if ("Sigma" %in% names(x$params)) return(x$params$Sigma) else return(cli::format_warning("No covariance 'Sigma' stored in the object."))
 }
 
 
@@ -151,7 +156,8 @@ get_covariance_Cholesky = function(x) {
       return(chol) },
     error = function(e) return(list()) )
 
-  try(expr = { chol = x$params$Chol; if (!purrr::is_empty(Chol)) return(Chol) }, silent = T)
+  check_params(x)
+  if ("Chol" %in% names(x$params)) return(x$params$Chol) else return(cli::format_warning("No Cholesky factorization matrix 'Chol' stored in the object."))
 }
 
 
@@ -179,7 +185,9 @@ get_z_probs = function(x) {
       return(probs) },
     error = function(e) return(list()) )
 
-  try(expr = { z_probs = x$params$probabilites; if (!purrr::is_empty(z_probs)) return(z_probs) }, silent = T)
+  check_params(x)
+  if ("probabilites" %in% names(x$params)) return(x$params$probabilites) else
+    return(cli::format_warning("No posterior probabilities stored in the object."))
 }
 
 
@@ -194,10 +202,11 @@ get_z_probs = function(x) {
 #'
 
 get_ISs = function(x, highlight=c()) {
-  if (purrr::is_empty(highlight))
-    highlight = get_unique_labels(x)
+  highlight = get_highlight(x, highlight=highlight)
+  # if (purrr::is_empty(highlight))
+  #   highlight = get_unique_labels(x)
 
-  return(sapply(highlight, get_ISs_single_cluster, x=x))
+  return( sapply(highlight, get_ISs_single_cluster, x=x) )
 }
 
 
@@ -226,25 +235,18 @@ get_ISs_single_cluster = function(x, cluster) {
 #'
 #' @export get_labels
 
-get_labels = function(x, initial_lab=F) {
+get_labels = function(x) {
   py_model = get_model(x)
-  if (!initial_lab) {
-    tryCatch(
-      expr = {
-        clusters_sort = get_unique_labels(py_model)
-        labels = factor(paste("C", py_model$params$clusters$detach()$numpy(), sep=""), levels=clusters_sort)
-        return(labels) },
-      error = function(e) return(list()) ) }
+  tryCatch(
+    expr = {
+      clusters_sort = get_unique_labels(py_model)
+      labels = factor(paste("C", py_model$params$clusters$detach()$numpy(), sep=""), levels=clusters_sort)
+      return(labels) },
+    error = function(e) return(list()) )
 
-  else {
-    tryCatch(
-      expr = {
-        clusters_sort = get_unique_labels(py_model)
-        labels = factor(paste("C", py_model$init_params$clusters$detach()$numpy(), sep=""), levels=clusters_sort)
-        return(labels) },
-      error = function(e) return(list()) ) }
-
-  try(expr = { labs = x$params$labels; if (!purrr::is_empty(labs)) return(labs) }, silent = T)
+  check_params(x)
+  if ("labels" %in% names(x$params)) return(x$params$labels) else
+    return(cli::format_warning("No labels assignments stored in the object."))
 }
 
 
@@ -288,12 +290,12 @@ get_unique_labels = function(x) {
 #'
 #' @export get_unique_muts_labels
 
-get_unique_muts_labels = function(x, clusters=c(), label="") {
-  if (purrr::is_empty(clusters))
-    return(get_all_unique_muts_labels(x, label=label))
+get_unique_muts_labels = function(x, clusters=c()) {
+  if (purrr::is_empty(clusters)) return(get_all_unique_muts_labels(x))
+
   return(
     x %>%
-      get_vaf_dataframe(label=label) %>%
+      get_vaf_dataframe() %>%
       dplyr::filter(labels %in% clusters) %>%
       dplyr::pull(labels_mut) %>%
       unique()
@@ -301,12 +303,31 @@ get_unique_muts_labels = function(x, clusters=c(), label="") {
 }
 
 
-get_all_unique_muts_labels = function(x, label="") {
-  labels = x %>%
-    get_vaf_dataframe(label=label) %>%
-    tidyr::drop_na() %>%
-    dplyr::pull(labels_mut) %>%
-    unique()
-  return(labels)
+get_all_unique_muts_labels = function(x) {
+  return(
+    x %>%
+      get_vaf_dataframe() %>%
+      tidyr::drop_na() %>%
+      dplyr::pull(labels_mut) %>%
+      unique()
+    )
+}
+
+
+#' Get infered growth rates dataframe.
+#'
+#' @param x
+#'
+#' @return
+#' @export
+#'
+
+get_growth_rates = function(x) {
+  if ("growth.rates" %in% names(x)) return(x$growth.rates) else return(data.frame())
+}
+
+
+check_params = function(x) {
+  if (!"params" %in% names(x)) return(cli::format_warning("No params stored in the object."))
 }
 

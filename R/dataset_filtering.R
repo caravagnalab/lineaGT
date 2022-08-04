@@ -29,14 +29,13 @@ filter_dataset = function(cov.df,
     dplyr::filter(any(coverage>=min_cov)) %>%
     dplyr::ungroup()
 
-  if (min_frac == 0)
-    return(cov.df)
+  if (min_frac == 0) return(cov.df)
 
   max_k = cov.df %>% check_max_k()
   k_interval = check_k_interval(k_interval, max_k)
 
   py_pkg = reticulate::import("pylineaGT")
-  x = initialize_object(K=as.integer(1), cov.df=cov.df, py_pkg)
+  x = suppressMessages(initialize_object(K=as.integer(1), cov.df=cov.df, py_pkg=py_pkg))
   x$py_model$filter_dataset(min_cov=as.integer(0),
                             min_ccf=as.numeric(min_frac),
                             metric=metric,

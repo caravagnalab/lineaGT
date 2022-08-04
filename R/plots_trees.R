@@ -5,7 +5,6 @@
 #' @param show_best add
 #' @param min_frac add
 #' @param highlight add
-#' @param label add
 #'
 #' @return
 #'
@@ -14,10 +13,11 @@
 #'
 #' @export plot_phylogeny
 
-plot_phylogeny = function(x, score_diff=1, show_best=1, min_frac=0, highlight=c(), label="") {
+plot_phylogeny = function(x, score_diff=1, show_best=1, min_frac=0, highlight=c()) {
+
   clusters_joined = get_highlight(x, min_frac, highlight)
 
-  trees = get_trees(x, label)
+  trees = get_trees(x)
   tree_plots = list()
   for (cluster in clusters_joined) {
     if (!purrr::is_empty(trees[[cluster]])) {

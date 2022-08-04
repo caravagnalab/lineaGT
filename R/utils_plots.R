@@ -29,24 +29,24 @@ split_to_camelcase = function(txt) {
 }
 
 
-get_colors = function(x=NULL, list_lab=list(), color_palette=list(), label="") {
+get_colors = function(x=NULL, list_lab=list(), color_palette=list()) {
   if (purrr::is_empty(list_lab)) {
     N = x$K
-    colss = Polychrome::createPalette(N, c("#856de3", "#9e461c"), target="normal", range=c(15, 80), M=1000)
-    colss = colss[1:N]
-    try({ names(colss) = x$params$labels %>% levels() }, silent=T) }
-  else {
-    # means we want colors for the subclones
-    colss = c()
-    for (cl in color_palette %>% names) {
-      mut_cl = get_unique_muts_labels(x, clusters=c(cl), label=label)
-      if (!purrr::is_empty(mut_cl)) {
-        n_cols = mut_cl %>% length() + 1
-        new_cols = Polychrome::createPalette(n_cols, c(color_palette[cl]),
-                                             target="normal", range=c(15, 80), M=1000)[2:n_cols]
-        names(new_cols) = mut_cl
-        colss = c(colss, new_cols)
-      }
+    colss = Polychrome::createPalette(N, c("#856de3","#9e461c"), target="normal", range=c(15,80), M=1000)[1:N]
+    try(setNames(colsss, nm=get_unique_labels(x)), silent=T)
+    return(colss)
+    }
+
+  # means we want colors for the subclones
+  colss = c()
+  for (cl in names(color_palette)) {
+    mut_cl = get_unique_muts_labels(x, clusters=cl)
+    if (!purrr::is_empty(mut_cl)) {
+      n_cols = length(mut_cl) + 1
+      new_cols = Polychrome::createPalette(n_cols, c(color_palette[cl]),
+                                           target="normal", range=c(15, 80), M=1000)[2:n_cols] %>%
+        setNames(nm=mut_cl)
+      colss = c(colss, new_cols)
     }
   }
   return(colss)
@@ -66,47 +66,35 @@ highlight_palette = function(x, highlight=c(), label="") {
 
 
 map_timepoints_int = function(x, timepoints_to_int=list()) {
-  if (!purrr::is_empty(timepoints_to_int)) return(timepoints_to_int)
+  if (!purrr::is_empty(timepoints_to_int)) return(timepoints_to_int %>% unlist())
 
-  if (!purrr::is_empty(x %>% get_tp_to_int())) return(x %>% get_tp_to_int())
+  suppressMessages( expr = { if (!purrr::is_empty(x %>% get_tp_to_int())) return(x %>% get_tp_to_int()) } )
 
   tp = x %>% get_timepoints()
   names(tp) = as.character(tp)
 
   # if is numeric or integer
-  if (is.numeric(tp)) {
-    tp = tp %>% sort() %>% as.list()
-    x$tp_to_int = tp
-    return(tp)
-  }
-  else {
-    tryCatch(expr =
-               {
-                 tp = as.numeric(tp) %>% sort() %>% as.list()
-                 names(tp) = as.character(tp)
-                 x$tp_to_int = tp
-                 return(tp)
-               },
-             warning = function(w) {} )
+  if (is.numeric(tp)) return( tp %>% sort() ) else
+    {  # check if they are convertible to numeric
+      tryCatch(expr = { return( as.numeric(tp) %>% sort() %>% setNames( as.character(tp) ) ) },
+               warning = function(w) {} )
+    }
+
+  if ( is.factor(tp) ) {
+    cli::cli_alert_warning("The provided timepoints are Factors.
+                            They will be converted to integer, with time unit of 50.")
+    tp.int = seq(from=50, to=50*length(tp), length.out=length(tp)) %>%
+      setNames( nm=levels(tp) )
+    return( tp.int )
   }
 
-  if (is.factor(tp)) {
-    names(tp) = tp %>% levels()
-    cli::cli_warn("The provided timepoints are Factors.
-                  They will be converted to integer, with time unit of 50.")
-    tp = seq(from=50, to=50*length(tp), length.out=length(tp)) %>% as.list()
-    x$tp_to_int = tp
-    return(tp)
-  }
-
-  if (is.character(tp)) {
-    cli::cli_warn("The provided timepoints are character.
-                  If you want to provide a temporal order, insert them as numeric or factors.
-                  They will be converted to integer, with time unit of 50.")
-    tp = seq(from=50, to=50*length(tp), length.out=length(tp)) %>% as.list()
-    names(tp) = x %>% get_timepoints()
-    x$tp_to_int = tp
-    return(tp)
+  if (is.character( tp )) {
+    cli::cli_alert_warning("The provided timepoints are characters.
+                            If you want to provide a temporal order, insert them as numeric or factors.
+                            They will be converted to integer, with time unit of 50.")
+    tp.int = seq(from=50, to=50*length(tp), length.out=length(tp)) %>%
+      setNames( nm=tp )
+    return( tp.int )
   }
 }
 

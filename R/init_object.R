@@ -1,20 +1,19 @@
-get_object = function(py_model, timepoints=list(), lineages=list()) {
+get_object = function(py_model, timepoints=list(), lineages=list(), timepoints_to_int=list()) {
   x = list()
   x$cov.dataframe = get_python_dataframe(py_model)
   x$params = get_python_params(py_model)
 
   x$K = py_model$params$K
-  x$N = py_model$params$N
-  x$`T` = py_model$params$`T`
+  x$data.shape = c(py_model$params$N, py_model$params$`T`)
 
   x$dimensions = py_model$dimensions
   x$timepoints = timepoints
-  x$tp_to_int = map_timepoints_int(x)
+  x$tp.to.int = map_timepoints_int(x, timepoints_to_int=timepoints_to_int)
   x$lineages = lineages
 
   x$py_model = py_model
 
-  x$color_palette = get_colors(x=x)
+  x$color.palette = get_colors(x=x)
 
   class(x) = "mvnmm"
 
@@ -33,17 +32,13 @@ get_python_dataframe = function(py_model) {
     try(expr = {
       labels = get_labels(py_model)
       dataset$labels = labels }, silent = T)
-
-    try(expr = {
-      labels_init = get_labels(py_model, initial_lab=T)
-      dataset$labels_init = labels_init }, silent = T)
   }, silent = T)
 
   return(dataset %>% wide_to_long_cov())
 }
 
 
-get_python_params = function(py_model, train=FALSE) {
+get_python_params = function(py_model) {
   params = list()
   params$mean = get_mean(py_model)
   params$weights = get_weights(py_model)
@@ -66,7 +61,7 @@ get_hyperpar = function(py_model) {
   return(hp %>%
            tibble::as_tibble() %>%
            t %>% as.data.frame() %>%
-           rownames_to_column(var="hyperparameter") %>%
+           tibble::rownames_to_column(var="hyperparameter") %>%
            dplyr::rename(value="V1")
          )
 }
@@ -74,10 +69,8 @@ get_hyperpar = function(py_model) {
 
 update_params = function(x) {
   x$params = get_params(py_model=x$py_model)
-  # x$params_train = get_params(py_model=x$py_model, train=T)
   x$K = x$py_model$params$K
-  x$N = x$py_model$params$N
-  x$`T` = x$py_model$params$`T`
+  x$data.shape = c(x$py_model$params$N, x$py_model$params$`T`)
   return(x)
 }
 

@@ -90,23 +90,25 @@ fit = function(cov.df,
   max_k = cov.df %>% check_max_k()
   k_interval = check_k_interval(k_interval, max_k)
 
+  cli::cli_process_start("Starting lineaGT model selection to retrieve the optimal number of clones")
   out = py_pkg$run$run_inference(cov_df=cov.df %>% long_to_wide_cov(),
-                                 lineages=cov.df$lineage %>% unique(),
-                                 k_interval=list(as.integer(k_interval[1]), as.integer(k_interval[2])),
-                                 n_runs=as.integer(n_runs),
-                                 steps=as.integer(steps),
-                                 lr=as.numeric(lr),
-                                 p=as.numeric(p),
-                                 convergence=convergence,
-                                 covariance=covariance,
-                                 hyperparameters=reticulate::py_dict(keys=names(hyperparameters),
-                                                                     values=as.numeric(hyperparameters)),
-                                 show_progr=show_progr,
-                                 store_grads=store_grads,
-                                 store_losses=store_losses,
-                                 store_params=store_params,
-                                 initializ=initializ,
-                                 seed=as.integer(seed))
+                             lineages=cov.df$lineage %>% unique(),
+                             k_interval=list(as.integer(k_interval[1]), as.integer(k_interval[2])),
+                             n_runs=as.integer(n_runs),
+                             steps=as.integer(steps),
+                             lr=as.numeric(lr),
+                             p=as.numeric(p),
+                             convergence=convergence,
+                             covariance=covariance,
+                             hyperparameters=reticulate::py_dict(keys=names(hyperparameters),
+                                                                 values=as.numeric(hyperparameters)),
+                             show_progr=show_progr,
+                             store_grads=store_grads,
+                             store_losses=store_losses,
+                             store_params=store_params,
+                             initializ=initializ,
+                             seed=as.integer(seed))
+  cli::cli_process_done()
 
   selection = list("ic"=out[[1]], "losses"=out[[2]], "grads"=out[[3]], "params"=out[[4]]) %>%
     get_selection_df()
@@ -115,22 +117,33 @@ fit = function(cov.df,
   best_init_seed = get_best_k(selection, method="BIC")$init_seed
   best_seed = get_best_k(selection, method="BIC")$seed
 
-  x = fit_singleK(best_k, cov.df, steps=steps, lr=lr, py_pkg=py_pkg,
-                  store_params=store_params, hyperparameters=hyperparameters,
-                  covariance=covariance, initializ=FALSE, seed=best_seed)
+  cli::cli_process_start("Fitting model to cluster ISs")
+  x = fit_singleK(best_k,
+                  cov.df,
+                  steps=steps,
+                  lr=lr,
+                  py_pkg=py_pkg,
+                  store_params=store_params,
+                  hyperparameters=hyperparameters,
+                  covariance=covariance,
+                  initializ=FALSE,
+                  seed=best_seed,
+                  timepoints_to_int=timepoints_to_int)
+  cli::cli_process_done(msg_done=paste0("Found ", x$K, " clones of ISs!"))
 
   x$runs = selection
-  x$tp_to_int = timepoints_to_int
 
-  if (!is.null(vaf.df)) x = fit_mutations(x, vaf.df, infer_phylo=infer_phylogenies, min_frac=min_frac, max_IS=max_IS)
+  if (!is.null(vaf.df)) {
+    cli::cli_process_start("Fitting model to cluster mutations")
+    x = fit_mutations(x, vaf.df, infer_phylo=infer_phylogenies, min_frac=min_frac, max_IS=max_IS)
+    cli::cli_process_done()
+  }
 
-  try(
-    expr = {
-      if (infer_growth)
-        x = fit_growth_rates(x, steps=steps, timepoints_to_int=timepoints_to_int)
-    },
-    silent = T
-  )
+  if (infer_growth) {
+    cli::cli_process_start("Fitting model to estimate population growth rates")
+    x = fit_growth_rates(x, steps=steps, timepoints_to_int=timepoints_to_int, py_pkg=py_pkg)
+    cli::cli_process_done()
+  }
 
   x$sample_id = sample_id
 

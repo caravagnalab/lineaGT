@@ -2,7 +2,7 @@ get_selection_df = function(selection) {
   runs = list()
 
   runs$IC = get_IC(selection)
-  runs$losses = get_losses(runs=selection, train=T)
+  runs$losses = get_losses(selection=selection, train=T)
   runs$grads = get_gradient_norms(selection)
   runs$params = get_params_train(selection$params)
 
@@ -77,16 +77,6 @@ get_params_train = function(params) {
 }
 
 
-# compute_IC = function(py_model) {
-#   IC = list()
-#   IC$BIC = py_model$compute_ic(method="BIC")$numpy()
-#   IC$AIC = py_model$compute_ic(method="AIC")$numpy()
-#   IC$ICL = py_model$compute_ic(method="ICL")$numpy()
-#   IC$NLL = py_model$nll$numpy()
-#   return(IC)
-# }
-
-
 load_losses = function(py_model) {
   return(py_model$losses_grad_train$losses)
 }
@@ -101,3 +91,11 @@ load_params_gradients = function(py_model) {
 }
 
 
+compute_IC = function(py_model) {
+  IC = list()
+  IC$BIC = py_model$compute_ic(method="BIC")$numpy()
+  IC$AIC = py_model$compute_ic(method="AIC")$numpy()
+  IC$ICL = py_model$compute_ic(method="ICL")$numpy()
+  IC$NLL = py_model$nll$numpy()
+  return(IC)
+}
