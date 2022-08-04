@@ -4,7 +4,7 @@
 \alias{get_vaf_dataframe}
 \title{Retrieve the mutations dataframe.}
 \usage{
-get_vaf_dataframe(x, label = "")
+get_vaf_dataframe(x)
 }
 \arguments{
 \item{x}{a mvnmm object.}

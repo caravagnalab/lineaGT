@@ -4,7 +4,7 @@
 \alias{get_labels}
 \title{Extract the observations labels.}
 \usage{
-get_labels(x, initial_lab = F)
+get_labels(x)
 }
 \arguments{
 \item{x}{a mvnmm object.}

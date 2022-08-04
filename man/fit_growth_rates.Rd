@@ -7,24 +7,29 @@
 fit_growth_rates(
   x,
   steps = 500,
-  highlight = list(),
-  timepoints_to_int = list(),
-  growth = "",
-  force = T
+  highlight = c(),
+  timepoints_to_int = c(),
+  growth_model = "",
+  force = T,
+  tree_score = 1
 )
 }
 \arguments{
 \item{x}{a mvnmm object.}
 
-\item{steps}{add}
+\item{steps}{maximum number of steps for inference.}
 
-\item{highlight}{add}
+\item{highlight}{set of clusters to run the inference for.
+If not specified, it will be run on all the clusters.}
 
-\item{timepoints_to_int}{add}
+\item{timepoints_to_int}{if the provided timepoints are not integers nor a timepoints-to-int list is
+stored in \code{x}, a list mapping their values to integers is required.}
 
-\item{growth}{add}
+\item{growth_model}{string specifying the type of growth model to use, between \code{exp} and \code{log}
+corresponding to exponential and logistic models, respectively.}
 
-\item{force}{add}
+\item{force}{if the model has already been fitted, setting \code{force} to \code{FALSE} will keep the
+computed rates. Setting \code{force} to \code{TRUE} will fit the model again for the specified clusters.}
 }
 \value{
 

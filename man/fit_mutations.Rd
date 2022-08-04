@@ -10,27 +10,21 @@ fit_mutations(
   infer_phylo = TRUE,
   min_frac = 0,
   max_IS = NULL,
-  highlight = list(),
-  lineages = c(),
-  label = ""
+  highlight = list()
 )
 }
 \arguments{
 \item{x}{a mvnmm object.}
 
-\item{vaf.df}{add}
+\item{vaf.df}{dataframe with mutations data.}
 
-\item{infer_phylo}{add}
+\item{infer_phylo}{a Boolean indicating whether to infer also the phylogenetic evolution per cluster of ISs.}
 
 \item{min_frac}{add}
 
 \item{max_IS}{add}
 
 \item{highlight}{add}
-
-\item{lineages}{add}
-
-\item{label}{add}
 }
 \value{
 

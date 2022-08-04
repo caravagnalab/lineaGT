@@ -9,10 +9,7 @@ fit_phylogenies(
   vaf.df = NULL,
   min_frac = 0,
   highlight = list(),
-  do_filter = FALSE,
-  label = "",
-  fit_muts = FALSE,
-  lineages = c()
+  fit_muts = FALSE
 )
 }
 \arguments{
@@ -28,9 +25,9 @@ fit_phylogenies(
 
 \item{label}{add}
 
-\item{lineages}{add}
-
 \item{fit_viber}{add}
+
+\item{lineages}{add}
 }
 \value{
 

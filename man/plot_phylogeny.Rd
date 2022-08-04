@@ -4,14 +4,7 @@
 \alias{plot_phylogeny}
 \title{Clonal evolution trees}
 \usage{
-plot_phylogeny(
-  x,
-  score_diff = 1,
-  show_best = 1,
-  min_frac = 0,
-  highlight = c(),
-  label = ""
-)
+plot_phylogeny(x, score_diff = 1, show_best = 1, min_frac = 0, highlight = c())
 }
 \arguments{
 \item{x}{add}
@@ -23,8 +16,6 @@ plot_phylogeny(
 \item{min_frac}{add}
 
 \item{highlight}{add}
-
-\item{label}{add}
 }
 \value{
 
