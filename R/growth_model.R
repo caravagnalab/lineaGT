@@ -24,7 +24,8 @@ fit_growth_rates = function(x,
                             timepoints_to_int=c(),
                             growth_model="",
                             force=T,
-                            tree_score=1) {
+                            tree_score=1,
+                            py_pkg=NULL) {
 
   highlight = get_highlight(x, highlight=highlight, mutations=F)
   timepoints_to_int = map_timepoints_int(x, timepoints_to_int)
@@ -32,14 +33,15 @@ fit_growth_rates = function(x,
   if (have_muts_fit(x)) mutations = T else mutations = F
 
   pop_df = x %>%
-    get_muller_pop(mutations=mutations, timepoints_to_int=timepoints_to_int, tree_score=tree_score)
+    get_muller_pop(mutations=mutations, timepoints_to_int=timepoints_to_int,
+                   tree_score=tree_score)
 
-  rates.df = x %>% get_growth_rates()
-  if (have_growth_rates(x)) evaluated = rates.df$Identity %>% unique() else evaluated = list()
+  rates.df = data.frame()
+  evaluated = list()
 
   # if force is TRUE, then all the clusters are fitted again
-  if (force & have_growth_rates(x)) {
-    rates.df = rates.df %>% filter(!Identity %in% highlight)
+  if (!force & have_growth_rates(x)) {
+    rates.df = x %>% get_growth_rates() %>% dplyr::filter(!Identity %in% highlight)
     evaluated = rates.df$Identity %>% unique()
   }
 
@@ -50,10 +52,11 @@ fit_growth_rates = function(x,
 
       # filter the dataset
       pop_df.cl = pop_df %>%
-        dplyr::filter(grepl(paste(cluster,".",sep=""), Identity) | Identity == cluster) %>%
-        dplyr::select(-starts_with("lm"))
+        dplyr::filter(grepl(paste(cluster,".",sep=""), Identity) | Identity == cluster)
+
       # get the identity-parents dataframe of clone "cluster"
-      parents = get_parents(x, highlight=cluster)
+      # parents = get_parents(x, highlight=cluster, tree_score=tree_score)
+      parents = get_muller_edges(x, mutations=mutations, tree_score=tree_score, highlight=cluster)
 
       # first in the clonal cluster of ISs
       rates.df = rates.df %>%
@@ -63,27 +66,30 @@ fit_growth_rates = function(x,
                                    growth=growth_model,
                                    steps=steps,
                                    clonal=TRUE,
-                                   timepoints_to_int=timepoints_to_int)
+                                   timepoints_to_int=timepoints_to_int,
+                                   py_pkg=py_pkg)
 
       # fit the growth rate in all the parents
       rates.df = rates.df %>%
         fit_growth_multiple_clones(clusters=parents$Parent %>% unique(),
-                                   pop_df=pop_df,
+                                   pop_df=pop_df.cl,
                                    parents=parents,
                                    growth=growth_model,
                                    steps=steps,
                                    clonal=F,
-                                   timepoints_to_int=timepoints_to_int)
+                                   timepoints_to_int=timepoints_to_int,
+                                   py_pkg=py_pkg)
 
       # then in all the children
       rates.df = rates.df %>%
         fit_growth_multiple_clones(clusters=parents$Identity %>% unique(),
-                                   pop_df=pop_df,
+                                   pop_df=pop_df.cl,
                                    parents=parents,
                                    growth=growth_model,
                                    steps=steps,
                                    clonal=F,
-                                   timepoints_to_int=timepoints_to_int)
+                                   timepoints_to_int=timepoints_to_int,
+                                   py_pkg=py_pkg)
 
       cli::cli_process_done()
 
@@ -98,27 +104,6 @@ fit_growth_rates = function(x,
 }
 
 
-sort_clusters_edges = function(clusters, parents) {
-  # clusters is a list of clusters
-  # parents is the edges tibble
-  nn = c(parents$Parent, parents$Identity) %>% unique() %>% length()
-  nodes = c(parents$Parent, parents$Identity) %>% unique()
-
-  root = setdiff(parents$Parent, parents$Identity)
-  node.name = parents %>% dplyr::filter(Parent==root) %>% dplyr::pull(Identity)
-  cls.sort = c(root)
-
-  for (i in 1:nn) {
-    if (node.name %in% clusters) cls.sort = c(cls.sort, node.name)
-    node.name = parents %>% dplyr::filter(Identity==node.name) %>% dplyr::pull(Identity)
-  }
-
-  return(
-    intersect(cls.sort, clusters) %>% unique()
-  )
-}
-
-
 fit_growth_multiple_clones = function(rates.df,
                                       clusters,
                                       pop_df,
@@ -126,7 +111,8 @@ fit_growth_multiple_clones = function(rates.df,
                                       growth,
                                       steps,
                                       clonal,
-                                      timepoints_to_int) {
+                                      timepoints_to_int,
+                                      py_pkg=NULL) {
 
   if (!clonal & nrow(parents)==0) return(rates.df)
 
@@ -135,7 +121,7 @@ fit_growth_multiple_clones = function(rates.df,
 
   for (subcl in clusters) {
 
-    if (!subcl %in% (rates.df$Identity) && (subcl %in% pop_df$Identity)) {
+    if (!subcl %in% (rates.df$Identity) && (subcl %in% pop_df$Identity) && (subcl != "P")) {
       if (purrr::is_empty(rates.df))
         rates.df = fit_growth_single_clone(pop_df=pop_df,
                                            cluster=subcl,
@@ -143,7 +129,8 @@ fit_growth_multiple_clones = function(rates.df,
                                            p.rates=get_parent_rate(parents, rates.df, subcl),
                                            clonal=clonal,
                                            growth=growth,
-                                           steps=steps)
+                                           steps=steps,
+                                           py_pkg=py_pkg)
       else rates.df = rates.df %>%
           dplyr::add_row(
             fit_growth_single_clone(pop_df=pop_df,
@@ -152,7 +139,8 @@ fit_growth_multiple_clones = function(rates.df,
                                     p.rates=get_parent_rate(parents, rates.df, subcl),
                                     clonal=clonal,
                                     growth=growth,
-                                    steps=steps)
+                                    steps=steps,
+                                    py_pkg=py_pkg)
           )
     }
   }
@@ -223,90 +211,4 @@ fit_growth_single_clone = function(pop_df,
       dplyr::mutate(best_model=best[Lineage])
   )
 }
-
-
-get_parent_rate = function(parents, rates.df, cluster) {
-  if (!cluster %in% parents$Identity) return(list("exp"=NULL, "log"=NULL))
-
-  par = parents %>% filter(Identity==cluster) %>% dplyr::pull(Parent)  ## parent of subcl
-  par.rates = rates.df %>%
-    filter(Identity==par) %>%
-    dplyr::select(dplyr::contains("rate.exp"), dplyr::contains("rate.log"), -dplyr::contains("p_rate")) %>%
-    as.list()
-
-  if (NA %in% unlist(par.rates)) return(list("exp"=NULL, "log"=NULL))
-
-  return(par.rates)
-}
-
-
-get_growth_params = function(timepoints_to_int,
-                             lineages,
-                             cluster,
-                             rates.exp=NULL,
-                             rates.log=NULL) {
-  if (!is.null(rates.exp)) params.exp = get_growth_rates_exp(rates.exp, lineages, cluster)
-  if (!is.null(rates.log)) params.log = get_growth_rates_log(rates.log, lineages, cluster)
-
-  if (is.null(rates.exp)) return(params.log)
-  if (is.null(rates.log)) return(params.exp)
-  return( dplyr::inner_join(params.exp, params.log, by=c("Lineage", "Identity")) )
-}
-
-
-get_growth_rates_exp = function(rates.df, lineages, cluster) {
-  return(
-    data.frame() %>%
-
-      # initialize the columns
-      tibble::add_column("fitness.exp"=NA,
-                         "init_t.exp"=NA,
-                         "Lineage"=as.character(NA),
-                         "p_rate.exp"=NA,
-                         "sigma.exp"=NA,
-                         "rate.exp"=as.numeric(NA)) %>%
-
-      # add the values
-      tibble::add_row(Lineage=lineages,
-                      p_rate.exp=rates.df$parent_rate,
-                      fitness.exp=rates.df$fitness,
-                      init_t.exp=rates.df$init_time) %>%
-
-      # compute the rates for subclones
-      dplyr::mutate(rate.exp=replace( rate.exp, !is.na(p_rate.exp), p_rate.exp * (1+fitness.exp) ),
-                    Identity=cluster,
-                    sigma.exp=list( setNames(object=rates.df$sigma, nm=c(0, unlist(timepoints_to_int))) )
-                    ) %>%
-
-      tibble::as_tibble()
-  )
-}
-
-
-get_growth_rates_log = function(rates.df, lineages, cluster) {
-  return(
-    data.frame() %>%
-      tibble::add_column("fitness.log"=NA,
-                         "K.log"=NA,
-                         "init_t.log"=NA,
-                         "Lineage"=as.character(NA),
-                         "p_rate.log"=NA,
-                         "sigma.log"=NA,
-                         "rate.log"=as.numeric(NA)) %>%
-
-      tibble::add_row(fitness.log=rates.df$fitness,
-                      K.log=rates.df$carr_capac,
-                      init_t.log=rates.df$init_time,
-                      Lineage=lineages,
-                      p_rate.log=rates.df$parent_rate) %>%
-
-      dplyr::mutate(rate.log=replace( rate.log, !is.na(p_rate.log), p_rate.log * (1+fitness.log) ),
-                    Identity=cluster,
-                    sigma.log=list( setNames(object=rates.df$sigma, nm=c(0, unlist(timepoints_to_int))) )
-                    ) %>%
-
-      tibble::as_tibble()
-  )
-}
-
 

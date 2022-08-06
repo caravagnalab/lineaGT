@@ -6,7 +6,6 @@
 #' @param highlight a vector of clusters IDs to highlight in the plot.
 #' @param min_frac min_frac numeric value in \code{[0,1]} representing the minimum abundance to highlight a clone.
 #' @param mutations Boolean. If set to \code{TRUE}, the growth will be visualize for each cluster of mutations.
-#' @param label a character corresponding to the label of the run to visualize.
 #' @param timepoints_to_int a list to map each \code{timepoint} value to an integer.
 #' @param fit add
 #'
@@ -18,16 +17,15 @@
 #' @export plot_growth_regression
 
 plot_growth_regression = function(x,
-                        highlight=c(),
-                        min_frac=0,
-                        mutations=F,
-                        label="",
-                        timepoints_to_int=list(),
-                        fit=F) {
+                                  highlight=c(),
+                                  min_frac=0,
+                                  mutations=F,
+                                  timepoints_to_int=list(),
+                                  fit=F) {
 
-  if (purrr::is_empty(timepoints_to_int)) timepoints_to_int = map_timepoints_int(x, timepoints_to_int)
+  timepoints_to_int = map_timepoints_int(x, timepoints_to_int)
   highlight = get_highlight(x, min_frac, highlight, mutations=mutations)
-  color_palette = highlight_palette(x, highlight, label)
+  color_palette = highlight_palette(x, highlight)
 
   if (fit)
     x = fit_growth_rates(x, highlight=highlight, timepoints_to_int=timepoints_to_int, force=fit)
@@ -37,27 +35,16 @@ plot_growth_regression = function(x,
   # keep only the clusters with growth model fitted
   highlight = intersect(highlight, x %>% get_growth_rates() %>% dplyr::pull(Identity))
 
-  pop_df = get_muller_pop(x, mutations=mutations, label=label, timepoints_to_int=timepoints_to_int) %>%
+  pop_df = x %>%
+    get_muller_pop(mutations=mutations, timepoints_to_int=timepoints_to_int) %>%
     filter(Identity %in% highlight)
-  regr.df = get_regression_df(x, highlight=highlight) %>%
-    tidyr::pivot_longer(starts_with("y."), names_to=c("else","type"), names_sep="[.]", values_to="y", names_repair="minimal") %>%
-    dplyr::mutate(sigma=ifelse(type=="log", sigma.log, sigma.exp),
-                  init_t=ifelse(type=="log", init_t.log, init_t.exp),
-                  rate=ifelse(type=="log", rate.log, rate.exp),
-                  K=ifelse(type=="log", K.log, NA)) %>%
-    dplyr::mutate(y.min=ifelse(type=="log",
-                               K / ( 1 + (K-1) * exp( (-rate*(x-init_t)) - sigma ) ),
-                               exp( rate * (x-init_t) - sigma ))) %>%
-    dplyr::mutate(y.max=ifelse(type=="log",
-                               K / ( 1 + (K-1) * exp( (-rate*(x-init_t)) + sigma ) ),
-                               exp( rate * (x-init_t) + sigma ))) %>%
-    dplyr::select(-"else",-dplyr::ends_with("exp"),-dplyr::ends_with("log")) %>%
-    dplyr::mutate(type=ifelse(type=="log", "Logistic", "Exponential"))
 
+  regr.df = get_regression_df(x, pop_df=pop_df, highlight=highlight)
 
   color_palette = c("firebrick","steelblue"); names(color_palette) = c("Exponential","Logistic")
   color_palette = c(color_palette, x$color_palette)
-  p = pop_df %>%
+  return(
+    pop_df %>%
     ggplot() +
     geom_point(aes(x=Generation, y=Population), alpha=.5, size=.7) +
     geom_line(data=regr.df, aes(x=x, y=y, color=type), size=.6, alpha=.8) +
@@ -65,11 +52,45 @@ plot_growth_regression = function(x,
     geom_errorbar(data=regr.df, aes(x=x, y=y, ymin=y.min, ymax=y.max, color=type), width=.5, position=position_dodge(width=0.5)) +
     facet_grid(rows=vars(Identity), cols=vars(Lineage), scales="free_y") +
     scale_color_manual(values=color_palette, breaks=c("Exponential","Logistic")) +
-    labs(color="") +
-    my_ggplot_theme()
-
+    labs(color="") + my_ggplot_theme()
+  )
   return(p)
 }
+
+
+# function to construct a regression dataframe per clone/lineage
+get_regression_df = function(x, pop_df, highlight) {
+  rates = x %>% get_growth_rates() %>%
+    dplyr::filter(Identity %in% highlight)
+  tmax = max(pop_df$Generation)
+  tmin = 0
+
+  n_lins = rates$Lineage %>% unique() %>% length()
+  n_cls = length(highlight)
+
+  regr_df = rates %>%
+    dplyr::select(-dplyr::starts_with("p_rate"), -dplyr::starts_with("fitness")) %>%
+    dplyr::mutate(x=list(tmin:tmax)) %>%
+    tidyr::unnest(x) %>%
+    dplyr::mutate(sigma.exp=unlist(sigma.exp)[as.character(x)],
+                  sigma.log=unlist(sigma.log)[as.character(x)]) %>%
+    dplyr::arrange(x, Identity) %>%
+    # dplyr::select(-dplyr::starts_with("rate"), -dplyr::starts_with("K")) %>%
+
+    tidyr::pivot_longer(starts_with("rate."), names_to=c("else","type"), names_sep="[.]",
+                        values_to="rate", names_repair="minimal") %>%
+
+    dplyr::mutate(init_t=ifelse(type=="log", init_t.log, init_t.exp),
+                  args=ifelse(type=="log", -rate*(x-init_t), rate*(x-init_t) ),
+                  y=ifelse(type=="log", K.log/( 1+(K.log-1)*exp(args) ), exp(args)),
+                  y.min=ifelse(type=="log", K.log/( 1+(K.log-1)*exp(args-sigma.log) ), exp(args-sigma.exp)),
+                  y.max=ifelse(type=="log", K.log/( 1+(K.log-1)*exp(args+sigma.log) ), exp(args+sigma.exp)) ) %>%
+    dplyr::select(Lineage, Identity, init_t, type, x, y, y.min, y.max) %>%
+    dplyr::mutate(type=ifelse(type=="log", "Logistic", "Exponential"))
+
+  return(regr_df)
+}
+
 
 
 #' Visualize the infered growth rates.
@@ -80,7 +101,6 @@ plot_growth_regression = function(x,
 #' @param highlight a vector of clusters IDs to highlight in the plot.
 #' @param min_frac min_frac numeric value in \code{[0,1]} representing the minimum abundance to highlight a clone.
 #' @param mutations Boolean. If set to \code{TRUE}, the growth will be visualize for each cluster of mutations.
-#' @param label a character corresponding to the label of the run to visualize.
 #' @param timepoints_to_int a list to map each \code{timepoint} value to an integer.
 #' @param fit add
 #'
@@ -95,7 +115,6 @@ plot_growth_rates = function(x,
                          highlight=c(),
                          min_frac=0,
                          mutations=F,
-                         label="",
                          timepoints_to_int=list(),
                          fit=F) {
 
@@ -128,41 +147,4 @@ plot_growth_rates = function(x,
     xlab("Clusters") + ylab("Growth rate") + labs(color="")
 
   return(p)
-}
-
-
-
-
-# function to construct a regression dataframe per clone/lineage
-get_regression_df = function(x, highlight) {
-  pop_df = x %>% get_muller_pop(mutations=TRUE, exp_coef=F, timepoints_to_int=get_tp_to_int(x)) %>%
-    filter(Identity %in% highlight)
-
-  rates = x %>% get_growth_rates() %>%
-    dplyr::filter(Identity %in% highlight) %>%
-    dplyr::select(dplyr::contains("rate"),
-                  dplyr::contains("K.log"),
-                  dplyr::contains("init_t"),
-                  dplyr::contains("sigma"),
-                  "Lineage", "Identity")
-
-  tmax = max(pop_df$Generation)
-  tmin = 0
-
-  n_lins = rates$Lineage %>% unique() %>% length()
-  n_cls = length(highlight)
-
-  regr_df = data.frame(x=rep( tmin:tmax, times=n_lins*n_cls ),
-                       Lineage=rep( rates$Lineage %>% unique(), each=(tmax-tmin+1)*n_cls ),
-                       Identity=rep( rates$Identity %>% unique(), times=(tmax-tmin+1)*n_lins) ) %>%
-    dplyr::inner_join(rates, by=c("Lineage", "Identity")) %>%
-    dplyr::mutate(y.exp=exp( rate.exp * (x-init_t.exp) ),
-                  y.log=K.log / ( 1 + (K.log-1) * exp( -rate.log*(x-init_t.log) ) )) %>%
-    dplyr::select(-dplyr::contains("p_rate")) %>%
-    tibble::as_tibble() %>%
-    dplyr::arrange(x, Identity) %>%
-    dplyr::mutate(sigma.exp=unlist(sigma.exp)[as.character(x)], sigma.log=unlist(sigma.log)[as.character(x)])
-
-
-  return(regr_df)
 }
