@@ -13,7 +13,6 @@
 #' @param single_clone Boolean. If \code{mutations} and \code{single_clone} are set to \code{TRUE}, only the clones
 #' reported in \code{highlight} and the respective subclones will be visualised.
 #' @param tree_score add
-#' @param label a character corresponding to the label of the run to visualize.#' @param legend.pos position of the legend. If set to \code{"none"}, the legend is not shown.
 #' @param legend.pos add
 #' @param wrap Boolean. If set to \code{TRUE}, a single plot with the mullerplots for each lineage will be returned.
 #'
@@ -30,23 +29,23 @@ plot_mullerplot = function(x,
                            which="frac",
                            highlight=c(),
                            min_frac=0,
-                           timepoints_to_int=list(),
+                           timepoints_to_int=c(),
                            mutations=F,
                            single_clone=T,
                            tree_score=1,
-                           label="",
                            legend.pos="right",
                            wrap=T) {
 
   timepoints_to_int = map_timepoints_int(x, timepoints_to_int)
 
   highlight.cov = get_highlight(x, min_frac=min_frac, highlight=highlight)
-  highlight = get_highlight(x, min_frac, highlight.cov, mutations=mutations, label=label)
-  color_palette = highlight_palette(x, highlight, label)
+  highlight = get_highlight(x, min_frac, highlight.cov, mutations=mutations)
+  color_palette = highlight_palette(x, highlight)
 
-  pop_df = get_muller_pop(x, mutations=mutations, timepoints_to_int=timepoints_to_int, label=label)
-  edges_df = get_muller_edges(x, mutations=mutations, label=label,
-                              tree_score=tree_score, highlight=highlight.cov)
+  pop_df = get_muller_pop(x, mutations=mutations, timepoints_to_int=timepoints_to_int)#, highlight=highlight.cov)
+  edges_df = get_muller_edges(x,
+                              mutations=mutations,
+                              tree_score=tree_score)#, highlight=highlight.cov)
 
   if (single_clone && mutations) {
     pop_df = pop_df %>% filter_muller_df(highlight=highlight.cov)
@@ -60,7 +59,7 @@ plot_mullerplot = function(x,
   for (ll in lineages) {
     tp = timepoints[grep(pattern=ll, x=timepoints)]
     if (length(tp) != 0) {
-      pop_ll = pop_df %>% filter(Lineage==ll)
+      pop_ll = pop_df %>% dplyr::filter(Lineage==ll)
       mullerdf_ll = ggmuller::get_Muller_df(edges_df, pop_ll) %>%
         dplyr::mutate(Lineage=ll)
 
@@ -117,3 +116,4 @@ mullerplot_util = function(mullerdf, which, color_palette, highlight, legend.pos
   )
 
 }
+
