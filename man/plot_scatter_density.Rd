@@ -4,22 +4,16 @@
 \alias{plot_scatter_density}
 \title{2D scatterplot and density}
 \usage{
-plot_scatter_density(
-  x,
-  plot_density = T,
-  facet = FALSE,
-  highlight = c(),
-  params = list()
-)
+plot_scatter_density(x, plot_density = T, highlight = c(), min_frac = 0)
 }
 \arguments{
 \item{x}{a mvnmm object.}
 
 \item{plot_density}{a Boolean. If set to FALSE, the Gaussian density will not be displayed.}
 
-\item{facet}{a Boolean. If set to TRUE, the plot will be faceted on the labels.}
-
 \item{highlight}{a vector of clusters IDs to highlight in the plot.}
+
+\item{facet}{a Boolean. If set to TRUE, the plot will be faceted on the labels.}
 }
 \value{
 a list of plots, one for each timepoints combination.

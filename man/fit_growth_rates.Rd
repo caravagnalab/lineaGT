@@ -11,7 +11,8 @@ fit_growth_rates(
   timepoints_to_int = c(),
   growth_model = "",
   force = T,
-  tree_score = 1
+  tree_score = 1,
+  py_pkg = NULL
 )
 }
 \arguments{

@@ -4,20 +4,16 @@
 \alias{plot_vaf}
 \title{VAF 2D scatterplot}
 \usage{
-plot_vaf(x, min_frac = 0, highlight = c(), wrap = T, label = "")
+plot_vaf(x, min_frac = 0, highlight = c(), wrap = T)
 }
 \arguments{
 \item{x}{a \code{mvnmm} object.}
 
-\item{min_frac}{value in \code{[0,1]} to show only the clusters with a minimum CCF of
-\code{min_frac} in at least one timepoint.}
+\item{min_frac}{value in \code{[0,1]} representing the minimum abundance to show the clusters.}
 
-\item{highlight}{a list of labels ID to show. All the clusters in the list are shown,
-even if the CCF is lower than \code{min_frac}.}
+\item{highlight}{a list of labels ID to show.}
 
 \item{wrap}{a Boolean to wrap the scatterplots of multiple lineages in a unique plot.}
-
-\item{label}{a character corresponding to the label of the fit to visualize, if more than one.}
 }
 \value{
 list of VAF scatterplots.

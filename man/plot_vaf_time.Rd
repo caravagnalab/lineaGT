@@ -4,26 +4,16 @@
 \alias{plot_vaf_time}
 \title{VAF over time}
 \usage{
-plot_vaf_time(
-  x,
-  min_frac = 0,
-  highlight = c(),
-  timepoints_to_int = list(),
-  label = ""
-)
+plot_vaf_time(x, min_frac = 0, highlight = c(), timepoints_to_int = list())
 }
 \arguments{
 \item{x}{a \code{mvnmm} object.}
 
-\item{min_frac}{value in \code{[0,1]} to show only the clusters with a minimum CCF of
-\code{min_frac} in at least one timepoint.}
+\item{min_frac}{value in \code{[0,1]} representing the minimum abundance to show the clusters.}
 
-\item{highlight}{a list of labels ID to show. All the clusters in the list are shown,
-even if the CCF is lower than \code{min_frac}.}
+\item{highlight}{a list of labels ID to show.}
 
 \item{timepoints_to_int}{a list to map each \code{timepoint} value to an integer.}
-
-\item{label}{a character corresponding to the label of the fit to visualize, if more than one.}
 }
 \value{
 a \code{ggplot} object.

@@ -8,7 +8,7 @@ plot_marginal(
   x,
   min_frac = 0,
   highlight = c(),
-  binwidth = 5,
+  binwidth = 10,
   show_dens = T,
   timepoints_to_int = list()
 )

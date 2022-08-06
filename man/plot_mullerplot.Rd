@@ -9,11 +9,10 @@ plot_mullerplot(
   which = "frac",
   highlight = c(),
   min_frac = 0,
-  timepoints_to_int = list(),
+  timepoints_to_int = c(),
   mutations = F,
   single_clone = T,
   tree_score = 1,
-  label = "",
   legend.pos = "right",
   wrap = T
 )
@@ -37,8 +36,6 @@ computed assuming a exponential growth.}
 reported in \code{highlight} and the respective subclones will be visualised.}
 
 \item{tree_score}{add}
-
-\item{label}{a character corresponding to the label of the run to visualize.#' @param legend.pos position of the legend. If set to \code{"none"}, the legend is not shown.}
 
 \item{legend.pos}{add}
 

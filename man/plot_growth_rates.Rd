@@ -9,7 +9,6 @@ plot_growth_rates(
   highlight = c(),
   min_frac = 0,
   mutations = F,
-  label = "",
   timepoints_to_int = list(),
   fit = F
 )
@@ -22,8 +21,6 @@ plot_growth_rates(
 \item{min_frac}{min_frac numeric value in \code{[0,1]} representing the minimum abundance to highlight a clone.}
 
 \item{mutations}{Boolean. If set to \code{TRUE}, the growth will be visualize for each cluster of mutations.}
-
-\item{label}{a character corresponding to the label of the run to visualize.}
 
 \item{timepoints_to_int}{a list to map each \code{timepoint} value to an integer.}
 
