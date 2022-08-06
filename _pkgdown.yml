@@ -47,6 +47,13 @@ reference:
   - plot_phylogeny
   - plot_differentiation_tree
 
+- title: Training
+  desc: Functions to visualize losses, Information Criteria and gradient norms computed during training.
+  contents:
+  - plot_losses
+  - plot_IC
+  - plot_gradient_norms
+
 - title: S3 object methods
   desc: Print and plot methods for the fitted object.
   contents:
