@@ -29,10 +29,12 @@ get_mean = function(x) {
       colnames(mean) = py_model$dimensions
       rownames(mean) = clusters_sort
       return(mean) },
-    error = function(e) { cli::format_warning(""); return(list()) } )
+    error = function(e) { return(list()) } )
 
   check_params(x)
-  if ("mean" %in% names(x$params)) return(x$params$mean) else return(cli::format_warning("No mean stored in the object."))
+  if ("mean" %in% names(x$params)) return(x$params$mean)
+  cli::cli_alert_warning("No mean stored in the object.")
+  return(list())
 }
 
 
@@ -59,7 +61,10 @@ get_weights = function(x) {
     error = function(e) return(list()) )
 
   check_params(x)
-  if ("weights" %in% names(x$params)) return(x$params$weights) else return(cli::format_warning("No weights stored in the object."))
+  if ("weights" %in% names(x$params)) return(x$params$weights)
+
+  cli::cli_alert_warning("No weights stored in the object.")
+  return(list())
 }
 
 
@@ -88,7 +93,10 @@ get_sigma = function(x) {
     error = function(e) return(list()) )
 
   check_params(x)
-  if ("sigma" %in% names(x$params)) return(x$params$sigma) else return(cli::format_warning("No variance 'sigma' stored in the object."))
+  if ("sigma" %in% names(x$params)) return(x$params$sigma)
+
+  cli::cli_alert_warning("No variance 'sigma' stored in the object.")
+  return(list())
 }
 
 
@@ -120,7 +128,10 @@ get_covariance_Sigma = function(x) {
     error = function(e) return(list()) )
 
   check_params(x)
-  if ("Sigma" %in% names(x$params)) return(x$params$Sigma) else return(cli::format_warning("No covariance 'Sigma' stored in the object."))
+  if ("Sigma" %in% names(x$params)) return(x$params$Sigma)
+
+  cli::cli_alert_warning("No covariance 'Sigma' stored in the object.")
+  return(list())
 }
 
 
@@ -157,7 +168,10 @@ get_covariance_Cholesky = function(x) {
     error = function(e) return(list()) )
 
   check_params(x)
-  if ("Chol" %in% names(x$params)) return(x$params$Chol) else return(cli::format_warning("No Cholesky factorization matrix 'Chol' stored in the object."))
+  if ("Chol" %in% names(x$params)) return(x$params$Chol)
+
+  cli::cli_alert_warning("No Cholesky factorization matrix 'Chol' stored in the object.")
+  return(list())
 }
 
 
@@ -186,8 +200,10 @@ get_z_probs = function(x) {
     error = function(e) return(list()) )
 
   check_params(x)
-  if ("probabilites" %in% names(x$params)) return(x$params$probabilites) else
-    return(cli::format_warning("No posterior probabilities stored in the object."))
+  if ("probabilites" %in% names(x$params)) return(x$params$probabilites)
+
+  cli::cli_alert_warning("No posterior probabilities stored in the object.")
+  return(list())
 }
 
 
@@ -203,9 +219,6 @@ get_z_probs = function(x) {
 
 get_ISs = function(x, highlight=c()) {
   highlight = get_highlight(x, highlight=highlight)
-  # if (purrr::is_empty(highlight))
-  #   highlight = get_unique_labels(x)
-
   return( sapply(highlight, get_ISs_single_cluster, x=x) )
 }
 
@@ -245,8 +258,10 @@ get_labels = function(x) {
     error = function(e) return(list()) )
 
   check_params(x)
-  if ("labels" %in% names(x$params)) return(x$params$labels) else
-    return(cli::format_warning("No labels assignments stored in the object."))
+  if ("labels" %in% names(x$params)) return(x$params$labels)
+
+  cli::cli_alert_warning("No labels assignments stored in the object.")
+  return(list())
 }
 
 

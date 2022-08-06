@@ -21,3 +21,18 @@ have_growth_rates = function(x) {
   return(TRUE)
 }
 
+
+have_phylo_fits = function(x) {
+  trees = suppressMessages(x %>% get_trees())
+  if (purrr::is_empty(trees))
+    return(FALSE)
+  return(TRUE)
+}
+
+
+have_tp_int = function(x) {
+  tp.int = suppressMessages(x %>% get_tp_to_int())
+  if (purrr::is_empty(tp.int))
+    return(FALSE)
+  return(TRUE)
+}

@@ -30,7 +30,7 @@ get_best_k = function(selection, method="BIC") {
 get_IC = function(selection) {
   return(selection$ic %>%
            reshape2::melt(id=c("K","run","id","seed","init_seed"), variable.name="method") %>%
-           dplyr::as_tibble() %>%
+           tibble::as_tibble() %>%
            dplyr::mutate(K=as.integer(K), run=as.integer(run))
          )
 }
@@ -38,21 +38,21 @@ get_IC = function(selection) {
 
 get_losses = function(x=NULL, selection=NULL, train=FALSE) {
   if (train) return(selection$losses %>%
-                     dplyr::as_tibble() %>%
+                     tibble::as_tibble() %>%
                      dplyr::mutate(K=as.integer(K), run=as.integer(run)))
   return(
     x$losses %>%
       tibble::as_tibble() %>%
       dplyr::rename(losses=value) %>%
       tibble::rownames_to_column(var="index") %>%
-      mutate(index=as.numeric(index))
+      dplyr::mutate(index=as.numeric(index))
            )
 }
 
 
 get_gradient_norms = function(selection) {
   return(selection$grads %>%
-           dplyr::as_tibble() %>%
+           tibble::as_tibble() %>%
            dplyr::mutate(K=as.integer(K),
                   run=as.integer(run),
                   param=str_replace_all(param, "_param","")))

@@ -31,7 +31,7 @@ add_growth_rates = function(x, rates.df, label="") {
 
 
 add_tp_int = function(x, tp.to.int) {
- if ("tp.to.int" %in% names(x)) return(x)
+  if (have_tp_int(x)) return(x)
  x$tp.to.int = tp.to.int
  return(x)
 }

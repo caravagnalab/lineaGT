@@ -40,14 +40,14 @@ get_python_dataframe = function(py_model) {
 
 get_python_params = function(py_model) {
   params = list()
-  params$mean = get_mean(py_model)
-  params$weights = get_weights(py_model)
-  params$sigma = get_sigma(py_model)
-  params$Sigma = get_covariance_Sigma(py_model)
-  params$Chol = get_covariance_Cholesky(py_model)
-  params$probabilites = get_z_probs(py_model)
-  params$labels = get_labels(py_model)
-  params$hyperparameters = get_hyperpar(py_model)
+  params$mean = suppressMessages(get_mean(py_model))
+  params$weights = suppressMessages(get_weights(py_model))
+  params$sigma = suppressMessages(get_sigma(py_model))
+  params$Sigma = suppressMessages(get_covariance_Sigma(py_model))
+  params$Chol = suppressMessages(get_covariance_Cholesky(py_model))
+  params$probabilites = suppressMessages(get_z_probs(py_model))
+  params$labels = suppressMessages(get_labels(py_model))
+  params$hyperparameters = suppressMessages(get_hyperpar(py_model))
   return(params)
 }
 
