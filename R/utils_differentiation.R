@@ -1,3 +1,128 @@
+get_mrca_df = function(x, clusters, edges) {
+
+  # edges.diff = differentiation_tree(return.numeric=T)
+  fracs = x %>%
+    get_vaf_dataframe() %>%
+    dplyr::filter(labels %in% clusters) %>%
+    dplyr::select(labels_mut, theta_binom, lineage, timepoints) %>%
+    dplyr::rename(cluster=labels_mut) %>%
+
+    # is.present stores whether the cluster has been observed in the cluster
+    dplyr::group_by(cluster, lineage) %>%
+    dplyr::summarise(is.present=any(theta_binom > 0), .groups="keep") %>%
+    dplyr::ungroup() %>%
+    dplyr::rename(Identity=lineage) %>%
+    dplyr::inner_join(edges, by="Identity")
+
+  if (nrow(fracs) == 0)
+    return(NULL)
+
+  orig = fracs %>%
+    dplyr::rowwise() %>%
+    dplyr::mutate(is.present.parent=is_present_desc(cluster, Parent, edges, fracs) ) %>%  # if is present in all descendants of the parent
+    dplyr::ungroup() %>%
+
+    # orig stores the node of differentiation tree where the cluster has originated
+    # it will stay NA if the it's never observed in the lineage
+    dplyr::mutate(orig=ifelse( (is.present & !is.present.parent), Identity, NA)) %>%
+    dplyr::mutate(orig=ifelse( (is.na(orig) & (is.present & is.present.parent)), Parent, orig ))
+
+  mrca.list = lapply(unique(orig$cluster), get_mrca_list, edges=edges, orig=orig) %>%
+    setNames(nm=unique(orig$cluster))
+
+  return(
+    mrca.list %>%
+      data.frame() %>% t() %>% as.data.frame() %>%
+      tibble::rownames_to_column() %>% setNames(c("cluster","Identity")) %>%
+      dplyr::inner_join(edges, by="Identity") %>%
+      dplyr::rename(mrca.from=Parent, mrca.to=Identity) %>%
+
+      dplyr::group_by(mrca.to) %>%
+      dplyr::mutate(n_clones=length(cluster), cluster=paste(cluster, collapse=", ")) %>%
+      dplyr::ungroup() %>%
+
+      unique()
+  )
+}
+
+
+get_mrca_list = function(cls, edges, orig) {
+  # cls is a subclone
+  # edges is the edges dataframe
+  # orig is a dataframe reporting where each cluster has been observed
+
+  # the function's purpose is to return the MRCA of "cls"
+  nodes = orig %>% filter(cluster==cls) %>% filter(!is.na(orig)) %>% dplyr::pull(orig)
+  root = get_root(edges)
+
+  if (length(unique(nodes)) == 1) return(nodes %>% unique())
+
+  mrca = nodes[1]
+
+  for (n1 in nodes)
+    for (n2 in nodes) {
+      if (n1 == n2) next
+      tmp = get_mrca(edges, n1, n2)
+      mrca = get_mrca(edges, mrca, tmp)
+      if (mrca == root) return(root)
+    }
+  return(mrca)
+}
+
+
+get_mrca = function(edges, n1, n2) {
+  root = get_root(edges)
+  if (n1==n2 && n1==root) return(root)
+  if (n1==n2) return(n1)
+
+  p1 = get_parent(edges, n1)
+  p2 = get_parent(edges, n2)
+
+  if (is_desc_of(edges,n1,n2)) return(n2)  # n1 descends from n2
+  if (is_desc_of(edges,n2,n1)) return(n1)  # n2 descends from n1
+  if (is_desc_of(edges,n1,p2)) return(p2)  # n1 descends from p2
+  if (is_desc_of(edges,n2,p1)) return(p1)  # n2 descends from p1
+
+  return(get_mrca(edges, p1, p2))  # check for their parents
+}
+
+
+is_present_desc = function(node, parent, edges, fracs) {
+  desc = get_desc_list(edges)[[parent]]
+
+  # check for each descendant whether cluster "node" is observed in lineage "dd"
+  for (dd in desc) {
+    if ( dd %in% fracs$Identity &&
+         !(fracs %>% dplyr::filter(cluster==node, Identity==dd) %>% dplyr::pull(is.present)) )
+      return(FALSE)
+  }
+  return(TRUE)
+}
+
+
+get_desc_list = function(edges) {
+  desc = list()
+
+  for (pp in unique(edges$Parent))  # parents
+    for (cc in unique(edges$Identity))  # children
+      if ((pp != cc) & (is_desc_of(edges, cc, pp)))
+        desc[[pp]] = c(desc[[pp]], cc)  # if cc descends from pp
+
+  return(desc)
+}
+
+
+compute_n_clones = function(edges, mrca.df, id) {
+  if (id %in% mrca.df$mrca.to) n_clones = mrca.df[mrca.df$mrca.to==id,] %>% dplyr::pull(n_clones)
+  else n_clones = 0
+
+  for (nn in mrca.df$mrca.to)
+    if (is_desc_of(edges, id, nn)) n_clones = n_clones + mrca.df[mrca.df$mrca.to==nn,] %>% dplyr::pull(n_clones)
+
+  return(n_clones)
+}
+
+
 edges_to_matrix = function(edges) {
   vars = unique(unlist(edges))
   matrix = matrix(0, nrow = length(vars), ncol = length(vars))
@@ -33,7 +158,7 @@ get_parent = function(edges, node) {
 
 
 is_desc_of = function(edges, desc, anc) {
-  root = setdiff(edges$Parent, edges$Identity)
+  root = get_root(edges)
 
   if (anc == root) return(TRUE)
   if (desc == root) return(FALSE)
@@ -45,79 +170,7 @@ is_desc_of = function(edges, desc, anc) {
 }
 
 
-get_mrca_df = function(x, clusters, label="") {
-  if (purrr::is_empty(clusters)) clusters = x %>% get_unique_labels()
-  edges.diff = differentiation_tree(return.numeric=T)
-
-  ccf = x %>% get_vaf_dataframe() %>%
-    dplyr::filter(labels %in% clusters) %>%
-    dplyr::mutate(theta=ifelse(is.na(theta), vaf, theta)) %>%
-    dplyr::select(labels_mut, theta, lineage, timepoints) %>%
-    dplyr::rename(cluster=labels_mut) %>%
-    dplyr::group_by(cluster, lineage) %>%
-    dplyr::summarise(is.present=any(theta>0), .groups="keep") %>%
-    dplyr::rename(Identity=lineage) %>%
-    dplyr::inner_join(edges.diff, by="Identity") %>%
-    dplyr::ungroup()
-
-  orig = ccf %>%
-    dplyr::group_by(Parent, cluster) %>%
-    dplyr::mutate(is.present.parent=is_present_desc(cluster, Parent, edges.diff, ccf) ) %>%  # if is present in all descendants of the parent
-    dplyr::ungroup() %>%
-    dplyr::mutate(orig=ifelse( (is.present & !is.present.parent), Identity, NA)) %>%
-    dplyr::mutate(orig=ifelse( (is.na(orig) & (is.present & is.present.parent)), Parent, orig ))
-
-  mrca.list = list()
-  for (cl in orig$cluster %>% unique()) {
-    nodes = orig %>% filter(cluster==cl) %>% filter(!is.na(orig)) %>% dplyr::pull(orig)
-    mrca.list[[cl]] = get_mrca(nodes, edges.diff)
-  }
-
-  return(
-    mrca.list %>%
-    data.frame() %>% t() %>% as.data.frame() %>%
-    rownames_to_column() %>% setNames(c("cluster","Identity")) %>%
-    dplyr::inner_join(edges.diff, by="Identity") %>%
-    dplyr::rename(mrca.from=Parent, mrca.to=Identity) %>%
-    group_by(mrca.to) %>%
-    dplyr::mutate(n_clones=length(cluster), cluster=paste(cluster, collapse=", ")) %>%
-    ungroup() %>%
-    unique()
-  )
-}
-
-
-is_present_desc = function(cluster, parent, edges, ccf) {
-  prnt = parent %>% unique()
-  cls = cluster %>% unique()
-  desc = get_desc_list(edges)
-
-  for (dd in desc[[prnt]]) {
-    if ( dd %in% ccf$Identity && !(ccf %>% dplyr::filter(cluster==cls, Identity==dd) %>% dplyr::pull(is.present)) )
-      return(FALSE)
-  }
-  return(TRUE)
-}
-
-
-get_desc_list = function(edges) {
-  desc = list()
-
-  for (pp in unique(edges$Parent))  # parents
-    for (cc in unique(edges$Identity))  # children
-      if ((pp != cc) & (is_desc_of(edges, cc, pp)))  desc[[pp]] = c(desc[[pp]], cc)  # if cc descends from pp
-
-  return(desc)
-}
-
-
-compute_n_clones = function(edges, mrca.df, id) {
-  if (id %in% mrca.df$mrca.to) n_clones = mrca.df[mrca.df$mrca.to==id,] %>% dplyr::pull(n_clones)
-  else n_clones = 0
-
-  for (nn in mrca.df$mrca.to)
-    if (is_desc_of(edges, id, nn)) n_clones = n_clones + mrca.df[mrca.df$mrca.to==nn,] %>% dplyr::pull(n_clones)
-
-  return(n_clones)
+get_root = function(edges) {
+  return(setdiff(edges$Parent, edges$Identity))
 }
 

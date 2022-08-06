@@ -4,16 +4,24 @@
 \alias{plot_differentiation_tree}
 \title{Visualize the number of subclones on the differentiatio tree}
 \usage{
-plot_differentiation_tree(x, label = "", label.on.node = T, cex = 1)
+plot_differentiation_tree(
+  x,
+  edges = differentiation_tree(),
+  highlight = c(),
+  single_tree = F,
+  wrap = T
+)
 }
 \arguments{
 \item{x}{add}
 
-\item{label}{add}
+\item{edges}{add}
 
-\item{label.on.node}{add}
+\item{highlight}{add}
 
-\item{cex}{add}
+\item{single_tree}{add}
+
+\item{wrap}{add}
 }
 \value{
 
