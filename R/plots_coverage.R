@@ -13,31 +13,40 @@
 #'
 #' @import ggplot2
 #' @importFrom purrr is_empty map
-#' @importFrom dplyr select all_of
+#' @importFrom dplyr select all_of group_by filter pull
+#' @importFrom purrr is_empty
+#'
 #' @export plot_scatter_density
 
-plot_scatter_density = function(x, plot_density=T, facet=FALSE, highlight=c(), params=list()) {
+plot_scatter_density = function(x, plot_density=T, highlight=c(), min_frac=0) {
+
   dataset = x %>% get_cov_dataframe() %>% long_to_wide_cov()
 
+  highlight = get_highlight(x, min_frac=min_frac, highlight=highlight)
   color_palette = highlight_palette(x, highlight)
-  if (purrr::is_empty(highlight)) highlight = get_unique_labels(x)
 
   if (plot_density) density = compute_density(x) else density = NULL
 
   combinations = get_pairs(dataset, columns=x %>% get_dimensions())
-  max_val = max(dataset %>% dplyr::select(dplyr::all_of(x %>% get_dimensions()))) +10
+  max_val = max(dataset %>% dplyr::select(dplyr::all_of(x %>% get_dimensions()))) + 10
 
   p = list()
   for (t1_t2 in combinations$pair_name) {
     xy = strsplit(t1_t2, ":")[[1]]
-    p[[t1_t2]] = plot_2D(x, xy[1], xy[2], color_palette, highlight, dens=density,
-                         facet=facet, ylim=c(0,max_val), xlim=c(0,max_val))
+    p[[t1_t2]] = plot_2D(x,
+                         xy[1],
+                         xy[2],
+                         color_palette,
+                         highlight,
+                         dens=density,
+                         ylim=c(0,max_val),
+                         xlim=c(0,max_val))
   }
   return(p)
 }
 
 
-plot_2D = function(x, dim1, dim2, color_palette, highlight, dens=NULL, facet=F, ...) {
+plot_2D = function(x, dim1, dim2, color_palette, highlight, dens=NULL, ...) {
   inputs = eval(substitute(alist(...))) %>% purrr::map(as.list)
 
   pl = ggplot2::ggplot() +
@@ -60,7 +69,6 @@ plot_2D = function(x, dim1, dim2, color_palette, highlight, dens=NULL, facet=F, 
                     aes_string(x=dim1, y=dim2, color="labels"),
                     inherit.aes=F, contour_var="ndensity", size=.1)
 
-  if (facet) pl = pl + facet_wrap(~labels, nrow=1) + theme(legend.position="none")
   return(pl)
 }
 
@@ -73,13 +81,17 @@ plot_2D = function(x, dim1, dim2, color_palette, highlight, dens=NULL, facet=F, 
 #' @param binwidth numeric value representing the histogram binwidth.
 #'
 #' @import ggplot2
+#' @importFrom purrr is_empty
+#' @importFrom dplyr mutate filter inner_join group_by ungroup
+#' @importFrom tidyr unnest
+#' @importFrom tibble rownames_to_column
 #'
 #' @examples
 #' if (FALSE) plot_marginal(x)
 #'
 #' @export plot_marginal
 
-plot_marginal = function(x, min_frac=0, highlight=c(), binwidth=5, show_dens=T, timepoints_to_int=list()) {
+plot_marginal = function(x, min_frac=0, highlight=c(), binwidth=10, show_dens=T, timepoints_to_int=list()) {
 
   if (purrr::is_empty(timepoints_to_int)) timepoints_to_int = map_timepoints_int(x)
 
@@ -124,8 +136,9 @@ plot_marginal = function(x, min_frac=0, highlight=c(), binwidth=5, show_dens=T, 
     p[[ll]] = dd %>%
       dplyr::filter(lineage==ll) %>%
       ggplot() +
-      geom_histogram(aes(x=coverage, fill=labels, y=..density..), position="identity", alpha=.7, binwidth=binwidth, inherit.aes=F) +
+      geom_histogram(aes(x=coverage, fill=labels, y=..count../sum(..count..)), position="identity", alpha=.7, binwidth=binwidth, inherit.aes=F) +
       scale_fill_manual(values=color_palette, breaks=highlight) +
+      scale_color_manual(values=color_palette, breaks=highlight) +
       facet_grid(timepoints ~ labels) +
       ylab("Counts") +
       xlab("Coverage") +
@@ -133,7 +146,8 @@ plot_marginal = function(x, min_frac=0, highlight=c(), binwidth=5, show_dens=T, 
       my_ggplot_theme() + guides(color="none")
 
     if (show_dens)
-      p[[ll]] = p[[ll]] + geom_density(data=dens.df, aes(x=dens, y=..density..*binwidth), color="#424949",
+      p[[ll]] = p[[ll]] + geom_density(data=dens.df, aes(x=dens, y=..count../sum(..count..)*binwidth, color=labels),
+                                       # color="#424949",
                                        linetype="solid", size=.1, inherit.aes=F)
   }
 
