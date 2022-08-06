@@ -1,35 +1,35 @@
 #' Clonal evolution trees
 #'
-#' @param x add
-#' @param score_diff add
-#' @param show_best add
-#' @param min_frac add
-#' @param highlight add
+#' @param x a \code{mvnmm} object.
+#' @param show_best the number of trees to visualize based on the computed score.
+#' @param min_frac value in \code{[0,1]} representing the minimum abundance to show the clusters.
+#' @param highlight a list of labels ID to show.
 #'
 #' @return
 #'
 #' @importFrom ggraph create_layout ggraph geom_edge_link geom_node_point geom_node_text circle
+#' @importFrom stringr str_replace_all
+#' @importFrom patchwork wrap_plots
 #' @importFrom RColorBrewer brewer.pal
 #'
 #' @export plot_phylogeny
 
-plot_phylogeny = function(x, score_diff=1, show_best=1, min_frac=0, highlight=c()) {
+plot_phylogeny = function(x, show_best=1, min_frac=0, highlight=c()) {
 
   clusters_joined = get_highlight(x, min_frac, highlight)
+  trees = get_trees(x); tree_plots = list()
 
-  trees = get_trees(x)
-  tree_plots = list()
   for (cluster in clusters_joined) {
-    if (!purrr::is_empty(trees[[cluster]])) {
-      tree = trees[[cluster]] %>% get_best_scores(show_best=show_best, score_diff=score_diff)
+
+    if (!is.null(trees[[cluster]])) {
+      tree = trees[[cluster]] %>%
+        get_best_scores(show_best=show_best)
 
       color_palette = get_color_palette(x)[x %>% get_unique_muts_labels(clusters=cluster)]
       names(color_palette) = names(color_palette) %>%
-        str_replace_all(cluster, "") %>%
-        str_replace_all("[.]", "")
-
+        stringr::str_replace_all(cluster, "") %>%
+        stringr::str_replace_all("[.]", "")
       color_palette = c(color_palette, get_color_palette(x)[cluster])
-
 
       cluster_plots = list()
       for (tt in 1:length(tree))
