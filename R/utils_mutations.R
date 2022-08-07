@@ -99,7 +99,7 @@ check_vaf_dimensions = function(vaf.df, x) {
 
   vaf.dims = vaf.df %>%
     group_by(lineage, timepoints) %>%
-    dplyr::summarise(nn=dplyr::n()) %>%
+    dplyr::summarise(nn=dplyr::n(), .groups="keep") %>%
     mutate(dimensions=paste("cov",timepoints,lineage,sep=".")) %>%
     dplyr::pull(dimensions)
 
@@ -116,9 +116,10 @@ check_vaf_dimensions = function(vaf.df, x) {
     vaf.df %>%
       dplyr::add_row(
         missing %>%
-          dplyr::mutate(mutation=vaf.df[1,] %>% dplyr::pull(mutation), IS=vaf.df[1,] %>% dplyr::pull(IS)) %>%
-          dplyr::mutate(dplyr::across(where(is.numeric), function(x) 0))
+          dplyr::mutate(mutation=vaf.df[1,] %>% dplyr::pull(mutation),
+                        IS=vaf.df[1,] %>% dplyr::pull(IS))
         ) %>%
+      replace(is.na(.), 0) %>%
       long_to_wide_muts() %>%
       wide_to_long_muts()
     )
