@@ -13,13 +13,26 @@ plot_differentiation_tree = function(x,
                                      edges=differentiation_tree(),
                                      highlight=c(),
                                      single_tree=F,
-                                     wrap=T) {
-  if (single_tree)
-    plots_all = util_plot_diff(get_mrca_df(x, clusters))
+                                     wrap=T,
+                                     timepoints=c()) {
 
   highlight = get_highlight(x, highlight=highlight)
-  mrca.list = lapply(clusters, get_mrca_df, x=x, edges=edges) %>% setNames(clusters)
-  plots = lapply(mrca.list, util_plot_diff, edges=edges) %>%
+  if (purrr::is_empty(timepoints)) timepoints = x %>% get_timepoints()
+
+  if (length(intersect(timepoints, get_timepoints(x)))==0) timepoints = x %>% get_timepoints()
+
+  if (single_tree)
+    return(
+      util_plot_diff(get_mrca_df(x, clusters=highlight, edges=edges, tps=timepoints),
+                     edges=edges,
+                     timepoints=timepoints)
+           )
+
+  mrca.list = lapply(highlight, get_mrca_df, x=x, edges=edges, tps=timepoints) %>% setNames(highlight)
+  if (mrca.list %>% unlist() %>% unique() %>% is.null())
+    return(NULL)
+
+  plots = lapply(mrca.list, util_plot_diff, edges=edges, timepoints=timepoints) %>%
     purrr::discard(is.null)
 
   if (wrap)
@@ -30,6 +43,7 @@ plot_differentiation_tree = function(x,
 
 util_plot_diff = function(mrca.df,
                           edges,
+                          timepoints,
                           cex=1,
                           node_palette=colorRampPalette(RColorBrewer::brewer.pal(n=9, "Set1"))) {
 
@@ -84,7 +98,7 @@ util_plot_diff = function(mrca.df,
     theme_void(base_size=10*cex) +
     theme(legend.position="right", text=element_text(size=9)) +
     guides(color=FALSE) +
-    labs(title=clone)
+    labs(title=paste0("Timepoints - ", paste0(timepoints, collapse=", ")))
 
   return(pp)
 }

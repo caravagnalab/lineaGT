@@ -27,7 +27,8 @@ fit_growth_rates = function(x,
                             tree_score=1,
                             py_pkg=NULL) {
 
-  highlight = get_highlight(x, highlight=highlight, mutations=F)
+  highlight.cov = get_highlight(x, highlight=highlight, mutations=F)
+  highlight.muts = get_highlight(x, highlight=highlight, mutations=T)
   timepoints_to_int = map_timepoints_int(x, timepoints_to_int)
 
   if (have_muts_fit(x)) mutations = T else mutations = F
@@ -40,12 +41,17 @@ fit_growth_rates = function(x,
   evaluated = list()
 
   # if force is TRUE, then all the clusters are fitted again
-  if (!force & have_growth_rates(x)) {
-    rates.df = x %>% get_growth_rates() %>% dplyr::filter(!Identity %in% highlight)
+  if (force & have_growth_rates(x)) {
+    rates.df = x %>% get_growth_rates() %>% dplyr::filter(!Identity %in% highlight.muts)
+    evaluated = rates.df$Identity %>% unique()
+  } else if (!force & have_growth_rates(x)) {
+    rates.df = x %>% get_growth_rates()
     evaluated = rates.df$Identity %>% unique()
   }
 
-  for (cluster in highlight) {
+  edges = get_muller_edges(x, mutations=mutations, tree_score=tree_score)
+
+  for (cluster in highlight.cov) {
     if (!cluster %in% evaluated) {
 
       cli::cli_process_start(paste0("Starting growth models inference of clone ", cluster))
@@ -56,7 +62,8 @@ fit_growth_rates = function(x,
 
       # get the identity-parents dataframe of clone "cluster"
       # parents = get_parents(x, highlight=cluster, tree_score=tree_score)
-      parents = get_muller_edges(x, mutations=mutations, tree_score=tree_score, highlight=cluster)
+      parents = edges %>%
+        dplyr::filter(Parent==cluster | Identity==cluster)
 
       # first in the clonal cluster of ISs
       rates.df = rates.df %>%
@@ -178,8 +185,8 @@ fit_growth_single_clone = function(pop_df,
 
   x.reg = py_pkg$explogreg$Regression(times, y)
   if (growth=="" | growth=="exp") {  # exp training
-    if (!is.null(p.rates[["rate.exp"]]))
-      p.rate.exp = torch$tensor(p.rates[["rate.exp"]])$float()
+    if (!is.null(p.rates[["exp"]]))
+      p.rate.exp = torch$tensor(p.rates[["exp"]])$float()
 
     losses.exp = x.reg$train(regr="exp", p_rate=p.rate.exp, steps=as.integer(steps), random_state=as.integer(random_state))
     p.exp = x.reg$get_learned_params()
@@ -187,8 +194,8 @@ fit_growth_single_clone = function(pop_df,
   }
 
   if (growth=="" | growth=="log") {   # log training
-    if (!is.null(p.rates[["rate.log"]]))
-      p.rate.log = torch$tensor(p.rates[["rate.log"]])$float()
+    if (!is.null(p.rates[["log"]]))
+      p.rate.log = torch$tensor(p.rates[["log"]])$float()
 
     losses.log = x.reg$train(regr="log", p_rate=p.rate.log, steps=as.integer(steps), random_state=as.integer(random_state))
     p.log = x.reg$get_learned_params()

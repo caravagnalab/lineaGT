@@ -9,7 +9,8 @@ plot_differentiation_tree(
   edges = differentiation_tree(),
   highlight = c(),
   single_tree = F,
-  wrap = T
+  wrap = T,
+  timepoints = c()
 )
 }
 \arguments{

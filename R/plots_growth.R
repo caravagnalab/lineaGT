@@ -58,10 +58,12 @@ plot_growth_regression = function(x,
 }
 
 
+
 # function to construct a regression dataframe per clone/lineage
 get_regression_df = function(x, pop_df, highlight) {
   rates = x %>% get_growth_rates() %>%
     dplyr::filter(Identity %in% highlight)
+
   tmax = max(pop_df$Generation)
   tmin = 0
 
@@ -69,24 +71,33 @@ get_regression_df = function(x, pop_df, highlight) {
   n_cls = length(highlight)
 
   regr_df = rates %>%
-    dplyr::select(-dplyr::starts_with("p_rate"), -dplyr::starts_with("fitness")) %>%
     dplyr::mutate(x=list(tmin:tmax)) %>%
     tidyr::unnest(x) %>%
-    dplyr::mutate(sigma.exp=unlist(sigma.exp)[as.character(x)],
-                  sigma.log=unlist(sigma.log)[as.character(x)]) %>%
+    dplyr::mutate(sigma=unlist(sigma)[as.character(x)],
+                  args=as.numeric(NA),
+                  y=as.numeric(NA),
+                  y.min=as.numeric(NA),
+                  y.max=as.numeric(NA)) %>%
     dplyr::arrange(x, Identity) %>%
-    # dplyr::select(-dplyr::starts_with("rate"), -dplyr::starts_with("K")) %>%
 
-    tidyr::pivot_longer(starts_with("rate."), names_to=c("else","type"), names_sep="[.]",
-                        values_to="rate", names_repair="minimal") %>%
+    dplyr::rowwise() %>%
 
-    dplyr::mutate(init_t=ifelse(type=="log", init_t.log, init_t.exp),
-                  args=ifelse(type=="log", -rate*(x-init_t), rate*(x-init_t) ),
-                  y=ifelse(type=="log", K.log/( 1+(K.log-1)*exp(args) ), exp(args)),
-                  y.min=ifelse(type=="log", K.log/( 1+(K.log-1)*exp(args-sigma.log) ), exp(args-sigma.exp)),
-                  y.max=ifelse(type=="log", K.log/( 1+(K.log-1)*exp(args+sigma.log) ), exp(args+sigma.exp)) ) %>%
+    dplyr::mutate(args=replace(args, type=="log", -rate*(x-init_t)),
+                  args=replace(args, type=="exp", rate*(x-init_t)),
+
+                  y=replace(y, type=="log", K / ( 1 + (K-1)*exp(args) ) ),
+                  y=replace(y, type=="exp", exp(args)),
+
+                  y.min=replace(y.min, type=="log", max(0, K / ( 1 + (K-1)*exp(args) ) - sigma)),
+                  y.min=replace(y.min, type=="exp", exp(args - sigma)),
+
+                  y.max=replace(y.max, type=="log", K / ( 1 + (K-1)*exp(args) ) + sigma),
+                  y.max=replace(y.max, type=="exp", exp(args + sigma)) ) %>%
+    dplyr::ungroup() %>%
+
     dplyr::select(Lineage, Identity, init_t, type, x, y, y.min, y.max) %>%
-    dplyr::mutate(type=ifelse(type=="log", "Logistic", "Exponential"))
+    dplyr::mutate(type=ifelse(type=="log", "Logistic", "Exponential")) %>%
+    dplyr::mutate(Identity=factor(Identity, levels=highlight))
 
   return(regr_df)
 }
@@ -127,23 +138,19 @@ plot_growth_rates = function(x,
   # keep only the clusters with growth model fitted
   highlight = intersect(highlight, x %>% get_growth_rates() %>% dplyr::pull(Identity))
 
-  rates = x %>% get_growth_rates() %>% dplyr::select(dplyr::starts_with("rate"), Identity, Lineage) %>%
-    tidyr::pivot_longer(cols=dplyr::starts_with("rate"), names_to="type", names_prefix="rate.", values_to="rate") %>%
+  rates = x %>%
+    get_growth_rates() %>%
     dplyr::mutate(type=ifelse(type=="exp", "Exponential", "Logistic"))
 
   color_palette = c("firebrick","steelblue"); names(color_palette) = c("Exponential","Logistic")
   p = rates %>%
-    # dplyr::select(-dplyr::contains(select))
-    # dplyr::mutate(Identity=Identity %>% stringr::str_replace("C_||C","")) %>%
     dplyr::filter(Identity %in% highlight) %>%
-    # dplyr::arrange(lm_r) %>%
     ggplot(aes(x=Identity, y=rate, ymax=rate, ymin=0, color=type)) +
     geom_linerange(alpha=.8, position=position_dodge2(width=.5)) +
     geom_point(alpha=.8, position=position_dodge2(width=.5)) +
     facet_wrap(~Lineage) +
     scale_color_manual(values=color_palette) +
     my_ggplot_theme() +
-    # theme(aspect.ratio=1) +
     xlab("Clusters") + ylab("Growth rate") + labs(color="")
 
   return(p)

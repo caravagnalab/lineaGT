@@ -25,15 +25,17 @@ get_parent_rate = function(parents, rates.df, cluster) {
   if (!cluster %in% parents$Identity) return(list("exp"=NULL, "log"=NULL))
   if (dplyr::filter(parents, Identity==cluster)$Parent=="P") return(list("exp"=NULL, "log"=NULL))
 
-  par = parents %>% filter(Identity==cluster) %>% dplyr::pull(Parent)  ## parent of subcl
+  par = get_parent(parents, cluster)
   par.rates = rates.df %>%
     filter(Identity==par) %>%
-    dplyr::select(dplyr::contains("rate.exp"), dplyr::contains("rate.log"), -dplyr::contains("p_rate")) %>%
-    as.list()
+    dplyr::select("rate", "type")
+
+  p_rates = list("exp"=dplyr::filter(par.rates, type=="exp")$rate,
+                 "log"=dplyr::filter(par.rates, type=="log")$rate)
 
   if (NA %in% unlist(par.rates)) return(list("exp"=NULL, "log"=NULL))
 
-  return(par.rates)
+  return(p_rates)
 }
 
 
@@ -48,7 +50,9 @@ get_growth_params = function(timepoints_to_int,
 
   if (is.null(rates.exp)) return(params.log)
   if (is.null(rates.log)) return(params.exp)
-  return( dplyr::inner_join(params.exp, params.log, by=c("Lineage", "Identity")) )
+
+  df = dplyr::inner_join(params.exp, params.log, by=c("Lineage", "Identity"))
+  return( df %>% get_growth_rates_long() )
 }
 
 
@@ -109,3 +113,18 @@ get_growth_rates_log = function(rates.df, lineages, cluster, timepoints_to_int) 
 }
 
 
+get_growth_rates_long = function(rates) {
+  # rates = x %>% get_growth_rates()
+  rates.exp = rates %>% dplyr::select(Lineage, Identity, dplyr::ends_with(".exp")) %>%
+    dplyr::rename_with(stringr::str_replace_all, pattern=".exp", replacement="") %>%
+    dplyr::mutate(K=NA, type="exp")
+
+  rates.log = rates %>% dplyr::select(Lineage, Identity, dplyr::ends_with(".log")) %>%
+    dplyr::rename_with(stringr::str_replace_all, pattern=".log", replacement="") %>%
+    dplyr::mutate(type="log")
+
+  return(
+    rates.exp %>%
+      dplyr::add_row(rates.log)
+  )
+}
