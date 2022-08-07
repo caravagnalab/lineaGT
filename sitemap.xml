@@ -109,13 +109,22 @@
     <loc>caravagnalab.github.io/lineaGT/reference/plot.mvnmm.html</loc>
   </url>
   <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/plot_IC.html</loc>
+  </url>
+  <url>
     <loc>caravagnalab.github.io/lineaGT/reference/plot_differentiation_tree.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/plot_gradient_norms.html</loc>
   </url>
   <url>
     <loc>caravagnalab.github.io/lineaGT/reference/plot_growth_rates.html</loc>
   </url>
   <url>
     <loc>caravagnalab.github.io/lineaGT/reference/plot_growth_regression.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/plot_losses.html</loc>
   </url>
   <url>
     <loc>caravagnalab.github.io/lineaGT/reference/plot_marginal.html</loc>
