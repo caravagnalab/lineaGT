@@ -214,8 +214,8 @@ get_z_probs = function(x) {
 #'
 #' @return an array with as names the clusters in \code{highlight} and as values the number of ISs assigned
 #' to each cluster
-#' @export
 #'
+#' @export get_ISs
 
 get_ISs = function(x, highlight=c()) {
   highlight = get_highlight(x, highlight=highlight)
@@ -328,14 +328,6 @@ get_all_unique_muts_labels = function(x) {
     )
 }
 
-
-#' Get infered growth rates dataframe.
-#'
-#' @param x
-#'
-#' @return
-#' @export
-#'
 
 get_growth_rates = function(x) {
   if ("growth.rates" %in% names(x)) return(x$growth.rates) else return(data.frame())
