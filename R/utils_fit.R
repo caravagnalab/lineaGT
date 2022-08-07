@@ -9,11 +9,18 @@ fit_singleK = function(k,
                        convergence=TRUE,
                        store_params=FALSE,
                        initializ=TRUE,
+                       default_constr=TRUE,
+                       sigma_constr_pars=list("slope"=0.09804862, "intercept"=22.09327233),
                        seed=5,
                        timepoints_to_int=list(),
                        py_pkg=NULL) {
 
-  x = initialize_object(K=k, cov.df=cov.df, py_pkg=py_pkg, timepoints_to_int=timepoints_to_int)
+  x = initialize_object(K=k,
+                        default_constr=default_constr,
+                        sigma_constr_pars=sigma_constr_pars,
+                        cov.df=cov.df,
+                        py_pkg=py_pkg,
+                        timepoints_to_int=timepoints_to_int)
 
   x = run_inference(x,
                     steps=as.integer(steps),
@@ -45,10 +52,15 @@ fit_singleK = function(k,
 # takes as input the long dataframe
 initialize_object = function(K,
                              cov.df,
+                             default_constr=TRUE,
+                             sigma_constr_pars=list("slope"=0.09804862, "intercept"=22.09327233),
                              timepoints_to_int=list(),
                              py_pkg=NULL) {
   if (is.null(py_pkg))
     py_pkg = reticulate::import("pylineaGT")
+
+  sigma_constr_pars = reticulate::py_dict(keys=names(sigma_constr_pars),
+                                          values=as.numeric(sigma_constr_pars))
 
   lineages = cov.df %>% check_lineages()
   timepoints = cov.df %>% check_timepoints()
@@ -63,7 +75,13 @@ initialize_object = function(K,
                                           data=df %>% dplyr::select(all_of(columns)),
                                           lineages=lineages,
                                           IS=IS,
-                                          columns=columns)
+                                          columns=columns,
+                                          default_init=default_constr)
+
+
+
+  if (default_constr)
+    py_model$set_sigma_constraints(slope=sigma_constr_pars["slope"], intercept=sigma_constr_pars["intercept"])
 
   return(get_object(py_model, timepoints=timepoints, lineages=lineages, timepoints_to_int=timepoints_to_int))
 }

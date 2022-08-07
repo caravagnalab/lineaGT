@@ -19,6 +19,8 @@ fit(
   convergence = TRUE,
   covariance = "full",
   hyperparameters = list(),
+  default_constr = TRUE,
+  sigma_constr_pars = list(slope = 0.09804862, intercept = 22.09327233),
   timepoints_to_int = list(),
   show_progr = FALSE,
   store_grads = TRUE,
@@ -62,6 +64,10 @@ otherwise it will perform \code{steps} iterations.}
 \item{covariance}{Covariance type for the Multivariate Gaussian.}
 
 \item{hyperparameters}{add}
+
+\item{default_constr}{add}
+
+\item{sigma_constr_pars}{add}
 
 \item{timepoints_to_int}{add}
 

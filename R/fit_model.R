@@ -32,6 +32,8 @@
 #' @param initializ add
 #' @param seed Value of the seed.
 #' @param sample_id add
+#' @param default_constr add
+#' @param sigma_constr_pars add
 #'
 #' @return a \code{mvnmm} object, containing the input dataset, annotated with IS_values, N, K, T
 #' specific of the dataset, the input IS and column names, a list params that will contain the
@@ -74,6 +76,8 @@ fit = function(cov.df,
                convergence=TRUE,
                covariance="full",
                hyperparameters=list(),
+               default_constr=TRUE,
+               sigma_constr_pars=list("slope"=0.09804862, "intercept"=22.09327233),
                timepoints_to_int=list(),
                show_progr=FALSE,
                store_grads=TRUE,
@@ -92,22 +96,25 @@ fit = function(cov.df,
 
   cli::cli_process_start("Starting lineaGT model selection to retrieve the optimal number of clones")
   out = py_pkg$run$run_inference(cov_df=cov.df %>% long_to_wide_cov(),
-                             lineages=cov.df$lineage %>% unique(),
-                             k_interval=list(as.integer(k_interval[1]), as.integer(k_interval[2])),
-                             n_runs=as.integer(n_runs),
-                             steps=as.integer(steps),
-                             lr=as.numeric(lr),
-                             p=as.numeric(p),
-                             convergence=convergence,
-                             covariance=covariance,
-                             hyperparameters=reticulate::py_dict(keys=names(hyperparameters),
-                                                                 values=as.numeric(hyperparameters)),
-                             show_progr=show_progr,
-                             store_grads=store_grads,
-                             store_losses=store_losses,
-                             store_params=store_params,
-                             initializ=initializ,
-                             seed=as.integer(seed))
+                                 lineages=cov.df$lineage %>% unique(),
+                                 k_interval=list(as.integer(k_interval[1]), as.integer(k_interval[2])),
+                                 n_runs=as.integer(n_runs),
+                                 steps=as.integer(steps),
+                                 lr=as.numeric(lr),
+                                 p=as.numeric(p),
+                                 convergence=convergence,
+                                 covariance=covariance,
+                                 hyperparameters=reticulate::py_dict(keys=names(hyperparameters),
+                                                                     values=as.numeric(hyperparameters)),
+                                 show_progr=show_progr,
+                                 store_grads=store_grads,
+                                 store_losses=store_losses,
+                                 store_params=store_params,
+                                 default_constr=default_constr,
+                                 sigma_constr_pars=reticulate::py_dict(keys=names(sigma_constr_pars),
+                                                                       values=as.numeric(sigma_constr_pars)),
+                                 initializ=initializ,
+                                 seed=as.integer(seed))
   cli::cli_process_done()
 
   selection = list("ic"=out[[1]], "losses"=out[[2]], "grads"=out[[3]], "params"=out[[4]]) %>%
@@ -125,6 +132,8 @@ fit = function(cov.df,
                   py_pkg=py_pkg,
                   store_params=store_params,
                   hyperparameters=hyperparameters,
+                  default_constr=default_constr,
+                  sigma_constr_pars=sigma_constr_pars,
                   covariance=covariance,
                   initializ=FALSE,
                   seed=best_seed,

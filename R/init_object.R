@@ -30,7 +30,7 @@ get_python_dataframe = function(py_model) {
     colnames(dataset) = py_model$dimensions
     dataset$IS = py_model$IS
     try(expr = {
-      labels = get_labels(py_model)
+      labels = suppressMessages( get_labels(py_model) )
       dataset$labels = labels }, silent = T)
   }, silent = T)
 
@@ -40,14 +40,14 @@ get_python_dataframe = function(py_model) {
 
 get_python_params = function(py_model) {
   params = list()
-  params$mean = suppressMessages(get_mean(py_model))
-  params$weights = suppressMessages(get_weights(py_model))
-  params$sigma = suppressMessages(get_sigma(py_model))
-  params$Sigma = suppressMessages(get_covariance_Sigma(py_model))
-  params$Chol = suppressMessages(get_covariance_Cholesky(py_model))
-  params$probabilites = suppressMessages(get_z_probs(py_model))
-  params$labels = suppressMessages(get_labels(py_model))
-  params$hyperparameters = suppressMessages(get_hyperpar(py_model))
+  params$mean = suppressMessages( get_mean(py_model) )
+  params$weights = suppressMessages( get_weights(py_model) )
+  params$sigma = suppressMessages( get_sigma(py_model) )
+  params$Sigma = suppressMessages( get_covariance_Sigma(py_model) )
+  params$Chol = suppressMessages( get_covariance_Cholesky(py_model) )
+  params$probabilites = suppressMessages( get_z_probs(py_model) )
+  params$labels = suppressMessages( get_labels(py_model) )
+  params$hyperparameters = suppressMessages( get_hyperpar(py_model) )
   return(params)
 }
 

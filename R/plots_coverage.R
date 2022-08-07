@@ -93,14 +93,15 @@ plot_2D = function(x, dim1, dim2, color_palette, highlight, dens=NULL, ...) {
 
 plot_marginal = function(x, min_frac=0, highlight=c(), binwidth=10, show_dens=T, timepoints_to_int=list()) {
 
-  if (purrr::is_empty(timepoints_to_int)) timepoints_to_int = map_timepoints_int(x)
+  timepoints_to_int = map_timepoints_int(x)
 
   tp = timepoints_to_int %>% unlist() %>% sort() %>% names()
 
   highlight = get_highlight(x, min_frac, highlight)
   color_palette = highlight_palette(x, highlight)
 
-  dd = x %>%
+  if (show_dens) {
+    dd = x %>%
     get_cov_dataframe() %>%
     dplyr::mutate(timepoints=factor(timepoints, levels=tp)) %>%
     dplyr::filter(labels %in% highlight)
@@ -120,35 +121,41 @@ plot_marginal = function(x, min_frac=0, highlight=c(), binwidth=10, show_dens=T,
     tibble::rownames_to_column(var="labels")
 
   params = dplyr::inner_join(means, vars, by=c("labels", "timepoints", "lineage")) %>%
-    dplyr::inner_join(weights, by="labels")
+    dplyr::inner_join(weights, by="labels") %>%
+    dplyr::mutate(labels=factor(labels, levels=highlight))
+  }
 
   p = list()
   lineages = x %>% get_lineages()
   for (ll in lineages) {
-    dens.df = params %>%
-      dplyr::filter(lineage==ll) %>%
-      dplyr::group_by(timepoints, labels) %>%
-      dplyr::mutate(dens=list(rnorm(1000, mean=mean_cov, sd=sigma))) %>%
-      tidyr::unnest(dens) %>%
-      dplyr::filter(dens>=0) %>%
-      dplyr::ungroup()
 
     p[[ll]] = dd %>%
       dplyr::filter(lineage==ll) %>%
       ggplot() +
-      geom_histogram(aes(x=coverage, fill=labels, y=..count../sum(..count..)), position="identity", alpha=.7, binwidth=binwidth, inherit.aes=F) +
+      geom_histogram(aes(x=coverage, fill=labels, y=..count../sum(..count..)),
+                     position="identity", alpha=.7, binwidth=binwidth, inherit.aes=F) +
       scale_fill_manual(values=color_palette, breaks=highlight) +
       scale_color_manual(values=color_palette, breaks=highlight) +
       facet_grid(timepoints ~ labels) +
-      ylab("Counts") +
-      xlab("Coverage") +
+      ylab("Counts") + xlab("Coverage") +
       labs(fill="Clusters", subtitle=ll) +
-      my_ggplot_theme() + guides(color="none")
+      my_ggplot_theme()
 
-    if (show_dens)
-      p[[ll]] = p[[ll]] + geom_density(data=dens.df, aes(x=dens, y=..count../sum(..count..)*binwidth, color=labels),
-                                       # color="#424949",
-                                       linetype="solid", size=.1, inherit.aes=F)
+    if (show_dens) {
+      dens.df = params %>%
+        dplyr::filter(lineage==ll) %>%
+        dplyr::group_by(timepoints, labels) %>%
+        dplyr::mutate(dens=list(rnorm(1000, mean=mean_cov, sd=sigma))) %>%
+        tidyr::unnest(dens) %>%
+        dplyr::filter(dens>=0) %>%
+        dplyr::ungroup()
+
+      p[[ll]] = p[[ll]] +
+        geom_density(data=dens.df, aes(x=dens, y=..count../sum(..count..)*binwidth, color=labels),
+                     linetype="solid", size=.1, inherit.aes=F) +
+        guides(color="none")
+    }
+
   }
 
   return(p)
