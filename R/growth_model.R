@@ -63,7 +63,10 @@ fit_growth_rates = function(x,
       # get the identity-parents dataframe of clone "cluster"
       # parents = get_parents(x, highlight=cluster, tree_score=tree_score)
       parents = edges %>%
-        dplyr::filter(Parent==cluster | Identity==cluster)
+        dplyr::filter(grepl(paste(cluster,".",sep=""), Parent) |
+                        grepl(paste(cluster,".",sep=""), Identity) |
+                        Identity==cluster |
+                        Parent==cluster)
 
       # first in the clonal cluster of ISs
       rates.df = rates.df %>%
