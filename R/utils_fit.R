@@ -78,8 +78,6 @@ initialize_object = function(K,
                                           columns=columns,
                                           default_init=default_constr)
 
-
-
   if (default_constr)
     py_model$set_sigma_constraints(slope=sigma_constr_pars["slope"], intercept=sigma_constr_pars["intercept"])
 

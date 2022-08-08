@@ -25,6 +25,7 @@ filter_dataset = function(cov.df,
                           seed=5) {
 
   cov.df = cov.df %>%
+    check_cov_dimensions() %>%
     dplyr::group_by(IS) %>%
     dplyr::filter(any(coverage>=min_cov)) %>%
     dplyr::ungroup()
