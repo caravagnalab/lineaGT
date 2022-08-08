@@ -42,10 +42,18 @@ plot_mullerplot = function(x,
   highlight = get_highlight(x, min_frac, highlight.cov, mutations=mutations)
   color_palette = highlight_palette(x, highlight)
 
-  pop_df = get_muller_pop(x, mutations=mutations, timepoints_to_int=timepoints_to_int)#, highlight=highlight.cov)
-  edges_df = get_muller_edges(x,
-                              mutations=mutations,
-                              tree_score=tree_score)#, highlight=highlight.cov)
+  if (single_clone) {
+    pop_df = get_muller_pop(x, mutations=mutations, timepoints_to_int=timepoints_to_int, highlight=highlight.cov)
+    edges_df = get_muller_edges(x,
+                                mutations=mutations,
+                                tree_score=tree_score, highlight=highlight.cov)
+  } else {
+    pop_df = get_muller_pop(x, mutations=mutations, timepoints_to_int=timepoints_to_int)
+    edges_df = get_muller_edges(x,
+                                mutations=mutations,
+                                tree_score=tree_score)
+  }
+
 
   if (single_clone && mutations) {
     pop_df = pop_df %>% filter_muller_df(highlight=highlight.cov)

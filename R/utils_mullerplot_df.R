@@ -60,11 +60,11 @@ get_edges_muts = function(x, highlight=c(), tree_score=1) {
 get_muller_pop = function(x,
                           mutations=F,
                           timepoints_to_int=c(),
-                          # highlight=c(),
+                          highlight=c(),
                           add_t0=T,
                           tree_score=1) {
 
-  # highlight = get_highlight(x, mutations=mutations)
+  highlight = get_highlight(x, mutations=mutations, highlight=highlight)
 
   # if highlight is specified -> we want to observe the frequencies of them related one to the other
   timepoints_to_int = map_timepoints_int(x, timepoints_to_int=timepoints_to_int)
@@ -75,14 +75,14 @@ get_muller_pop = function(x,
 
   means = x %>%
     get_mean_long() %>%
-    # dplyr::filter(labels %in% highlight) %>%
+    dplyr::filter(labels %in% highlight) %>%
     dplyr::rename(pop=mean_cov) %>%
     format_means_df() %>%
     dplyr::group_by(Generation, Lineage) %>%
     dplyr::mutate(Frequency=Population/sum(Population)) %>%
     dplyr::ungroup()
 
-  edges = get_muller_edges(x, mutations=mutations) #, highlight=highlight)
+  edges = get_muller_edges(x, mutations=mutations, highlight=highlight)
   if (mutations) means = get_pop_muts(x, means=means, edges=edges)
 
   pop_df = means %>%
@@ -142,8 +142,10 @@ get_pop_muts = function(x, means, edges) {
 
 
 check_fracs = function(means, edges, x) {
+  # not clonal parents
   not_clonal = edges %>% dplyr::filter(Parent!="P") %>%
-    dplyr::filter(Parent %in% Identity) %>% dplyr::pull(Parent)
+    dplyr::filter(Parent %in% Identity) %>% dplyr::pull(Parent) %>%
+    unique()
   if (length(not_clonal) == 0) return(means)
 
   frac.par = lapply(not_clonal, get_frac_parent, means=means, edges=edges, x=x) %>%
