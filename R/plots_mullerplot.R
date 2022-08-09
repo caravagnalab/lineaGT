@@ -42,17 +42,20 @@ plot_mullerplot = function(x,
   highlight = get_highlight(x, min_frac, highlight.cov, mutations=mutations)
   color_palette = highlight_palette(x, highlight)
 
-  if (single_clone) {
-    pop_df = get_muller_pop(x, mutations=mutations, timepoints_to_int=timepoints_to_int, highlight=highlight.cov)
-    edges_df = get_muller_edges(x,
-                                mutations=mutations,
-                                tree_score=tree_score, highlight=highlight.cov)
-  } else {
-    pop_df = get_muller_pop(x, mutations=mutations, timepoints_to_int=timepoints_to_int)
-    edges_df = get_muller_edges(x,
-                                mutations=mutations,
-                                tree_score=tree_score)
-  }
+  lvls = c("P", get_unique_muts_labels(x), get_unique_labels(x))
+
+  pop_df = get_muller_pop(x, mutations=mutations, timepoints_to_int=timepoints_to_int) %>%
+    dplyr::select(-Population, -Frequency, -Parent, -theta_binom, -dplyr::contains("Pop.subcl")) %>%
+    dplyr::rename(Population=Pop.plot) %>%
+
+    dplyr::mutate(Identity=factor(Identity, levels=lvls)) %>%
+    dplyr::arrange(Identity, Generation, Lineage)
+
+  edges_df = get_muller_edges(x,
+                              mutations=mutations,
+                              tree_score=tree_score) %>%
+    dplyr::mutate(Parent=factor(Parent, levels=lvls)) %>%
+    dplyr::arrange(Parent) #%>% dplyr::mutate(Parent=as.character(Parent))
 
 
   if (single_clone && mutations) {
@@ -102,18 +105,19 @@ mullerplot_util = function(mullerdf, which, color_palette, highlight, legend.pos
     )
   }
 
-  if (which == "frac") {
-    fill = "Identity"
+  if (which == "frac")
     y = "Frequency"
-  } else if (which == "pop") {
-    fill = "Identity"
+  else if (which == "pop") {
     y = "Population"
     mullerdf = mullerdf %>% pop_df_add_empty()
   }
 
   return(
-    mullerdf %>% ggplot() +
-      geom_area(aes_string(x="Generation", y=y, group="Group_id", fill=fill, colour="Identity")) +
+    mullerdf %>%
+      dplyr::mutate(Identity=factor(Identity, levels=lvls)) %>%
+      dplyr::arrange(Identity, Group_id) %>%
+      ggplot() +
+      geom_area(aes_string(x="Generation", y=y, group="Group_id", fill="Identity", colour="Identity")) +
       geom_vline(xintercept=mullerdf$Generation %>% unique(), linetype="dashed") +
       guides(linetype="none", color="none") +
       facet_wrap(~Lineage, nrow=1) +

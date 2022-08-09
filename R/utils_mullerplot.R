@@ -9,14 +9,15 @@ format_means_df = function(mean_df) {
 }
 
 
-add_parent = function(pop_df, x, mutations=T) {
-  # if (mutations) return(pop_df)
-
+add_parent = function(pop_df, x) {
   return(
     pop_df %>%
       dplyr::add_row(
         Identity=rep( "P", times = x$data.shape[2] ),
         Population=rep( 0, times = x$data.shape[2] ),
+        Pop.plot=rep( 0, times = x$data.shape[2] ),
+        Frequency=rep( 0, times = x$data.shape[2] ),
+        theta_binom=rep( 0, times = x$data.shape[2] ),
         Generation=rep( get_timepoints(x), times = get_lineages(x) %>% length() ),
         Lineage=rep( x$lineages, each = get_timepoints(x) %>% length() )
         ) %>%
@@ -39,17 +40,24 @@ add_time_0 = function(pop_df,
   ids = pop_df %>% filter(Identity!="P") %>% dplyr::pull(Identity) %>% unique()
   n_ids = length(ids)
   n_lins = x %>% get_lineages() %>% length()
+
   return(
     pop_df %>%
       dplyr::add_row(
         Identity=rep( ids, times = n_lins ),
         Population=rep( 0, times = n_ids * n_lins ),
+        Pop.plot=rep( 0, times = n_ids * n_lins ),
+        Frequency=rep( 0, times = n_ids * n_lins ),
+        theta_binom=rep( 0, times = n_ids * n_lins ),
         Generation=rep( value, times = n_ids * n_lins ),
         Lineage=rep( x$lineages, each = n_ids )
       ) %>%
       dplyr::add_row(
         Identity=rep( "P", times = n_lins ),
         Population=rep( 1, times = n_lins ),
+        Pop.plot=rep( 1, times = n_lins ),
+        Frequency=rep( 1, times = n_lins ),
+        theta_binom=rep( 1, times = n_lins ),
         Generation=rep( value, times = n_lins ),
         Lineage=x$lineages
       ) %>%
