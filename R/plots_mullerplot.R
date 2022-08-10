@@ -114,8 +114,8 @@ mullerplot_util = function(mullerdf, which, color_palette, highlight, legend.pos
 
   return(
     mullerdf %>%
-      dplyr::mutate(Identity=factor(Identity, levels=lvls)) %>%
-      dplyr::arrange(Identity, Group_id) %>%
+      # dplyr::mutate(Identity=factor(Identity, levels=lvls)) %>%
+      # dplyr::arrange(Identity, Group_id) %>%
       ggplot() +
       geom_area(aes_string(x="Generation", y=y, group="Group_id", fill="Identity", colour="Identity")) +
       geom_vline(xintercept=mullerdf$Generation %>% unique(), linetype="dashed") +
