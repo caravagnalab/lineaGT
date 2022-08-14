@@ -4,6 +4,21 @@
     <loc>caravagnalab.github.io/lineaGT/404.html</loc>
   </url>
   <url>
+    <loc>caravagnalab.github.io/lineaGT/articles/articles/Input-formats.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/articles/articles/Lineage-inference.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/articles/articles/Plotting-functions.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/articles/articles/Utilities.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/articles/Get-started.html</loc>
+  </url>
+  <url>
     <loc>caravagnalab.github.io/lineaGT/articles/index.html</loc>
   </url>
   <url>
@@ -31,13 +46,64 @@
     <loc>caravagnalab.github.io/lineaGT/reference/add_vaf.html</loc>
   </url>
   <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/configure_environment.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/cov.df.example.html</loc>
+  </url>
+  <url>
     <loc>caravagnalab.github.io/lineaGT/reference/filter_dataset.html</loc>
   </url>
   <url>
     <loc>caravagnalab.github.io/lineaGT/reference/fit.html</loc>
   </url>
   <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/fit_growth_rates.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/fit_mutations.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/fit_phylogenies.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/get_covariance_Cholesky.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/get_covariance_Sigma.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/get_cov_dataframe.html</loc>
+  </url>
+  <url>
     <loc>caravagnalab.github.io/lineaGT/reference/get_dataframe.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/get_dimensions.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/get_ISs.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/get_labels.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/get_lineages.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/get_mean.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/get_sigma.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/get_timepoints.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/get_unique_labels.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/get_unique_muts_labels.html</loc>
   </url>
   <url>
     <loc>caravagnalab.github.io/lineaGT/reference/get_vaf_dataframe.html</loc>
@@ -46,10 +112,28 @@
     <loc>caravagnalab.github.io/lineaGT/reference/get_viber_clusters.html</loc>
   </url>
   <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/get_weights.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/get_z_probs.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/have_loaded_env.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/have_python_deps.html</loc>
+  </url>
+  <url>
     <loc>caravagnalab.github.io/lineaGT/reference/index.html</loc>
   </url>
   <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/load_conda_env.html</loc>
+  </url>
+  <url>
     <loc>caravagnalab.github.io/lineaGT/reference/plot.mvnmm.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/plot_differentiation_tree.html</loc>
   </url>
   <url>
     <loc>caravagnalab.github.io/lineaGT/reference/plot_exp_fit.html</loc>
@@ -58,10 +142,28 @@
     <loc>caravagnalab.github.io/lineaGT/reference/plot_exp_rate.html</loc>
   </url>
   <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/plot_gradient_norms.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/plot_growth_rates.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/plot_growth_regression.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/plot_IC.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/plot_losses.html</loc>
+  </url>
+  <url>
     <loc>caravagnalab.github.io/lineaGT/reference/plot_marginal.html</loc>
   </url>
   <url>
     <loc>caravagnalab.github.io/lineaGT/reference/plot_mullerplot.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/plot_phylogeny.html</loc>
   </url>
   <url>
     <loc>caravagnalab.github.io/lineaGT/reference/plot_scatter_density.html</loc>
@@ -70,9 +172,21 @@
     <loc>caravagnalab.github.io/lineaGT/reference/plot_vaf.html</loc>
   </url>
   <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/plot_vaf_time.html</loc>
+  </url>
+  <url>
     <loc>caravagnalab.github.io/lineaGT/reference/print.mvnmm.html</loc>
   </url>
   <url>
     <loc>caravagnalab.github.io/lineaGT/reference/run_viber.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/vaf.df.example.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/which_conda_env.html</loc>
+  </url>
+  <url>
+    <loc>caravagnalab.github.io/lineaGT/reference/x.example.html</loc>
   </url>
 </urlset>

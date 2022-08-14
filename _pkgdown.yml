@@ -60,6 +60,13 @@ reference:
   - print.mvnmm
   - plot.mvnmm
 
+- title: Example input datasets
+  desc: Example of the input datasets and of the fitted object.
+  contents:
+  - cov.df.exmaple
+  - vaf.df.example
+  - x.example
+
 - title: Helper functions
   desc: Function to configure and install the required dependencies.
   contents:

@@ -42,6 +42,10 @@ check_dp = function(x, thr=10) {
   vaf.df = x %>% get_vaf_dataframe()
   means = x %>% get_mean_long()
 
+  if (!"vaf" %in% colnames(vaf.df))
+    vaf.df = vaf.df %>%
+    dplyr::mutate(vaf=alt/dp)
+
   joined = dplyr::inner_join(vaf.df, means, by=c("labels", "timepoints", "lineage")) %>%
 
     # check 1 -> if "dp" is < "thr", set it as the mean coverage of the cluster

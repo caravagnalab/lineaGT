@@ -17,15 +17,51 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(lineaGT)
-library(magrittr)
+# library(magrittr)
 ```
 
+The `fit` function of the library requires two input datasets: one dataset with the coverage observation and one with the mutations variant allele number of reads and per-locus depth.
 
-The dataset can be filtered calling the `filter_dataset()` function.
+# Coverage Dataframe
 
-```{r dataset_filtering}
-data_filt = data %>% filter_dataset()
+The first dataframe requires the following columns:
 
-data_filt
+-   `IS`: the integration site ID,
+
+-   `timepoints`: the longitunal timepoint,
+
+-   `lineage`: the cell lineage name,
+
+-   `coverage` the number of reads assigned to the ISs.
+
+If `lineage` and `timepoints` columns are not present, a single longitunal observation and single lineage will be assumed.
+
+A dataset example is the following:
+
+```{r coverage dataframe}
+data(cov.df.example)
+cov.df.example
 ```
 
+# Mutations Dataframe
+
+The second dataframe requires the following columns:
+
+-   `IS`: the integration site ID,
+
+-   `mutation`: the mutation ID,
+
+-   `timepoints`: the longitunal timepoint,
+
+-   `lineage`: the cell lineage name,
+
+-   `alt`: the per-locus variant allele number of reads,
+
+-   `dp`: the per-locus total number of reads, hence the per-locus depth.
+
+A dataframe example is the following:
+
+```{r mutations dataframe}
+data(vaf.df.example)
+vaf.df.example
+```

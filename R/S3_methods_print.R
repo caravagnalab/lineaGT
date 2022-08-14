@@ -28,7 +28,7 @@ print.mvnmm = function(x, ...) {
   cat("\n")
   cli::cli_text(clisymbols::symbol$arrow_right, " Lineages: {.field {get_lineages(x) %>% sort()}}.")
   cli::cli_text(clisymbols::symbol$arrow_right, " Timepoints: {.field {tp}}.")
-  cli::cli_text(clisymbols::symbol$arrow_right, " Number of Insertion Sites: {.field {x$N}}.")
+  cli::cli_text(clisymbols::symbol$arrow_right, " Number of Insertion Sites: {.field {x$data.shape[1]}}.")
 
   pi = x %>% lineaGT::get_weights() %>% round(2) %>% sort(decreasing = TRUE)
   n_IS = x %>% get_ISs() %>% sort(decreasing=T)

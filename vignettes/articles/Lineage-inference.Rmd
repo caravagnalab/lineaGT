@@ -14,20 +14,44 @@ library(lineaGT)
 library(magrittr)
 ```
 
-```{r}
-# reticulate::use_condaenv("lineaGT", required=TRUE)
+The coverage dataset can be filtered calling the `filter_dataset()` function.
+
+```{r loading data}
+data(cov.df.example)
+data(vaf.df.example)
 ```
 
+```{r data filtering}
+cov.example.filt = cov.df.example %>%
+  filter_dataset(min_cov=5, min_frac=0.05)
 
-## Fitting the model
+cov.example.filt
+```
+
+# Fitting the model
+
 ```{r warning=FALSE}
-# x_fit = fit(
-#   data_filt,
-#   vaf,
-#   steps = 500,
-#   n_runs = 2,
-#   k_interval = c(10, 12),
-#   min_frac=0.1
-#   )
+x = fit(
+  cov.df = cov.example.filt,
+  vaf.df = vaf.df.example,
+  steps = 500,
+  # n_runs = 1,
+  k_interval = c(5, 15),
+  timepoints_to_int = unlist(list("t1"=60, "t2"=150))
+  )
 ```
 
+Printing the fitted object information regarding the data:
+
+-   lineages and timpoints present in the data,
+
+-   number of integration sites,
+
+-   number of inferred clones of ISs, estimated via model selection on the input range of number of clusters,
+
+-   for each clone, the number of assigned ISs and the mean coverage, per timepoint and lineage.
+
+```{r}
+data(x.example)
+x.example
+```
