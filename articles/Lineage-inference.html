@@ -99,20 +99,199 @@
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Loading <span style="color: #00BB00;">VIBER</span>, <span style="font-style: italic;">'Variational inference for multivariate Binomial mixtures'</span>. Support : <span style="color: #0000BB; font-style: italic;">&lt;https://caravagn.github.io/VIBER/&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Loading <span style="color: #00BB00;">lineaGT</span>, <span style="font-style: italic;">'Lineage inference from gene therapy'</span>. Support : <span style="color: #0000BB; font-style: italic;">&lt;https://caravagnalab.github.io/lineaGT/&gt;</span></span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span></span></code></pre></div>
+<p>The coverage dataset can be filtered calling the <code><a href="../reference/filter_dataset.html">filter_dataset()</a></code> function.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># reticulate::use_condaenv("lineaGT", required=TRUE)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">cov.df.example</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">vaf.df.example</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cov.example.filt</span> <span class="op">=</span> <span class="va">cov.df.example</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/filter_dataset.html">filter_dataset</a></span><span class="op">(</span>min_cov<span class="op">=</span><span class="fl">5</span>, min_frac<span class="op">=</span><span class="fl">0.05</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">cov.example.filt</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 264 × 4</span></span></span>
+<span><span class="co">#&gt;    IS    timepoints lineage coverage</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> IS100 t1         l1             0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> IS100 t2         l1           418</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> IS100 t1         l2             0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> IS100 t2         l2            74</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> IS101 t1         l1           502</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> IS101 t2         l1           186</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> IS101 t1         l2            62</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> IS101 t2         l2           640</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> IS11  t1         l1           128</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> IS11  t2         l1           196</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># … with 254 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ Use `print(n = ...)` to see more rows</span></span></span></code></pre></div>
 <div class="section level2">
 <h2 id="fitting-the-model">Fitting the model<a class="anchor" aria-label="anchor" href="#fitting-the-model"></a>
 </h2>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># x_fit = fit(</span></span>
-<span><span class="co">#   data_filt,</span></span>
-<span><span class="co">#   vaf,</span></span>
-<span><span class="co">#   steps = 500,</span></span>
-<span><span class="co">#   n_runs = 2,</span></span>
-<span><span class="co">#   k_interval = c(10, 12),</span></span>
-<span><span class="co">#   min_frac=0.1</span></span>
-<span><span class="co">#   )</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>x =<span class="st"> </span><span class="kw">fit</span>(</span>
+<span id="cb4-2"><a href="#cb4-2"></a>  <span class="dt">cov.df =</span> cov.example.filt,</span>
+<span id="cb4-3"><a href="#cb4-3"></a>  <span class="dt">vaf.df =</span> vaf.df.example,</span>
+<span id="cb4-4"><a href="#cb4-4"></a>  <span class="dt">steps =</span> <span class="dv">500</span>,</span>
+<span id="cb4-5"><a href="#cb4-5"></a>  <span class="co"># n_runs = 1,</span></span>
+<span id="cb4-6"><a href="#cb4-6"></a>  <span class="dt">k_interval =</span> <span class="kw">c</span>(<span class="dv">5</span>, <span class="dv">15</span>),</span>
+<span id="cb4-7"><a href="#cb4-7"></a>  <span class="dt">timepoints_to_int =</span> <span class="kw">unlist</span>(<span class="kw">list</span>(<span class="st">"t1"</span>=<span class="dv">60</span>, <span class="st">"t2"</span>=<span class="dv">150</span>))</span>
+<span id="cb4-8"><a href="#cb4-8"></a>  )</span>
+<span id="cb4-9"><a href="#cb4-9"></a><span class="co">#&gt;  [36mℹ [39m Starting lineaGT model selection to retrieve the optimal number of clones</span></span>
+<span id="cb4-10"><a href="#cb4-10"></a><span class="co">#&gt;  [32m✔ [39m Starting lineaGT model selection to retrieve the optimal number of clones ...…</span></span>
+<span id="cb4-11"><a href="#cb4-11"></a><span class="co">#&gt; </span></span>
+<span id="cb4-12"><a href="#cb4-12"></a><span class="co">#&gt;  [36mℹ [39m Fitting model to cluster ISs</span></span>
+<span id="cb4-13"><a href="#cb4-13"></a><span class="co">#&gt;  [32m✔ [39m Found 8 clones of ISs!</span></span>
+<span id="cb4-14"><a href="#cb4-14"></a><span class="co">#&gt; </span></span>
+<span id="cb4-15"><a href="#cb4-15"></a><span class="co">#&gt;  [36mℹ [39m Fitting model to cluster mutations</span></span>
+<span id="cb4-16"><a href="#cb4-16"></a><span class="co">#&gt;  [36mℹ [39m Starting clustering of clone C1 mutations</span></span>
+<span id="cb4-17"><a href="#cb4-17"></a><span class="co">#&gt;  [44m [37m [ VIBER - variational fit ] </span></span>
+<span id="cb4-18"><a href="#cb4-18"></a><span class="co">#&gt;  [39m [49m</span></span>
+<span id="cb4-19"><a href="#cb4-19"></a><span class="co">#&gt;  [32m✔ [39m Starting clustering of clone C1 mutations ... done</span></span>
+<span id="cb4-20"><a href="#cb4-20"></a><span class="co">#&gt; </span></span>
+<span id="cb4-21"><a href="#cb4-21"></a><span class="co">#&gt;  [36mℹ [39m Fitting model to cluster mutations</span></span>
+<span id="cb4-22"><a href="#cb4-22"></a> [36mℹ [39m Starting clustering of clone C2 mutations</span>
+<span id="cb4-23"><a href="#cb4-23"></a><span class="co">#&gt;  [44m [37m [ VIBER - variational fit ] </span></span>
+<span id="cb4-24"><a href="#cb4-24"></a><span class="co">#&gt;  [39m [49m</span></span>
+<span id="cb4-25"><a href="#cb4-25"></a><span class="co">#&gt;  [36mℹ [39m Input n = 9, with k &lt; 9. Dirichlet concentration  [32m [32mα =  [32m1e-06 [32m [32m [39m.</span></span>
+<span id="cb4-26"><a href="#cb4-26"></a><span class="co">#&gt;  [36mℹ [39m Starting clustering of clone C2 mutations</span></span>
+<span id="cb4-27"><a href="#cb4-27"></a> [36mℹ [39m <span class="kw">Beta</span> (a_<span class="dv">0</span>, b_<span class="dv">0</span>) =<span class="st"> </span>(<span class="dv">1</span>, <span class="dv">1</span>); q_i =<span class="st"> </span>prior. Optimise<span class="op">:</span><span class="st"> </span>ε =<span class="st"> </span><span class="fl">1e-10</span> or <span class="dv">5000</span> steps, r =<span class="st"> </span><span class="dv">10</span> starts.</span>
+<span id="cb4-28"><a href="#cb4-28"></a><span class="co">#&gt;  [36mℹ [39m Starting clustering of clone C2 mutations</span></span>
+<span id="cb4-29"><a href="#cb4-29"></a><span class="co">#&gt;  [32m✔ [39m  [1mVIBER fit [22m completed in 0.06 mins (status:  [32mconverged [39m)</span></span>
+<span id="cb4-30"><a href="#cb4-30"></a><span class="co">#&gt;  [36mℹ [39m Starting clustering of clone C2 mutations</span></span>
+<span id="cb4-31"><a href="#cb4-31"></a><span class="co">#&gt; ──  [30m [43m[ VIBER ] My VIBER model [49m [39m n = 9 (w = 4 dimensions). Fit with  [32mk = 9 [39m clusters. ─</span></span>
+<span id="cb4-32"><a href="#cb4-32"></a><span class="co">#&gt;  [36mℹ [39m Starting clustering of clone C2 mutations</span></span>
+<span id="cb4-33"><a href="#cb4-33"></a>• Clusters<span class="op">:</span><span class="st"> </span>π =<span class="st"> </span><span class="dv">100</span>% [ [33mC8 [39m], with π <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.</span></span>
+<span id="cb4-34"><a href="#cb4-34"></a><span class="co">#&gt;  [36mℹ [39m Starting clustering of clone C2 mutations</span></span>
+<span id="cb4-35"><a href="#cb4-35"></a>• Binomials<span class="op">:</span><span class="st"> </span>θ =<span class="st"> </span><span class="er">&lt;</span><span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span><span class="op">&gt;</span><span class="st"> </span>[ [33mC8 [39m].</span>
+<span id="cb4-36"><a href="#cb4-36"></a><span class="co">#&gt;  [36mℹ [39m Starting clustering of clone C2 mutations</span></span>
+<span id="cb4-37"><a href="#cb4-37"></a> [36mℹ [39m <span class="kw">Score</span>(s)<span class="op">:</span><span class="st"> </span>ELBO =<span class="st"> </span><span class="dv">-248</span>.<span class="fl">577.</span> Fit  [32mconverged [39m <span class="cf">in</span> <span class="dv">8</span> steps, ε =<span class="st"> </span>1e<span class="fl">-10.</span></span>
+<span id="cb4-38"><a href="#cb4-38"></a><span class="co">#&gt;  [36mℹ [39m Starting clustering of clone C2 mutations</span></span>
+<span id="cb4-39"><a href="#cb4-39"></a> [32m✔ [39m Reduced to k =<span class="st"> </span><span class="dv">1</span> (from <span class="dv">9</span>) selecting VIBER <span class="kw">cluster</span>(s) with π <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.0555555555555556</span>, and Binomial p <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span> <span class="cf">in</span> w <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span> <span class="kw">dimension</span>(s).</span>
+<span id="cb4-40"><a href="#cb4-40"></a><span class="co">#&gt;  [36mℹ [39m Starting clustering of clone C2 mutations</span></span>
+<span id="cb4-41"><a href="#cb4-41"></a> [32m✔ [39m Starting clustering of clone C2 mutations ... done</span>
+<span id="cb4-42"><a href="#cb4-42"></a><span class="co">#&gt; </span></span>
+<span id="cb4-43"><a href="#cb4-43"></a><span class="co">#&gt;  [36mℹ [39m Fitting model to cluster mutations</span></span>
+<span id="cb4-44"><a href="#cb4-44"></a> [36mℹ [39m Starting clustering of clone C3 mutations</span>
+<span id="cb4-45"><a href="#cb4-45"></a><span class="co">#&gt;  [44m [37m [ VIBER - variational fit ] </span></span>
+<span id="cb4-46"><a href="#cb4-46"></a><span class="co">#&gt;  [39m [49m</span></span>
+<span id="cb4-47"><a href="#cb4-47"></a><span class="co">#&gt;  [32m✔ [39m Starting clustering of clone C3 mutations ... done</span></span>
+<span id="cb4-48"><a href="#cb4-48"></a><span class="co">#&gt; </span></span>
+<span id="cb4-49"><a href="#cb4-49"></a><span class="co">#&gt;  [36mℹ [39m Fitting model to cluster mutations</span></span>
+<span id="cb4-50"><a href="#cb4-50"></a> [36mℹ [39m Starting clustering of clone C4 mutations</span>
+<span id="cb4-51"><a href="#cb4-51"></a><span class="co">#&gt;  [44m [37m [ VIBER - variational fit ] </span></span>
+<span id="cb4-52"><a href="#cb4-52"></a><span class="co">#&gt;  [39m [49m</span></span>
+<span id="cb4-53"><a href="#cb4-53"></a><span class="co">#&gt;  [32m✔ [39m Starting clustering of clone C4 mutations ... done</span></span>
+<span id="cb4-54"><a href="#cb4-54"></a><span class="co">#&gt; </span></span>
+<span id="cb4-55"><a href="#cb4-55"></a><span class="co">#&gt;  [36mℹ [39m Fitting model to cluster mutations</span></span>
+<span id="cb4-56"><a href="#cb4-56"></a> [36mℹ [39m Starting clustering of clone C5 mutations</span>
+<span id="cb4-57"><a href="#cb4-57"></a><span class="co">#&gt;  [44m [37m [ VIBER - variational fit ] </span></span>
+<span id="cb4-58"><a href="#cb4-58"></a><span class="co">#&gt;  [39m [49m</span></span>
+<span id="cb4-59"><a href="#cb4-59"></a><span class="co">#&gt;  [32m✔ [39m Starting clustering of clone C5 mutations ... done</span></span>
+<span id="cb4-60"><a href="#cb4-60"></a><span class="co">#&gt; </span></span>
+<span id="cb4-61"><a href="#cb4-61"></a><span class="co">#&gt;  [36mℹ [39m Fitting model to cluster mutations</span></span>
+<span id="cb4-62"><a href="#cb4-62"></a> [36mℹ [39m Starting clustering of clone C6 mutations</span>
+<span id="cb4-63"><a href="#cb4-63"></a><span class="co">#&gt;  [44m [37m [ VIBER - variational fit ] </span></span>
+<span id="cb4-64"><a href="#cb4-64"></a><span class="co">#&gt;  [39m [49m</span></span>
+<span id="cb4-65"><a href="#cb4-65"></a><span class="co">#&gt;  [36mℹ [39m Input n = 6, with k &lt; 6. Dirichlet concentration  [32m [32mα =  [32m1e-06 [32m [32m [39m.</span></span>
+<span id="cb4-66"><a href="#cb4-66"></a><span class="co">#&gt;  [36mℹ [39m Starting clustering of clone C6 mutations</span></span>
+<span id="cb4-67"><a href="#cb4-67"></a> [36mℹ [39m <span class="kw">Beta</span> (a_<span class="dv">0</span>, b_<span class="dv">0</span>) =<span class="st"> </span>(<span class="dv">1</span>, <span class="dv">1</span>); q_i =<span class="st"> </span>prior. Optimise<span class="op">:</span><span class="st"> </span>ε =<span class="st"> </span><span class="fl">1e-10</span> or <span class="dv">5000</span> steps, r =<span class="st"> </span><span class="dv">10</span> starts.</span>
+<span id="cb4-68"><a href="#cb4-68"></a><span class="co">#&gt;  [36mℹ [39m Starting clustering of clone C6 mutations</span></span>
+<span id="cb4-69"><a href="#cb4-69"></a><span class="co">#&gt;  [32m✔ [39m  [1mVIBER fit [22m completed in 0.06 mins (status:  [32mconverged [39m)</span></span>
+<span id="cb4-70"><a href="#cb4-70"></a><span class="co">#&gt;  [36mℹ [39m Starting clustering of clone C6 mutations</span></span>
+<span id="cb4-71"><a href="#cb4-71"></a><span class="co">#&gt; ──  [30m [43m[ VIBER ] My VIBER model [49m [39m n = 6 (w = 4 dimensions). Fit with  [32mk = 6 [39m clusters. ─</span></span>
+<span id="cb4-72"><a href="#cb4-72"></a><span class="co">#&gt;  [36mℹ [39m Starting clustering of clone C6 mutations</span></span>
+<span id="cb4-73"><a href="#cb4-73"></a>• Clusters<span class="op">:</span><span class="st"> </span>π =<span class="st"> </span><span class="dv">100</span>% [ [33mC4 [39m], with π <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.</span></span>
+<span id="cb4-74"><a href="#cb4-74"></a><span class="co">#&gt;  [36mℹ [39m Starting clustering of clone C6 mutations</span></span>
+<span id="cb4-75"><a href="#cb4-75"></a>• Binomials<span class="op">:</span><span class="st"> </span>θ =<span class="st"> </span><span class="er">&lt;</span><span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span><span class="op">&gt;</span><span class="st"> </span>[ [33mC4 [39m].</span>
+<span id="cb4-76"><a href="#cb4-76"></a><span class="co">#&gt;  [36mℹ [39m Starting clustering of clone C6 mutations</span></span>
+<span id="cb4-77"><a href="#cb4-77"></a> [36mℹ [39m <span class="kw">Score</span>(s)<span class="op">:</span><span class="st"> </span>ELBO =<span class="st"> </span><span class="dv">-195</span>.<span class="fl">122.</span> Fit  [32mconverged [39m <span class="cf">in</span> <span class="dv">6</span> steps, ε =<span class="st"> </span>1e<span class="fl">-10.</span></span>
+<span id="cb4-78"><a href="#cb4-78"></a><span class="co">#&gt;  [36mℹ [39m Starting clustering of clone C6 mutations</span></span>
+<span id="cb4-79"><a href="#cb4-79"></a> [32m✔ [39m Reduced to k =<span class="st"> </span><span class="dv">1</span> (from <span class="dv">6</span>) selecting VIBER <span class="kw">cluster</span>(s) with π <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.0833333333333333</span>, and Binomial p <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span> <span class="cf">in</span> w <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span> <span class="kw">dimension</span>(s).</span>
+<span id="cb4-80"><a href="#cb4-80"></a><span class="co">#&gt;  [36mℹ [39m Starting clustering of clone C6 mutations</span></span>
+<span id="cb4-81"><a href="#cb4-81"></a> [32m✔ [39m Starting clustering of clone C6 mutations ... done</span>
+<span id="cb4-82"><a href="#cb4-82"></a><span class="co">#&gt; </span></span>
+<span id="cb4-83"><a href="#cb4-83"></a><span class="co">#&gt;  [36mℹ [39m Fitting model to cluster mutations</span></span>
+<span id="cb4-84"><a href="#cb4-84"></a> [36mℹ [39m Starting clustering of clone C7 mutations</span>
+<span id="cb4-85"><a href="#cb4-85"></a><span class="co">#&gt;  [44m [37m [ VIBER - variational fit ] </span></span>
+<span id="cb4-86"><a href="#cb4-86"></a><span class="co">#&gt;  [39m [49m</span></span>
+<span id="cb4-87"><a href="#cb4-87"></a><span class="co">#&gt;  [36mℹ [39m Input n = 2, with k &lt; 2. Dirichlet concentration  [32m [32mα =  [32m1e-06 [32m [32m [39m.</span></span>
+<span id="cb4-88"><a href="#cb4-88"></a><span class="co">#&gt;  [36mℹ [39m Starting clustering of clone C7 mutations</span></span>
+<span id="cb4-89"><a href="#cb4-89"></a> [36mℹ [39m <span class="kw">Beta</span> (a_<span class="dv">0</span>, b_<span class="dv">0</span>) =<span class="st"> </span>(<span class="dv">1</span>, <span class="dv">1</span>); q_i =<span class="st"> </span>prior. Optimise<span class="op">:</span><span class="st"> </span>ε =<span class="st"> </span><span class="fl">1e-10</span> or <span class="dv">5000</span> steps, r =<span class="st"> </span><span class="dv">10</span> starts.</span>
+<span id="cb4-90"><a href="#cb4-90"></a><span class="co">#&gt;  [36mℹ [39m Starting clustering of clone C7 mutations</span></span>
+<span id="cb4-91"><a href="#cb4-91"></a><span class="co">#&gt;  [32m✔ [39m  [1mVIBER fit [22m completed in 0.05 mins (status:  [32mconverged [39m)</span></span>
+<span id="cb4-92"><a href="#cb4-92"></a><span class="co">#&gt;  [36mℹ [39m Starting clustering of clone C7 mutations</span></span>
+<span id="cb4-93"><a href="#cb4-93"></a><span class="co">#&gt; ──  [30m [43m[ VIBER ] My VIBER model [49m [39m n = 2 (w = 4 dimensions). Fit with  [32mk = 2 [39m clusters. ─</span></span>
+<span id="cb4-94"><a href="#cb4-94"></a><span class="co">#&gt;  [36mℹ [39m Starting clustering of clone C7 mutations</span></span>
+<span id="cb4-95"><a href="#cb4-95"></a>• Clusters<span class="op">:</span><span class="st"> </span>π =<span class="st"> </span><span class="dv">100</span>% [ [33mC1 [39m], with π <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.</span></span>
+<span id="cb4-96"><a href="#cb4-96"></a><span class="co">#&gt;  [36mℹ [39m Starting clustering of clone C7 mutations</span></span>
+<span id="cb4-97"><a href="#cb4-97"></a>• Binomials<span class="op">:</span><span class="st"> </span>θ =<span class="st"> </span><span class="er">&lt;</span><span class="fl">0.01</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span><span class="op">&gt;</span><span class="st"> </span>[ [33mC1 [39m].</span>
+<span id="cb4-98"><a href="#cb4-98"></a><span class="co">#&gt;  [36mℹ [39m Starting clustering of clone C7 mutations</span></span>
+<span id="cb4-99"><a href="#cb4-99"></a> [36mℹ [39m <span class="kw">Score</span>(s)<span class="op">:</span><span class="st"> </span>ELBO =<span class="st"> </span><span class="dv">-96</span>.<span class="fl">047.</span> Fit  [32mconverged [39m <span class="cf">in</span> <span class="dv">5</span> steps, ε =<span class="st"> </span>1e<span class="fl">-10.</span></span>
+<span id="cb4-100"><a href="#cb4-100"></a><span class="co">#&gt;  [36mℹ [39m Starting clustering of clone C7 mutations</span></span>
+<span id="cb4-101"><a href="#cb4-101"></a> [32m✔ [39m Reduced to k =<span class="st"> </span><span class="dv">1</span> (from <span class="dv">2</span>) selecting VIBER <span class="kw">cluster</span>(s) with π <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.25</span>, and Binomial p <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span> <span class="cf">in</span> w <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span> <span class="kw">dimension</span>(s).</span>
+<span id="cb4-102"><a href="#cb4-102"></a><span class="co">#&gt;  [36mℹ [39m Starting clustering of clone C7 mutations</span></span>
+<span id="cb4-103"><a href="#cb4-103"></a> [32m✔ [39m Starting clustering of clone C7 mutations ... done</span>
+<span id="cb4-104"><a href="#cb4-104"></a><span class="co">#&gt; </span></span>
+<span id="cb4-105"><a href="#cb4-105"></a><span class="co">#&gt;  [36mℹ [39m Fitting model to cluster mutations</span></span>
+<span id="cb4-106"><a href="#cb4-106"></a> [32m✔ [39m Fitting model to cluster mutations ... done</span>
+<span id="cb4-107"><a href="#cb4-107"></a><span class="co">#&gt; </span></span>
+<span id="cb4-108"><a href="#cb4-108"></a><span class="co">#&gt;  [36mℹ [39m Fitting model to estimate population growth rates</span></span>
+<span id="cb4-109"><a href="#cb4-109"></a><span class="co">#&gt;  [36mℹ [39m Starting growth models inference of clone C0</span></span>
+<span id="cb4-110"><a href="#cb4-110"></a><span class="co">#&gt;  [32m✔ [39m Starting growth models inference of clone C0 ... done</span></span>
+<span id="cb4-111"><a href="#cb4-111"></a><span class="co">#&gt; </span></span>
+<span id="cb4-112"><a href="#cb4-112"></a><span class="co">#&gt;  [36mℹ [39m Fitting model to estimate population growth rates</span></span>
+<span id="cb4-113"><a href="#cb4-113"></a> [36mℹ [39m Starting growth models inference of clone C1</span>
+<span id="cb4-114"><a href="#cb4-114"></a><span class="co">#&gt;  [32m✔ [39m Starting growth models inference of clone C1 ... done</span></span>
+<span id="cb4-115"><a href="#cb4-115"></a><span class="co">#&gt; </span></span>
+<span id="cb4-116"><a href="#cb4-116"></a><span class="co">#&gt;  [36mℹ [39m Fitting model to estimate population growth rates</span></span>
+<span id="cb4-117"><a href="#cb4-117"></a> [36mℹ [39m Starting growth models inference of clone C2</span>
+<span id="cb4-118"><a href="#cb4-118"></a><span class="co">#&gt;  [32m✔ [39m Starting growth models inference of clone C2 ... done</span></span>
+<span id="cb4-119"><a href="#cb4-119"></a><span class="co">#&gt; </span></span>
+<span id="cb4-120"><a href="#cb4-120"></a><span class="co">#&gt;  [36mℹ [39m Fitting model to estimate population growth rates</span></span>
+<span id="cb4-121"><a href="#cb4-121"></a> [36mℹ [39m Starting growth models inference of clone C3</span>
+<span id="cb4-122"><a href="#cb4-122"></a><span class="co">#&gt;  [32m✔ [39m Starting growth models inference of clone C3 ... done</span></span>
+<span id="cb4-123"><a href="#cb4-123"></a><span class="co">#&gt; </span></span>
+<span id="cb4-124"><a href="#cb4-124"></a><span class="co">#&gt;  [36mℹ [39m Fitting model to estimate population growth rates</span></span>
+<span id="cb4-125"><a href="#cb4-125"></a> [36mℹ [39m Starting growth models inference of clone C4</span>
+<span id="cb4-126"><a href="#cb4-126"></a><span class="co">#&gt;  [32m✔ [39m Starting growth models inference of clone C4 ... done</span></span>
+<span id="cb4-127"><a href="#cb4-127"></a><span class="co">#&gt; </span></span>
+<span id="cb4-128"><a href="#cb4-128"></a><span class="co">#&gt;  [36mℹ [39m Fitting model to estimate population growth rates</span></span>
+<span id="cb4-129"><a href="#cb4-129"></a> [36mℹ [39m Starting growth models inference of clone C5</span>
+<span id="cb4-130"><a href="#cb4-130"></a><span class="co">#&gt;  [32m✔ [39m Starting growth models inference of clone C5 ... done</span></span>
+<span id="cb4-131"><a href="#cb4-131"></a><span class="co">#&gt; </span></span>
+<span id="cb4-132"><a href="#cb4-132"></a><span class="co">#&gt;  [36mℹ [39m Fitting model to estimate population growth rates</span></span>
+<span id="cb4-133"><a href="#cb4-133"></a> [36mℹ [39m Starting growth models inference of clone C6</span>
+<span id="cb4-134"><a href="#cb4-134"></a><span class="co">#&gt;  [32m✔ [39m Starting growth models inference of clone C6 ... done</span></span>
+<span id="cb4-135"><a href="#cb4-135"></a><span class="co">#&gt; </span></span>
+<span id="cb4-136"><a href="#cb4-136"></a><span class="co">#&gt;  [36mℹ [39m Fitting model to estimate population growth rates</span></span>
+<span id="cb4-137"><a href="#cb4-137"></a> [36mℹ [39m Starting growth models inference of clone C7</span>
+<span id="cb4-138"><a href="#cb4-138"></a><span class="co">#&gt;  [32m✔ [39m Starting growth models inference of clone C7 ... done</span></span>
+<span id="cb4-139"><a href="#cb4-139"></a><span class="co">#&gt; </span></span>
+<span id="cb4-140"><a href="#cb4-140"></a><span class="co">#&gt;  [36mℹ [39m Fitting model to estimate population growth rates</span></span>
+<span id="cb4-141"><a href="#cb4-141"></a> [32m✔ [39m Fitting model to estimate population growth rates ... done</span></code></pre></div>
+<p>Printing the fitted object information regarding the data:</p>
+<ul>
+<li><p>lineages and timpoints present in the data,</p></li>
+<li><p>number of integration sites,</p></li>
+<li><p>number of inferred clones of ISs, estimated via model selection on the input range of number of clusters,</p></li>
+<li><p>for each clone, the number of assigned ISs and the mean coverage, per timepoint and lineage.</p></li>
+</ul>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">x.example</span><span class="op">)</span></span>
+<span><span class="va">x.example</span></span>
+<span><span class="co">#&gt; ── <span style="color: #000000; background-color: #BBBB00;">[ lineaGT ] </span> ──── <span style="font-weight: bold;">Python:</span> <span style="color: #555555;">/usr/share/miniconda/envs/lineagt-env/bin/python</span> ──</span></span>
+<span><span class="co">#&gt; → Lineages: <span style="color: #00BB00;">l1</span> and <span style="color: #00BB00;">l2</span>.</span></span>
+<span><span class="co">#&gt; → Timepoints: <span style="color: #00BB00;">t1</span> and <span style="color: #00BB00;">t2</span>.</span></span>
+<span><span class="co">#&gt; → Number of Insertion Sites: <span style="color: #00BB00;">66</span>.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Optimal IS model with <span style="color: #00BB00;">k = 8</span>.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     <span style="color: #BBBB00;">C2</span> (20 ISs) : <span style="color: #0000BB;">l1</span> [168, 202]; <span style="color: #0000BB;">l2</span> [ 24, 333] </span></span>
+<span><span class="co">#&gt;     <span style="color: #BBBB00;">C6</span> (17 ISs) : <span style="color: #0000BB;">l1</span> [342, 236]; <span style="color: #0000BB;">l2</span> [ 78, 557] </span></span>
+<span><span class="co">#&gt;      <span style="color: #BBBB00;">C1</span> (7 ISs) : <span style="color: #0000BB;">l1</span> [ 92, 119]; <span style="color: #0000BB;">l2</span> [197, 678] </span></span>
+<span><span class="co">#&gt;      <span style="color: #BBBB00;">C4</span> (7 ISs) : <span style="color: #0000BB;">l1</span> [  2, 663]; <span style="color: #0000BB;">l2</span> [  1, 920] </span></span>
+<span><span class="co">#&gt;      <span style="color: #BBBB00;">C5</span> (6 ISs) : <span style="color: #0000BB;">l1</span> [267, 226]; <span style="color: #0000BB;">l2</span> [ 61, 523] </span></span>
+<span><span class="co">#&gt;      <span style="color: #BBBB00;">C7</span> (5 ISs) : <span style="color: #0000BB;">l1</span> [  1, 270]; <span style="color: #0000BB;">l2</span> [  1, 124] </span></span>
+<span><span class="co">#&gt;      <span style="color: #BBBB00;">C0</span> (2 ISs) : <span style="color: #0000BB;">l1</span> [  2, 847]; <span style="color: #0000BB;">l2</span> [  0, 344] </span></span>
+<span><span class="co">#&gt;      <span style="color: #BBBB00;">C3</span> (2 ISs) : <span style="color: #0000BB;">l1</span> [156, 239]; <span style="color: #0000BB;">l2</span> [ 33, 575]</span></span></code></pre></div>
 </div>
   </main>
 </div>

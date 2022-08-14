@@ -92,28 +92,73 @@
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Loading <span style="color: #00BB00;">ctree</span>, <span style="font-style: italic;">'Clone trees in cancer'</span>. Support : <span style="color: #0000BB; font-style: italic;">&lt;https://caravagn.github.io/ctree/&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Loading <span style="color: #00BB00;">VIBER</span>, <span style="font-style: italic;">'Variational inference for multivariate Binomial mixtures'</span>. Support : <span style="color: #0000BB; font-style: italic;">&lt;https://caravagn.github.io/VIBER/&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Loading <span style="color: #00BB00;">lineaGT</span>, <span style="font-style: italic;">'Lineage inference from gene therapy'</span>. Support : <span style="color: #0000BB; font-style: italic;">&lt;https://caravagnalab.github.io/lineaGT/&gt;</span></span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span></span></code></pre></div>
-<p>The dataset can be filtered calling the <code><a href="../reference/filter_dataset.html">filter_dataset()</a></code> function.</p>
+<span><span class="co"># library(magrittr)</span></span></code></pre></div>
+<p>The <code>fit</code> function of the library requires two input datasets: one dataset with the coverage observation and one with the mutations variant allele number of reads and per-locus depth.</p>
+<div class="section level2">
+<h2 id="coverage-dataframe">Coverage Dataframe<a class="anchor" aria-label="anchor" href="#coverage-dataframe"></a>
+</h2>
+<p>The first dataframe requires the following columns:</p>
+<ul>
+<li><p><code>IS</code>: the integration site ID,</p></li>
+<li><p><code>timepoints</code>: the longitunal timepoint,</p></li>
+<li><p><code>lineage</code>: the cell lineage name,</p></li>
+<li><p><code>coverage</code> the number of reads assigned to the ISs.</p></li>
+</ul>
+<p>If <code>lineage</code> and <code>timepoints</code> columns are not present, a single longitunal observation and single lineage will be assumed.</p>
+<p>A dataset example is the following:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">data_filt</span> <span class="op">=</span> <span class="va">data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/filter_dataset.html">filter_dataset</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">data_filt</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1,200 × 4</span></span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">cov.df.example</span><span class="op">)</span></span>
+<span><span class="va">cov.df.example</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 428 × 4</span></span></span>
 <span><span class="co">#&gt;    IS    timepoints lineage coverage</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> IS.1  early      L2            12</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> IS.1  early      L1             2</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> IS.1  early      L4             7</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> IS.1  early      L3            10</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> IS.1  mid        L2             9</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> IS.1  mid        L1            10</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> IS.1  mid        L4             8</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> IS.1  mid        L3             6</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> IS.1  late       L2             3</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> IS.1  late       L1             4</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 1,190 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> IS1   t1         l1           124</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> IS1   t2         l1           190</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> IS1   t1         l2             2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> IS1   t2         l2             6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> IS10  t1         l1             4</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> IS10  t2         l1            14</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> IS10  t1         l2             0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> IS10  t2         l2            12</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> IS100 t1         l1             0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> IS100 t2         l1           418</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># … with 418 more rows</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ Use `print(n = ...)` to see more rows</span></span></span></code></pre></div>
-  </main>
+</div>
+<div class="section level2">
+<h2 id="mutations-dataframe">Mutations Dataframe<a class="anchor" aria-label="anchor" href="#mutations-dataframe"></a>
+</h2>
+<p>The second dataframe requires the following columns:</p>
+<ul>
+<li><p><code>IS</code>: the integration site ID,</p></li>
+<li><p><code>mutation</code>: the mutation ID,</p></li>
+<li><p><code>timepoints</code>: the longitunal timepoint,</p></li>
+<li><p><code>lineage</code>: the cell lineage name,</p></li>
+<li><p><code>alt</code>: the per-locus variant allele number of reads,</p></li>
+<li><p><code>dp</code>: the per-locus total number of reads, hence the per-locus depth.</p></li>
+</ul>
+<p>A dataframe example is the following:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">vaf.df.example</span><span class="op">)</span></span>
+<span><span class="va">vaf.df.example</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 116 × 6</span></span></span>
+<span><span class="co">#&gt;    IS    mutation timepoints lineage   alt    dp</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> IS1   mut1     t1         l1         58   134</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> IS1   mut1     t2         l1         53   173</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> IS1   mut1     t1         l2          0    26</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> IS1   mut1     t2         l2         90   322</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> IS10  mut12    t1         l1          0   372</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> IS10  mut12    t2         l1          0   146</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> IS10  mut12    t1         l2          0    57</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> IS10  mut12    t2         l2          0   482</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> IS11  mut13    t1         l1        160   372</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> IS11  mut13    t2         l1          0   146</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># … with 106 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ Use `print(n = ...)` to see more rows</span></span></span></code></pre></div>
+</div>
+  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 
