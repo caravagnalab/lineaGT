@@ -135,9 +135,11 @@ fit = function(cov.df,
                   default_constr=default_constr,
                   sigma_constr_pars=sigma_constr_pars,
                   covariance=covariance,
-                  initializ=FALSE,
-                  seed=best_seed,
+                  initializ=TRUE,
+                  # seed=best_seed,
+                  init_seed=best_init_seed,
                   timepoints_to_int=timepoints_to_int)
+
   cli::cli_process_done(msg_done=paste0("Found ", x$K, " clones of ISs!"))
 
   x$runs = selection

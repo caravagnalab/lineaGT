@@ -12,6 +12,7 @@ fit_singleK = function(k,
                        default_constr=TRUE,
                        sigma_constr_pars=list("slope"=0.09804862, "intercept"=22.09327233),
                        seed=5,
+                       init_seed=5,
                        timepoints_to_int=list(),
                        py_pkg=NULL) {
 
@@ -31,7 +32,8 @@ fit_singleK = function(k,
                     convergence=convergence,
                     store_params=store_params,
                     initializ=initializ,
-                    seed=seed)
+                    seed=seed,
+                    init_seed=init_seed)
 
   x = classifier(x, timepoints_to_int=timepoints_to_int)
 
@@ -117,7 +119,8 @@ run_inference = function(x,
                          convergence=TRUE,
                          initializ=TRUE,
                          store_params=FALSE,
-                         seed=5) {
+                         seed=5,
+                         init_seed=5) {
 
   # modify the hyperparameters as given in input
   for (hyperpar in names(hyperparameters))
@@ -130,7 +133,8 @@ run_inference = function(x,
                  convergence=convergence,
                  store_params=store_params,
                  initializ=initializ,
-                 seed=as.integer(seed))
+                 seed=as.integer(seed),
+                 init_seed=as.integer(init_seed))
 
   return(update_params(x))
 }

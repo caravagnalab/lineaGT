@@ -22,7 +22,7 @@ get_best_k = function(selection, method="BIC") {
 
       tidyr::separate("id", into=c("K.init", "else"), sep="[.]") %>%
       dplyr::mutate(K.init=as.integer(K.init)) %>%
-      dplyr::select(K, seed, init_seed) %>% unique() %>% as.list()
+      dplyr::select(K.init, seed, init_seed) %>% unique() %>% as.list()
     )
 }
 
