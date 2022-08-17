@@ -2,6 +2,11 @@ generate_synthetic_df = function(N_values,
                                  T_values,
                                  K_values,
                                  n_datasets=30,
+                                 dafault_constr=T,
+                                 var_loc=50,
+                                 var_scale=150,
+                                 mean_loc=100,
+                                 mean_scale=1000,
                                  path=".",
                                  run=T) {
 
@@ -21,8 +26,10 @@ generate_synthetic_df = function(N_values,
                                 K=as.integer(kk),
                                 seed=as.integer(seeds[n_df]),
                                 label=as.integer(n_df),
-                                mean_loc=as.integer(100),
-                                mean_scale=as.integer(1500))
+                                var_loc=as.integer(var_loc),
+                                var_scale=as.integer(var_scale),
+                                mean_loc=as.integer(mean_loc),
+                                mean_scale=as.integer(mean_scale))
 
           if (paste0(sim$sim_id, ".data.Rds") %in% files_list)
             x = readRDS(paste0(path, sim$sim_id, ".data.Rds"))
@@ -41,7 +48,8 @@ generate_synthetic_df = function(N_values,
 
           k_interval = get_sim_k_interval(x, cov.df)
 
-          x_fit = fit(cov.df=cov.df, k_interval=k_interval, infer_growth=F, infer_phylogenies=F)
+          x_fit = fit(cov.df=cov.df, k_interval=k_interval, infer_growth=F, infer_phylogenies=F,
+                      default_constr=dafault_constr, hyperparameters=list("var_loc"=var_loc, "var_scale"=var_scale))
 
           x_fit$cov.dataframe = tibble::as_tibble(x$dataset) %>%
             dplyr::mutate(coverage=as.integer(coverage)) %>%
