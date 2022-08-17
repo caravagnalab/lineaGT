@@ -18,10 +18,10 @@
 #' @param p Numeric value used to check the convergence of the parameters.
 #' @param min_frac add
 #' @param max_IS add
-#' @param convergence A Boolean. If set to \code{TRUE}, the function will check for early convergence,
+#' @param check_conv A Boolean. If set to \code{TRUE}, the function will check for early convergence,
 #' otherwise it will perform \code{steps} iterations.
 #' @param covariance Covariance type for the Multivariate Gaussian.
-#' @param hyperparameters add
+#' @param hyperparams add
 #' @param timepoints_to_int add
 #' @param show_progr A Boolean. If \code{TRUE}, the progression bar will be shown during inference.
 #' @param store_grads A Booolean. If \code{TRUE}, the gradient norms for the parameters at each
@@ -29,11 +29,10 @@
 #' @param store_losses A Boolean. If \code{TRUE}, the computed losses for the parameters at each
 #' iteration will be stored.
 #' @param store_params A Boolean. If \code{TRUE}, the estimated parameters at each iteration will be stored.
-#' @param initializ add
+#' @param seed_optim add
 #' @param seed Value of the seed.
 #' @param sample_id add
-#' @param default_constr add
-#' @param sigma_constr_pars add
+#' @param default_lm add
 #'
 #' @return a \code{mvnmm} object, containing the input dataset, annotated with IS_values, N, K, T
 #' specific of the dataset, the input IS and column names, a list params that will contain the
@@ -55,7 +54,7 @@
 #'
 #' @export fit
 
-# hyperparameters A list of hyperparameters to set. Available values are:
+# hyperparams A list of hyperparams to set. Available values are:
 # \code{mean_loc}, the center of the mean prior (default set to the sample mean),
 # \code{mean_scale}, the variance of the mean prior (default set to the sample variance),
 # \code{var_scale}, the variance of the variance prior (default set to \code{400}),
@@ -73,18 +72,18 @@ fit = function(cov.df,
                p=1,
                min_frac=0,
                max_IS=NULL,
-               convergence=TRUE,
+               check_conv=TRUE,
                covariance="full",
-               hyperparameters=list(),
-               default_constr=TRUE,
-               sigma_constr_pars=list("slope"=0.09804862, "intercept"=22.09327233),
+               hyperparams=list(),
+               default_lm=TRUE,
                timepoints_to_int=list(),
                show_progr=FALSE,
                store_grads=TRUE,
                store_losses=TRUE,
                store_params=FALSE,
-               initializ=TRUE,
-               seed=25,
+               seed_optim=TRUE,
+               seed=5,
+               init_seed=NULL,
                sample_id="") {
 
   py_pkg = reticulate::import("pylineaGT")
@@ -94,6 +93,8 @@ fit = function(cov.df,
   max_k = cov.df %>% check_max_k()
   k_interval = check_k_interval(k_interval, max_k)
 
+  print(k_interval)
+
   cli::cli_process_start("Starting lineaGT model selection to retrieve the optimal number of clones")
   out = py_pkg$run$run_inference(cov_df=cov.df %>% long_to_wide_cov(),
                                  lineages=cov.df$lineage %>% unique(),
@@ -101,20 +102,22 @@ fit = function(cov.df,
                                  n_runs=as.integer(n_runs),
                                  steps=as.integer(steps),
                                  lr=as.numeric(lr),
+
+                                 check_conv=check_conv,
                                  p=as.numeric(p),
-                                 convergence=convergence,
+
+                                 default_lm=default_lm,
                                  covariance=covariance,
-                                 hyperparameters=reticulate::py_dict(keys=names(hyperparameters),
-                                                                     values=as.numeric(hyperparameters)),
+                                 hyperparams=reticulate::py_dict(keys=names(hyperparams),
+                                                                     values=as.numeric(hyperparams)),
                                  show_progr=show_progr,
                                  store_grads=store_grads,
                                  store_losses=store_losses,
                                  store_params=store_params,
-                                 default_constr=default_constr,
-                                 sigma_constr_pars=reticulate::py_dict(keys=names(sigma_constr_pars),
-                                                                       values=as.numeric(sigma_constr_pars)),
-                                 initializ=initializ,
-                                 seed=as.integer(seed))
+
+                                 seed_optim=seed_optim,
+                                 seed=as.integer(seed),
+                                 init_seed=init_seed)
   cli::cli_process_done()
 
   selection = list("ic"=out[[1]], "losses"=out[[2]], "grads"=out[[3]], "params"=out[[4]]) %>%
@@ -124,21 +127,29 @@ fit = function(cov.df,
   best_init_seed = get_best_k(selection, method="BIC")$init_seed
   best_seed = get_best_k(selection, method="BIC")$seed
 
+  print(c(best_k, best_init_seed, best_seed))
+
   cli::cli_process_start("Fitting model to cluster ISs")
-  x = fit_singleK(best_k,
-                  cov.df,
+  x = fit_singleK(k=best_k,
+                  cov.df=cov.df,
                   steps=steps,
-                  lr=lr,
-                  py_pkg=py_pkg,
-                  store_params=store_params,
-                  hyperparameters=hyperparameters,
-                  default_constr=default_constr,
-                  sigma_constr_pars=sigma_constr_pars,
+
+                  hyperparams=hyperparams,
+                  default_lm=default_lm,
                   covariance=covariance,
-                  initializ=TRUE,
-                  # seed=best_seed,
+
+                  lr=lr,
+                  p=p,
+                  check_conv=check_conv,
+
+                  store_params=store_params,
+
+                  seed_optim=FALSE,
+                  seed=best_seed,
                   init_seed=best_init_seed,
-                  timepoints_to_int=timepoints_to_int)
+
+                  timepoints_to_int=timepoints_to_int,
+                  py_pkg=py_pkg)
 
   cli::cli_process_done(msg_done=paste0("Found ", x$K, " clones of ISs!"))
 
@@ -198,6 +209,7 @@ check_max_k = function(cov.df) {
     dplyr::select(dplyr::starts_with("cov")) %>%
     unique() %>%
     nrow()
+
   return(
     n_dinstinct - 1
   )

@@ -1,37 +1,39 @@
 # Function to perform a single run of the model
 fit_singleK = function(k,
                        cov.df,
-                       steps=500,
-                       covariance="full",
-                       hyperparameters=list(),
-                       lr=0.001,
-                       p=1,
-                       convergence=TRUE,
-                       store_params=FALSE,
-                       initializ=TRUE,
-                       default_constr=TRUE,
-                       sigma_constr_pars=list("slope"=0.09804862, "intercept"=22.09327233),
-                       seed=5,
-                       init_seed=5,
-                       timepoints_to_int=list(),
+                       steps,
+                       covariance,
+                       hyperparams,
+                       lr,
+                       p,
+                       check_conv,
+                       store_params,
+                       default_lm,
+                       seed_optim,
+                       seed,
+                       init_seed,
+                       timepoints_to_int,
                        py_pkg=NULL) {
 
   x = initialize_object(K=k,
-                        default_constr=default_constr,
-                        sigma_constr_pars=sigma_constr_pars,
                         cov.df=cov.df,
-                        py_pkg=py_pkg,
-                        timepoints_to_int=timepoints_to_int)
+                        timepoints_to_int=timepoints_to_int,
+                        py_pkg=py_pkg)
 
   x = run_inference(x,
                     steps=as.integer(steps),
-                    covariance=covariance,
                     lr=as.numeric(lr),
+
+                    check_conv=check_conv,
                     p=as.numeric(p),
-                    hyperparameters=hyperparameters,
-                    convergence=convergence,
+
+                    covariance=covariance,
+                    default_lm=default_lm,
+                    hyperparams=hyperparams,
+
                     store_params=store_params,
-                    initializ=initializ,
+
+                    seed_optim=seed_optim,
                     seed=seed,
                     init_seed=init_seed)
 
@@ -54,36 +56,38 @@ fit_singleK = function(k,
 # takes as input the long dataframe
 initialize_object = function(K,
                              cov.df,
-                             default_constr=TRUE,
-                             sigma_constr_pars=list("slope"=0.09804862, "intercept"=22.09327233),
                              timepoints_to_int=list(),
-                             py_pkg=NULL) {
+                             py_pkg=NULL,
+                             return_model=FALSE) {
   if (is.null(py_pkg))
     py_pkg = reticulate::import("pylineaGT")
-
-  sigma_constr_pars = reticulate::py_dict(keys=names(sigma_constr_pars),
-                                          values=as.numeric(sigma_constr_pars))
 
   lineages = cov.df %>% check_lineages()
   timepoints = cov.df %>% check_timepoints()
 
   df = long_to_wide_cov(cov.df)
+
   columns = df %>%
     dplyr::select(dplyr::starts_with("cov")) %>%
     colnames()
+
   IS = df$IS
 
   py_model = py_pkg$mvnmm$MVNMixtureModel(K=as.integer(K),
                                           data=df %>% dplyr::select(all_of(columns)),
                                           lineages=lineages,
                                           IS=IS,
-                                          columns=columns,
-                                          default_init=default_constr)
+                                          columns=columns)
 
-  if (default_constr)
-    py_model$set_sigma_constraints(slope=sigma_constr_pars["slope"], intercept=sigma_constr_pars["intercept"])
+  if (return_model) return(py_model)
 
-  return(get_object(py_model, timepoints=timepoints, lineages=lineages, timepoints_to_int=timepoints_to_int))
+  return(
+    get_object(
+      py_model,
+      timepoints=timepoints,
+      lineages=lineages,
+      timepoints_to_int=timepoints_to_int)
+    )
 }
 
 
@@ -111,28 +115,37 @@ check_timepoints = function(cov.df) {
 
 
 run_inference = function(x,
-                         steps=500,
-                         covariance="full",
-                         hyperparameters=list(),
-                         lr=0.005,
-                         p=1,
-                         convergence=TRUE,
-                         initializ=TRUE,
-                         store_params=FALSE,
-                         seed=5,
-                         init_seed=5) {
+                         steps,
+                         lr,
 
-  # modify the hyperparameters as given in input
-  for (hyperpar in names(hyperparameters))
-    x$py_model$set_hyperparameters(hyperpar, as.numeric(hyperparameters[[hyperpar]]))
+                         covariance,
+                         default_lm,
+                         hyperparams,
+
+                         check_conv,
+                         p,
+
+                         store_params,
+
+                         seed_optim,
+                         seed,
+                         init_seed) {
+
+  # modify the hyperparams as given in input
+  for (hyperpar in names(hyperparams))
+    x$py_model$set_hyperparameters(hyperpar, as.numeric(hyperparams[[hyperpar]]))
 
   x$py_model$fit(steps=as.integer(steps),
                  cov_type=covariance,
                  lr=as.numeric(lr),
+
+                 check_conv=check_conv,
                  p=as.numeric(p),
-                 convergence=convergence,
+
+                 default_lm=default_lm,
                  store_params=store_params,
-                 initializ=initializ,
+
+                 seed_optim=seed_optim,
                  seed=as.integer(seed),
                  init_seed=as.integer(init_seed))
 
@@ -142,6 +155,13 @@ run_inference = function(x,
 
 classifier = function(x, timepoints_to_int=list()) {
   x$py_model$classifier()
-  return(get_object(x$py_model, timepoints=x$timepoints, lineages=x$lineages, timepoints_to_int=timepoints_to_int))
+  return(
+    get_object(
+      x$py_model,
+      timepoints=x$timepoints,
+      lineages=x$lineages,
+      timepoints_to_int=timepoints_to_int
+    )
+  )
 }
 

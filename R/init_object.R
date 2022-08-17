@@ -55,8 +55,12 @@ get_python_params = function(py_model) {
 get_hyperpar = function(py_model) {
   hp = list()
 
-  for (hh in names(py_model$hyperparameters))
+  for (hh in names(py_model$hyperparameters)) {
+    print(hh)
+    print(py_model$hyperparameters[[hh]])
     hp[[hh]] = py_model$hyperparameters[[hh]]$numpy() %>% as.numeric
+
+  }
 
   return(hp %>%
            tibble::as_tibble() %>%

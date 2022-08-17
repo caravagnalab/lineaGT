@@ -16,18 +16,18 @@ fit(
   p = 1,
   min_frac = 0,
   max_IS = NULL,
-  convergence = TRUE,
+  check_conv = TRUE,
   covariance = "full",
-  hyperparameters = list(),
-  default_constr = TRUE,
-  sigma_constr_pars = list(slope = 0.09804862, intercept = 22.09327233),
+  hyperparams = list(),
+  default_lm = TRUE,
   timepoints_to_int = list(),
   show_progr = FALSE,
   store_grads = TRUE,
   store_losses = TRUE,
   store_params = FALSE,
-  initializ = TRUE,
-  seed = 25,
+  seed_optim = TRUE,
+  seed = 5,
+  init_seed = NULL,
   sample_id = ""
 )
 }
@@ -58,16 +58,14 @@ the returned object the phylogenetic trees for each cluster.}
 
 \item{max_IS}{add}
 
-\item{convergence}{A Boolean. If set to \code{TRUE}, the function will check for early convergence,
+\item{check_conv}{A Boolean. If set to \code{TRUE}, the function will check for early convergence,
 otherwise it will perform \code{steps} iterations.}
 
 \item{covariance}{Covariance type for the Multivariate Gaussian.}
 
-\item{hyperparameters}{add}
+\item{hyperparams}{add}
 
-\item{default_constr}{add}
-
-\item{sigma_constr_pars}{add}
+\item{default_lm}{add}
 
 \item{timepoints_to_int}{add}
 
@@ -81,7 +79,7 @@ iteration will be stored.}
 
 \item{store_params}{A Boolean. If \code{TRUE}, the estimated parameters at each iteration will be stored.}
 
-\item{initializ}{add}
+\item{seed_optim}{add}
 
 \item{seed}{Value of the seed.}
 

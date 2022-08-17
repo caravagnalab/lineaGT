@@ -2,12 +2,13 @@ generate_synthetic_df = function(N_values,
                                  T_values,
                                  K_values,
                                  n_datasets=30,
-                                 dafault_constr=T,
-                                 var_loc=50,
-                                 var_scale=150,
-                                 mean_loc=100,
+                                 default_lm=T,
+                                 var_loc=118,
+                                 var_scale=130,
+                                 mean_loc=500,
                                  mean_scale=1000,
                                  path=".",
+                                 filename="",
                                  run=T) {
 
   torch = reticulate::import("torch")
@@ -31,31 +32,38 @@ generate_synthetic_df = function(N_values,
                                 mean_loc=as.integer(mean_loc),
                                 mean_scale=as.integer(mean_scale))
 
-          if (paste0(sim$sim_id, ".data.Rds") %in% files_list)
-            x = readRDS(paste0(path, sim$sim_id, ".data.Rds"))
+
+          if (filename == "") filename = sim$sim_id
+
+          if (paste0(filename, ".data.Rds") %in% files_list)
+            x = readRDS(paste0(path, filename, ".data.Rds"))
           else {
             sim$generate_dataset()
             x = get_simulation_object(sim)
             print(paste0(path, sim$sim_id, ".data.Rds"))
-            saveRDS(x, paste0(path, sim$sim_id, ".data.Rds"))
+            saveRDS(x, paste0(path, filename, ".data.Rds"))
           }
 
-          if (!run)
-            next
+          if (!run) next
 
           cov.df = x$dataset %>%
             filter_dataset(min_cov=5, min_frac=0.05)
 
           k_interval = get_sim_k_interval(x, cov.df)
 
-          x_fit = fit(cov.df=cov.df, k_interval=k_interval, infer_growth=F, infer_phylogenies=F,
-                      default_constr=dafault_constr, hyperparameters=list("var_loc"=var_loc, "var_scale"=var_scale))
+          x_fit = fit(cov.df=cov.df,
+                      k_interval=k_interval,
+                      infer_growth=F,
+                      infer_phylogenies=F,
+                      default_lm=default_lm,
+                      # hyperparameters=list("var_loc"=var_loc, "var_scale"=var_scale),
+                      sample_id=x$sim_id)
 
           x_fit$cov.dataframe = tibble::as_tibble(x$dataset) %>%
             dplyr::mutate(coverage=as.integer(coverage)) %>%
             dplyr::inner_join(x_fit$cov.dataframe, by=c("IS","timepoints","lineage","coverage"))
 
-          saveRDS(x_fit, paste0(path, sim$sim_id, ".fit.Rds"))
+          saveRDS(x_fit, paste0(path, filename, ".fit.Rds"))
         }
       }
     }
