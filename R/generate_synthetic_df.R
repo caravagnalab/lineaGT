@@ -31,17 +31,14 @@ generate_synthetic_df = function(N_values,
                                 mean_loc=as.integer(mean_loc),
                                 mean_scale=as.integer(mean_scale))
 
-
+          sim$generate_dataset()
           if (filename == "") filename = sim$sim_id
 
-          if (paste0(filename, ".data.Rds") %in% files_list) x = readRDS(paste0(path, filename, ".data.Rds"))
-          else {
-            sim$generate_dataset()
-            x = get_simulation_object(sim)
+          x = get_simulation_object(sim)
 
-            print(paste0(path, filename, ".data.Rds"))
-            saveRDS(x, paste0(path, filename, ".data.Rds"))
-          }
+          print(paste0(path, filename, ".data.Rds"))
+          saveRDS(x, paste0(path, filename, ".data.Rds"))
+
 
           if (!run) next
 
@@ -54,6 +51,7 @@ generate_synthetic_df = function(N_values,
                       k_interval=k_interval,
                       infer_growth=F,
                       infer_phylogenies=F,
+                      hyperparams=list("var_loc"=118, "var_scale"=130),
                       default_lm=TRUE,
                       seed_optim=TRUE,
                       sample_id=x$sim_id)
