@@ -93,8 +93,6 @@ fit = function(cov.df,
   max_k = cov.df %>% check_max_k()
   k_interval = check_k_interval(k_interval, max_k)
 
-  print(k_interval)
-
   cli::cli_process_start("Starting lineaGT model selection to retrieve the optimal number of clones")
   out = py_pkg$run$run_inference(cov_df=cov.df %>% long_to_wide_cov(),
                                  lineages=cov.df$lineage %>% unique(),
@@ -126,8 +124,6 @@ fit = function(cov.df,
   best_k = get_best_k(selection, method="BIC")$K
   best_init_seed = get_best_k(selection, method="BIC")$init_seed
   best_seed = get_best_k(selection, method="BIC")$seed
-
-  print(c(best_k, best_init_seed, best_seed))
 
   cli::cli_process_start("Fitting model to cluster ISs")
   x = fit_singleK(k=best_k,

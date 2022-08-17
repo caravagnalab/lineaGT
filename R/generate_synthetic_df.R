@@ -40,7 +40,8 @@ generate_synthetic_df = function(N_values,
           else {
             sim$generate_dataset()
             x = get_simulation_object(sim)
-            print(paste0(path, sim$sim_id, ".data.Rds"))
+
+            print(paste0(path, filename, ".data.Rds"))
             saveRDS(x, paste0(path, filename, ".data.Rds"))
           }
 
