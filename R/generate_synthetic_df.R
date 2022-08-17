@@ -2,7 +2,6 @@ generate_synthetic_df = function(N_values,
                                  T_values,
                                  K_values,
                                  n_datasets=30,
-                                 default_lm=T,
                                  var_loc=118,
                                  var_scale=130,
                                  mean_loc=500,
@@ -35,8 +34,7 @@ generate_synthetic_df = function(N_values,
 
           if (filename == "") filename = sim$sim_id
 
-          if (paste0(filename, ".data.Rds") %in% files_list)
-            x = readRDS(paste0(path, filename, ".data.Rds"))
+          if (paste0(filename, ".data.Rds") %in% files_list) x = readRDS(paste0(path, filename, ".data.Rds"))
           else {
             sim$generate_dataset()
             x = get_simulation_object(sim)
@@ -48,7 +46,7 @@ generate_synthetic_df = function(N_values,
           if (!run) next
 
           cov.df = x$dataset %>%
-            filter_dataset(min_cov=5, min_frac=0.05)
+            filter_dataset(min_cov=5, min_frac=0)
 
           k_interval = get_sim_k_interval(x, cov.df)
 
@@ -56,8 +54,8 @@ generate_synthetic_df = function(N_values,
                       k_interval=k_interval,
                       infer_growth=F,
                       infer_phylogenies=F,
-                      default_lm=default_lm,
-                      # hyperparameters=list("var_loc"=var_loc, "var_scale"=var_scale),
+                      default_lm=TRUE,
+                      seed_optim=TRUE,
                       sample_id=x$sim_id)
 
           x_fit$cov.dataframe = tibble::as_tibble(x$dataset) %>%
