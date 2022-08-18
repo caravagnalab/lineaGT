@@ -65,7 +65,7 @@ fit = function(cov.df,
                vaf.df=NULL,
                infer_phylogenies=TRUE,
                infer_growth=TRUE,
-               k_interval=c(10,30),
+               k_interval=c(5,15),
                n_runs=1,
                steps=500,
                lr=0.005,
@@ -83,7 +83,7 @@ fit = function(cov.df,
                store_params=FALSE,
                seed_optim=TRUE,
                seed=5,
-               init_seed=NULL,
+               init_seed=5,
                sample_id="") {
 
   py_pkg = reticulate::import("pylineaGT")
@@ -93,7 +93,7 @@ fit = function(cov.df,
   max_k = cov.df %>% check_max_k()
   k_interval = check_k_interval(k_interval, max_k)
 
-  cli::cli_process_start("Starting lineaGT model selection to retrieve the optimal number of clones")
+  cli::cli_process_start("\nStarting lineaGT model selection to retrieve the optimal number of clones\n")
   out = py_pkg$run$run_inference(cov_df=cov.df %>% long_to_wide_cov(),
                                  lineages=cov.df$lineage %>% unique(),
                                  k_interval=list(as.integer(k_interval[1]), as.integer(k_interval[2])),
@@ -115,7 +115,7 @@ fit = function(cov.df,
 
                                  seed_optim=seed_optim,
                                  seed=as.integer(seed),
-                                 init_seed=init_seed)
+                                 init_seed=as.integer(init_seed))
   cli::cli_process_done()
 
   selection = list("ic"=out[[1]], "losses"=out[[2]], "grads"=out[[3]], "params"=out[[4]]) %>%

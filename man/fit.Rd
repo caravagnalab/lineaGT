@@ -9,7 +9,7 @@ fit(
   vaf.df = NULL,
   infer_phylogenies = TRUE,
   infer_growth = TRUE,
-  k_interval = c(10, 30),
+  k_interval = c(5, 15),
   n_runs = 1,
   steps = 500,
   lr = 0.005,
@@ -27,7 +27,7 @@ fit(
   store_params = FALSE,
   seed_optim = TRUE,
   seed = 5,
-  init_seed = NULL,
+  init_seed = 5,
   sample_id = ""
 )
 }

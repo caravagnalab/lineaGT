@@ -2,9 +2,9 @@ generate_synthetic_df = function(N_values,
                                  T_values,
                                  K_values,
                                  n_datasets=30,
-                                 var_loc=118,
+                                 var_loc=120,
                                  var_scale=130,
-                                 mean_loc=500,
+                                 mean_loc=200,
                                  mean_scale=1000,
                                  path=".",
                                  filename="",
@@ -25,20 +25,23 @@ generate_synthetic_df = function(N_values,
                                 `T`=as.integer(tt),
                                 K=as.integer(kk),
                                 seed=as.integer(seeds[n_df]),
-                                label=as.integer(n_df),
+                                label=as.character(n_df),
                                 var_loc=as.integer(var_loc),
                                 var_scale=as.integer(var_scale),
                                 mean_loc=as.integer(mean_loc),
                                 mean_scale=as.integer(mean_scale))
 
           sim$generate_dataset()
-          if (filename == "") filename = sim$sim_id
+          filename = sim$sim_id
+
+          if ((paste0(path, filename, ".data.Rds") %in% files_list) &
+              (paste0(path, filename, ".fit.Rds") %in% files_list))
+            next
 
           x = get_simulation_object(sim)
 
           print(paste0(path, filename, ".data.Rds"))
           saveRDS(x, paste0(path, filename, ".data.Rds"))
-
 
           if (!run) next
 
@@ -51,9 +54,12 @@ generate_synthetic_df = function(N_values,
                       k_interval=k_interval,
                       infer_growth=F,
                       infer_phylogenies=F,
-                      hyperparams=list("var_loc"=118, "var_scale"=130),
+                      covariance="full",
+                      check_conv=TRUE,
                       default_lm=TRUE,
+
                       seed_optim=TRUE,
+                      init_seed=5,
                       sample_id=x$sim_id)
 
           x_fit$cov.dataframe = tibble::as_tibble(x$dataset) %>%

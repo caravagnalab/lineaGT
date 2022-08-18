@@ -37,7 +37,7 @@ filter_dataset = function(cov.df,
 
   py_pkg = reticulate::import("pylineaGT")
 
-  py_model = suppressMessages(initialize_object(K=as.integer(1), cov.df=cov.df, py_pkg=py_pkg, return_model=TRUE))
+  py_model = initialize_object(K=as.integer(1), cov.df=cov.df, py_pkg=py_pkg, return_model=TRUE)
 
   py_model$filter_dataset(min_cov=as.integer(0),
                           min_frac=as.numeric(min_frac),
@@ -45,6 +45,8 @@ filter_dataset = function(cov.df,
                           k_interval=as.integer(k_interval),
                           seed=as.integer(seed))
 
-  return(get_python_dataframe(py_model))
+  return(
+      get_python_dataframe(py_model)
+    )
 }
 

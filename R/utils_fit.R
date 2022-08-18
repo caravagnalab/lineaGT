@@ -16,9 +16,9 @@ fit_singleK = function(k,
                        py_pkg=NULL) {
 
   x = initialize_object(K=k,
-                        cov.df=cov.df,
-                        timepoints_to_int=timepoints_to_int,
-                        py_pkg=py_pkg)
+                      cov.df=cov.df,
+                      timepoints_to_int=timepoints_to_int,
+                      py_pkg=py_pkg)
 
   x = run_inference(x,
                     steps=as.integer(steps),
@@ -82,11 +82,14 @@ initialize_object = function(K,
   if (return_model) return(py_model)
 
   return(
-    get_object(
-      py_model,
-      timepoints=timepoints,
-      lineages=lineages,
-      timepoints_to_int=timepoints_to_int)
+    suppressMessages(
+      get_object(
+        py_model,
+        timepoints=timepoints,
+        lineages=lineages,
+        timepoints_to_int=timepoints_to_int
+        )
+      )
     )
 }
 
@@ -155,12 +158,15 @@ run_inference = function(x,
 
 classifier = function(x, timepoints_to_int=list()) {
   x$py_model$classifier()
+
   return(
-    get_object(
-      x$py_model,
-      timepoints=x$timepoints,
-      lineages=x$lineages,
-      timepoints_to_int=timepoints_to_int
+    suppressMessages(
+      get_object(
+        x$py_model,
+        timepoints=x$timepoints,
+        lineages=x$lineages,
+        timepoints_to_int=timepoints_to_int
+      )
     )
   )
 }
