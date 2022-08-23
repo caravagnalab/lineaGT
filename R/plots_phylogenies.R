@@ -69,7 +69,7 @@ plot_ctree_mod = function (x.tree,
       coord_cartesian(clip="off") +
       scale_color_manual(values=node_palette) +
       scale_size(range=c(3, 10) * cex) +
-      guides(color=FALSE, size=guide_legend("Clone size", nrow=1)) +
+      guides(color="none", size=guide_legend("Clone size", nrow=1)) +
       labs(title=paste(cluster_id),
            subtitle=paste0("Scores ", format(tree$score, scientific=T), ".")) +
       theme_void(base_size=10*cex) +

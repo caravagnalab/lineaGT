@@ -33,7 +33,7 @@ get_mrca_df = function(x, clusters, edges, tps=c()) {
   mrca.list = lapply(unique(orig$cluster), get_mrca_list, edges=edges, orig=orig) %>%
     setNames(nm=unique(orig$cluster))
 
-  if (mrca.list %>% unlist() %>% unique() %>% is.na())
+  if (all(mrca.list %>% unlist() %>% unique() %>% is.na()))
     return(NULL)
 
   return(

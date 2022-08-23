@@ -20,12 +20,14 @@ sort_clusters_edges = function(clusters, parents) {
 }
 
 
-get_parent_rate = function(parents, rates.df, cluster) {
+get_parent_rate = function(par, rates.df, cluster) {
 
-  if (!cluster %in% parents$Identity) return(list("exp"=NULL, "log"=NULL))
-  if (dplyr::filter(parents, Identity==cluster)$Parent=="P") return(list("exp"=NULL, "log"=NULL))
+  if (is.na(par) || par == "P") return(list("exp"=NULL, "log"=NULL))
 
-  par = get_parent(parents, cluster)
+  # if (!cluster %in% parents$Identity) return(list("exp"=NULL, "log"=NULL))
+  # if (dplyr::filter(parents, Identity==cluster)$Parent=="P") return(list("exp"=NULL, "log"=NULL))
+
+  # par = get_parent(parents, cluster)
   par.rates = rates.df %>%
     filter(Identity==par) %>%
     dplyr::select("rate", "type")

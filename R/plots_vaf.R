@@ -29,11 +29,11 @@ plot_vaf = function(x,
   dataframe = x %>% get_vaf_dataframe()
 
   dataframe = dataframe %>%
-    dplyr::mutate(theta=theta*100) %>%
+    dplyr::mutate(theta_binom=theta_binom*100) %>%
     dplyr::select(-contains("ref"), -contains("dp"), -contains("alt")) %>%
     tidyr::pivot_wider(names_from=c("timepoints"),
                        names_sep=".",
-                       values_from=c("vaf","theta"))
+                       values_from=c("vaf","theta_binom"))
 
   highlight = get_highlight(x, min_frac, highlight, mutations=T)
   highlight_v = get_unique_muts_labels(x, highlight)
@@ -46,7 +46,7 @@ plot_vaf = function(x,
   p = list()
   for (t1_t2 in combinations$pair_name) {
     xy.vaf = strsplit(t1_t2, ":")[[1]]
-    xy.theta = stringr::str_replace_all(xy.vaf, "vaf.", "theta.")
+    xy.theta = stringr::str_replace_all(xy.vaf, "vaf.", "theta_binom.")
 
     df = dataframe %>%
       filter(labels %in% highlight)
@@ -119,10 +119,12 @@ plot_vaf_time = function(x,
 
   vaf.df = x %>%
     get_vaf_dataframe() %>%
-    # add_lineage_vaf() %>%
     dplyr::filter(labels %in% highlight.c) %>%
     dplyr::mutate(timepoints=as.character(timepoints_to_int[timepoints])) %>%
     dplyr::mutate(timepoints=as.integer(timepoints))
+
+  if (nrow(vaf.df) == 0)
+    return(NULL)
 
   color_palette = get_color_palette(x)[highlight.m]
   color_palette[paste(vaf.df %>% dplyr::pull(timepoints) %>% unique())] = "black"

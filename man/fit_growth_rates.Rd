@@ -9,7 +9,7 @@ fit_growth_rates(
   steps = 500,
   highlight = c(),
   timepoints_to_int = c(),
-  growth_model = "",
+  growth_model = "exp.log",
   force = T,
   tree_score = 1,
   py_pkg = NULL

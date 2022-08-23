@@ -22,7 +22,7 @@ fit_growth_rates = function(x,
                             steps=500,
                             highlight=c(),
                             timepoints_to_int=c(),
-                            growth_model="",
+                            growth_model="exp.log",
                             force=T,
                             tree_score=1,
                             py_pkg=NULL) {
@@ -35,76 +35,53 @@ fit_growth_rates = function(x,
 
   pop_df = x %>%
     get_muller_pop(mutations=mutations, timepoints_to_int=timepoints_to_int,
-                   tree_score=tree_score)
+                   tree_score=tree_score) %>%
+    dplyr::select(-Pop.subcl, -Pop.plot, -dplyr::contains("theta"))
 
   rates.df = data.frame()
   evaluated = list()
 
   # if force is TRUE, then all the clusters are fitted again
-  if (force & have_growth_rates(x)) {
-    rates.df = x %>% get_growth_rates() %>% dplyr::filter(!Identity %in% highlight.muts)
-    evaluated = rates.df$Identity %>% unique()
-  } else if (!force & have_growth_rates(x)) {
+  if (have_growth_rates(x)) {
     rates.df = x %>% get_growth_rates()
+    if (force) rates.df = x %>% get_growth_rates() %>% dplyr::filter(!Identity %in% highlight.muts)
+
     evaluated = rates.df$Identity %>% unique()
   }
 
   edges = get_muller_edges(x, mutations=mutations, tree_score=tree_score)
 
   for (cluster in highlight.cov) {
-    if (!cluster %in% evaluated) {
+    if (cluster %in% evaluated) next
 
-      cli::cli_process_start(paste0("Starting growth models inference of clone ", cluster))
+    cli::cli_process_start(paste0("Starting growth models inference of clone ", cluster))
 
-      # filter the dataset
-      pop_df.cl = pop_df %>%
-        dplyr::filter(grepl(paste(cluster,".",sep=""), Identity) | Identity == cluster)
+    # filter the dataset
+    pop_df.cl = pop_df %>%
+      dplyr::filter(grepl(paste(cluster,".",sep=""), Identity) | Identity == cluster)
 
-      # get the identity-parents dataframe of clone "cluster"
-      # parents = get_parents(x, highlight=cluster, tree_score=tree_score)
-      parents = edges %>%
-        dplyr::filter(grepl(paste(cluster,".",sep=""), Parent) |
-                        grepl(paste(cluster,".",sep=""), Identity) |
-                        Identity==cluster |
-                        Parent==cluster)
+    # get the identity-parents dataframe of clone "cluster"
+    # parents = get_parents(x, highlight=cluster, tree_score=tree_score)
+    parents = edges %>%
+      dplyr::filter(grepl(paste(cluster,".",sep=""), Parent) |
+                      grepl(paste(cluster,".",sep=""), Identity) |
+                      Identity==cluster |
+                      Parent==cluster)
 
-      # first in the clonal cluster of ISs
-      rates.df = rates.df %>%
-        fit_growth_multiple_clones(clusters=cluster,
-                                   pop_df=pop_df.cl,
-                                   parents=parents,
-                                   growth=growth_model,
-                                   steps=steps,
-                                   clonal=TRUE,
-                                   timepoints_to_int=timepoints_to_int,
-                                   py_pkg=py_pkg)
+    rates.df = fit_growth_utils(rates.df=rates.df,
+                                cluster=cluster,
+                                pop_df.cl=pop_df.cl,
+                                parents=parents,
+                                growth_model=growth_model,
+                                steps=steps,
+                                timepoints_to_int=timepoints_to_int,
+                                py_pkg=py_pkg)
 
-      # fit the growth rate in all the parents
-      rates.df = rates.df %>%
-        fit_growth_multiple_clones(clusters=parents$Parent %>% unique(),
-                                   pop_df=pop_df.cl,
-                                   parents=parents,
-                                   growth=growth_model,
-                                   steps=steps,
-                                   clonal=F,
-                                   timepoints_to_int=timepoints_to_int,
-                                   py_pkg=py_pkg)
+    print(rates.df)
 
-      # then in all the children
-      rates.df = rates.df %>%
-        fit_growth_multiple_clones(clusters=parents$Identity %>% unique(),
-                                   pop_df=pop_df.cl,
-                                   parents=parents,
-                                   growth=growth_model,
-                                   steps=steps,
-                                   clonal=F,
-                                   timepoints_to_int=timepoints_to_int,
-                                   py_pkg=py_pkg)
+    evaluated = c(cluster, evaluated)
 
-      cli::cli_process_done()
-
-      evaluated = c(cluster, evaluated)
-    }
+    cli::cli_process_done()
   }
 
   x = add_growth_rates(x, rates.df)
@@ -114,15 +91,61 @@ fit_growth_rates = function(x,
 }
 
 
-fit_growth_multiple_clones = function(rates.df,
-                                      clusters,
-                                      pop_df,
-                                      parents,
-                                      growth,
-                                      steps,
-                                      clonal,
-                                      timepoints_to_int,
-                                      py_pkg=NULL) {
+fit_growth_utils = function(rates.df,
+                            cluster,
+                            pop_df.cl,
+                            parents,
+                            growth_model,
+                            steps,
+                            timepoints_to_int,
+                            py_pkg) {
+
+  # first in the clonal cluster of ISs
+  rates.df = rates.df %>%
+    fit_growth_clones(clusters=cluster,
+                      pop_df.cl=pop_df.cl,
+                      parents=parents,
+                      growth_model=growth_model,
+                      steps=steps,
+                      clonal=TRUE,
+                      timepoints_to_int=timepoints_to_int,
+                      py_pkg=py_pkg)
+
+  # fit the growth rate in all the parents
+  rates.df = rates.df %>%
+    fit_growth_clones(clusters=parents$Parent %>% unique(),
+                      pop_df.cl=pop_df.cl,
+                      parents=parents,
+                      growth_model=growth_model,
+                      steps=steps,
+                      clonal=FALSE,
+                      timepoints_to_int=timepoints_to_int,
+                      py_pkg=py_pkg)
+
+  # then in all the children
+  rates.df = rates.df %>%
+    fit_growth_clones(clusters=parents$Identity %>% unique(),
+                      pop_df.cl=pop_df.cl,
+                      parents=parents,
+                      growth_model=growth_model,
+                      steps=steps,
+                      clonal=FALSE,
+                      timepoints_to_int=timepoints_to_int,
+                      py_pkg=py_pkg)
+
+  return(rates.df)
+}
+
+
+fit_growth_clones = function(rates.df,
+                             clusters,
+                             pop_df.cl,
+                             parents,
+                             growth_model,
+                             steps,
+                             clonal,
+                             timepoints_to_int,
+                             py_pkg=NULL) {
 
   if (!clonal & nrow(parents)==0) return(rates.df)
 
@@ -131,51 +154,43 @@ fit_growth_multiple_clones = function(rates.df,
 
   for (subcl in clusters) {
 
-    if (!subcl %in% (rates.df$Identity) && (subcl %in% pop_df$Identity) && (subcl != "P")) {
-      if (purrr::is_empty(rates.df))
-        rates.df = fit_growth_single_clone(pop_df=pop_df,
-                                           cluster=subcl,
-                                           timepoints_to_int=timepoints_to_int,
-                                           p.rates=get_parent_rate(parents, rates.df, subcl),
-                                           clonal=clonal,
-                                           growth=growth,
-                                           steps=steps,
-                                           py_pkg=py_pkg)
-      else rates.df = rates.df %>%
-          dplyr::add_row(
-            fit_growth_single_clone(pop_df=pop_df,
-                                    cluster=subcl,
-                                    timepoints_to_int=timepoints_to_int,
-                                    p.rates=get_parent_rate(parents, rates.df, subcl),
-                                    clonal=clonal,
-                                    growth=growth,
-                                    steps=steps,
-                                    py_pkg=py_pkg)
-          )
-    }
+    par = pop_df.cl %>% dplyr::filter(Identity==subcl) %>% dplyr::pull(Parent) %>% unique()
+
+    if (!subcl %in% (rates.df$Identity) && (subcl %in% pop_df.cl$Identity) && (subcl != "P"))
+        rates.df = run_py_growth(rates.df,
+                                 pop_df.cl=pop_df.cl,
+                                 cluster=subcl,
+                                 timepoints_to_int=timepoints_to_int,
+                                 p.rates=get_parent_rate(par, rates.df, subcl),
+                                 clonal=clonal,
+                                 growth_model=growth_model,
+                                 steps=steps,
+                                 py_pkg=py_pkg)
   }
   return(rates.df)
 }
 
 
-fit_growth_single_clone = function(pop_df,
-                                   cluster,
-                                   timepoints_to_int,
-                                   steps=500,
-                                   p.rates=list("exp"=NULL, "log"=NULL),
-                                   clonal=FALSE,
-                                   growth="",
-                                   random_state=25,
-                                   py_pkg=NULL) {
+run_py_growth = function(rates.df,
+                         pop_df.cl,
+                         cluster,
+                         timepoints_to_int,
+                         steps=500,
+                         p.rates=list("exp"=NULL, "log"=NULL),
+                         clonal=FALSE,
+                         growth_model="exp.log",
+                         random_state=25,
+                         py_pkg=NULL) {
 
   torch = reticulate::import("torch")
   if (is.null(py_pkg)) py_pkg = reticulate::import("pylineaGT")
 
-  input.clone = pop_df %>%
+  input.clone = pop_df.cl %>%
     filter(Identity == cluster) %>%
     dplyr::select(-Frequency) %>%
     dplyr::mutate(Population=ifelse((Generation == 0 & clonal), 1, Population)) %>%
-    tidyr::pivot_wider(id_cols="Generation", names_from="Lineage", values_from="Population")
+    tidyr::pivot_wider(id_cols="Generation", names_from="Lineage", values_from="Population") %>%
+    dplyr::arrange(Generation)
 
   times = input.clone$Generation
   y = input.clone[2:ncol(input.clone)]
@@ -187,18 +202,16 @@ fit_growth_single_clone = function(pop_df,
   p.rate.exp = p.rate.log = NULL
 
   x.reg = py_pkg$explogreg$Regression(times, y)
-  if (growth=="" | growth=="exp") {  # exp training
-    if (!is.null(p.rates[["exp"]]))
-      p.rate.exp = torch$tensor(p.rates[["exp"]])$float()
+  if (grepl("exp", growth_model)) {  # exp training
+    if (!is.null(p.rates[["exp"]])) p.rate.exp = torch$tensor(p.rates[["exp"]])$float()
 
     losses.exp = x.reg$train(regr="exp", p_rate=p.rate.exp, steps=as.integer(steps), random_state=as.integer(random_state))
     p.exp = x.reg$get_learned_params()
     ll.exp = x.reg$compute_log_likelihood() %>% setNames(nm=lineages)
   }
 
-  if (growth=="" | growth=="log") {   # log training
-    if (!is.null(p.rates[["log"]]))
-      p.rate.log = torch$tensor(p.rates[["log"]])$float()
+  if (grepl("log", growth_model)) {   # log training
+    if (!is.null(p.rates[["log"]])) p.rate.log = torch$tensor(p.rates[["log"]])$float()
 
     losses.log = x.reg$train(regr="log", p_rate=p.rate.log, steps=as.integer(steps), random_state=as.integer(random_state))
     p.log = x.reg$get_learned_params()
@@ -208,17 +221,28 @@ fit_growth_single_clone = function(pop_df,
   params = get_growth_params(timepoints_to_int,
                              rates.exp=p.exp,
                              rates.log=p.log,
-                             lineages=pop_df$Lineage %>% unique(),
+                             lineages=pop_df.cl$Lineage %>% unique(),
                              cluster=cluster)
 
   best = c()
   for (ll in lineages)
-    if (ll.exp[ll] > ll.log[ll]) best = c(best, "exp") %>% setNames(nm=c(names(best), ll)) else
+    if (ll.exp[ll] > ll.log[ll])
+      best = c(best, "exp") %>% setNames(nm=c(names(best), ll)) else
       best = c(best, "log") %>% setNames(nm=c(names(best), ll))
 
+
+  if (purrr::is_empty(rates.df))
+    return(
+      params %>%
+        dplyr::mutate(best_model=best[Lineage])
+    )
+
   return(
-    params %>%
-      dplyr::mutate(best_model=best[Lineage])
+    rates.df %>%
+      dplyr::add_row(
+        params %>%
+          dplyr::mutate(best_model=best[Lineage])
+      )
   )
 }
 

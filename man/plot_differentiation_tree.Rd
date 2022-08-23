@@ -8,7 +8,7 @@ plot_differentiation_tree(
   x,
   edges = differentiation_tree(),
   highlight = c(),
-  single_tree = F,
+  single_tree = T,
   wrap = T,
   timepoints = c()
 )
