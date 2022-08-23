@@ -13,14 +13,23 @@ generate_synthetic_df = function(N_values,
   torch = reticulate::import("torch")
   py_pkg = reticulate::import("pylineaGT")
 
-  files_list = list.files(path=path)
-
   seeds = sample(0:min(50,n_datasets), size=n_datasets, replace=FALSE)
 
   for (n_df in 1:n_datasets) {
     for (nn in N_values) {
       for (tt in T_values) {
         for (kk in K_values) {
+
+          tmp_name = paste0("N", nn, ".T", tt, ".K", kk)
+          subpath = paste0(path, "N", nn, "/", tmp_name, "/")
+          files_list = list.files(path=subpath)
+
+          print(paste0(tmp_name, ".", n_df, ".data.Rds"))
+
+          if ( (paste0(tmp_name, ".", n_df, ".data.Rds") %in% files_list)  &
+               (paste0(tmp_name, ".", n_df, ".fit.Rds") %in% files_list) )
+            next
+
           sim = py_pkg$Simulate(N=as.integer(nn),
                                 `T`=as.integer(tt),
                                 K=as.integer(kk),
@@ -34,14 +43,10 @@ generate_synthetic_df = function(N_values,
           sim$generate_dataset()
           filename = sim$sim_id
 
-          if ((paste0(path, filename, ".data.Rds") %in% files_list) &
-              (paste0(path, filename, ".fit.Rds") %in% files_list))
-            next
-
           x = get_simulation_object(sim)
 
-          print(paste0(path, filename, ".data.Rds"))
-          saveRDS(x, paste0(path, filename, ".data.Rds"))
+          print(paste0(subpath, filename, ".data.Rds"))
+          saveRDS(x, paste0(subpath, filename, ".data.Rds"))
 
           if (!run) next
 
@@ -66,7 +71,7 @@ generate_synthetic_df = function(N_values,
             dplyr::mutate(coverage=as.integer(coverage)) %>%
             dplyr::inner_join(x_fit$cov.dataframe, by=c("IS","timepoints","lineage","coverage"))
 
-          saveRDS(x_fit, paste0(path, filename, ".fit.Rds"))
+          saveRDS(x_fit, paste0(subpath, filename, ".fit.Rds"))
         }
       }
     }
