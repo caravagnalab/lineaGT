@@ -55,7 +55,7 @@ plot_mullerplot(x.example, which="pop", wrap=T)
 
 
 ```{r}
-# plot_vaf_time(x.example)
+# plot_vaf_time(x.example, highlight="C3")
 ```
 
 
