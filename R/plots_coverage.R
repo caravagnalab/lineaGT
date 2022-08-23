@@ -14,7 +14,6 @@
 #' @import ggplot2
 #' @importFrom purrr is_empty map
 #' @importFrom dplyr select all_of group_by filter pull
-#' @importFrom purrr is_empty
 #'
 #' @export plot_scatter_density
 
@@ -50,7 +49,7 @@ plot_2D = function(x, dim1, dim2, color_palette, highlight, dens=NULL, ...) {
   inputs = eval(substitute(alist(...))) %>% purrr::map(as.list)
 
   pl = ggplot2::ggplot() +
-    geom_point(data=x %>% get_cov_dataframe() %>% long_to_wide_cov(),
+    geom_point(data=long_to_wide_cov(get_cov_dataframe(x)),
                aes_string(x=dim1, y=dim2, color="labels"),
                alpha=.4, size=.8) +
     scale_color_manual(values=color_palette, breaks=highlight) +
@@ -58,8 +57,8 @@ plot_2D = function(x, dim1, dim2, color_palette, highlight, dens=NULL, ...) {
     xlab(split_to_camelcase(dim1)) +
     ylab(split_to_camelcase(dim2)) +
     my_ggplot_theme() +
-    theme(legend.position="bottom") +
-    coord_fixed(ratio=1)
+    theme(legend.position="bottom")
+    # coord_fixed(ratio=1)
 
   try({ pl = pl + ylim(inputs$ylim) }, silent=T)
   try({ pl = pl + xlim(inputs$xlim) }, silent=T)

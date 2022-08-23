@@ -12,7 +12,7 @@ fit_singleK = function(k,
                        seed_optim,
                        seed,
                        init_seed,
-                       timepoints_to_int,
+                       timepoints_to_int=list(),
                        py_pkg=NULL) {
 
   x = initialize_object(K=k,

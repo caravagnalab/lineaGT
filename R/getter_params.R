@@ -306,6 +306,8 @@ get_unique_labels = function(x) {
 #' @export get_unique_muts_labels
 
 get_unique_muts_labels = function(x, clusters=c()) {
+  if (!have_vaf_df(x)) return(list())
+
   if (purrr::is_empty(clusters)) return(get_all_unique_muts_labels(x))
 
   return(
@@ -319,6 +321,7 @@ get_unique_muts_labels = function(x, clusters=c()) {
 
 
 get_all_unique_muts_labels = function(x) {
+  if (!have_vaf_df(x)) return(list())
   return(
     x %>%
       get_vaf_dataframe() %>%

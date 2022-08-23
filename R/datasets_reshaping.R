@@ -4,7 +4,7 @@ long_to_wide_cov = function(cov.df) {
 
   return(
     cov.df %>%
-      dplyr::select("coverage", "IS", "timepoints", "lineage") %>%
+      dplyr::select("coverage", "IS", "timepoints", "lineage", dplyr::contains("labels")) %>%
       tidyr::pivot_wider(names_from=c("timepoints","lineage"),
                          names_prefix="cov.",
                          names_sep=".",
