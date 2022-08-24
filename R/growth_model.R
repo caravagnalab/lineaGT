@@ -49,7 +49,7 @@ fit_growth_rates = function(x,
     evaluated = rates.df$Identity %>% unique()
   }
 
-  edges = get_muller_edges(x, mutations=mutations, tree_score=tree_score)
+  # edges = get_muller_edges(x, mutations=mutations, tree_score=tree_score)
 
   for (cluster in highlight.cov) {
     if (cluster %in% evaluated) next
@@ -58,15 +58,12 @@ fit_growth_rates = function(x,
 
     # filter the dataset
     pop_df.cl = pop_df %>%
-      dplyr::filter(grepl(paste(cluster,".",sep=""), Identity) | Identity == cluster)
+      dplyr::filter(Identity==cluster | Parent==cluster)
 
     # get the identity-parents dataframe of clone "cluster"
     # parents = get_parents(x, highlight=cluster, tree_score=tree_score)
-    parents = edges %>%
-      dplyr::filter(grepl(paste(cluster,".",sep=""), Parent) |
-                      grepl(paste(cluster,".",sep=""), Identity) |
-                      Identity==cluster |
-                      Parent==cluster)
+    parents = pop_df.cl %>%
+      dplyr::select(Parent, Identity) %>% unique()
 
     rates.df = fit_growth_utils(rates.df=rates.df,
                                 cluster=cluster,

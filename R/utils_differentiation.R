@@ -1,11 +1,11 @@
-get_mrca_df = function(x, clusters, edges, tps=c()) {
+get_mrca_df = function(x, highlight, edges, tps=c()) {
 
   if (purrr::is_empty(tps)) tps = x %>% get_timepoints()
 
   # edges.diff = differentiation_tree(return.numeric=T)
   fracs = x %>%
     get_vaf_dataframe() %>%
-    dplyr::filter(labels %in% clusters) %>%
+    dplyr::filter(labels %in% highlight) %>%
     dplyr::filter(timepoints %in% tps) %>%
     dplyr::select(labels_mut, theta_binom, lineage, timepoints) %>%
     dplyr::rename(cluster=labels_mut) %>%
