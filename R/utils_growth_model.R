@@ -1,21 +1,34 @@
-sort_clusters_edges = function(clusters, parents) {
-  # clusters is a list of clusters
-  # parents is the edges tibble
-  nn = c(parents$Parent, parents$Identity) %>% setdiff("P") %>% unique() %>% length()
-  nodes = c(parents$Parent, parents$Identity) %>% setdiff("P") %>% unique()
+sort_clusters_edges = function(clusters, edges, clonal.cl=NULL) {
+  if (!is.null(clonal.cl)) edges = edges %>% filter_edges(cluster=clonal.cl)
 
-  root = setdiff(parents$Parent, parents$Identity)
-  node.name = parents %>% dplyr::filter(Parent==root) %>% dplyr::pull(Identity)
+  # clusters is a list of clusters
+  # edges is the edges tibble
+  nn = c(edges$Parent, edges$Identity) %>% setdiff("P") %>% unique() %>% length() # the n of nodes
+  nodes = c(edges$Parent, edges$Identity) %>% setdiff("P") %>% unique() # all the nodes in edges
+
+  root = setdiff(edges$Parent, edges$Identity) # the root
+  node.name = edges %>% dplyr::filter(Parent==root) %>% dplyr::pull(Identity) # the root children
   cls.sort = c(root)
 
   for (i in 1:nn) {
     if (length(node.name)>1) { cls.sort = c(cls.sort, node.name); break }
     if (node.name %in% clusters) cls.sort = c(cls.sort, node.name)
-    node.name = parents %>% dplyr::filter(Parent==node.name) %>% dplyr::pull(Identity)
+    node.name = edges %>% dplyr::filter(Parent==node.name) %>% dplyr::pull(Identity)
   }
 
   return(
     intersect(cls.sort, clusters) %>% setdiff("P") %>% unique()
+  )
+}
+
+
+filter_edges = function(edges, cluster) {
+  return(
+    edges %>%
+      dplyr::filter(Identity==cluster |
+                      Parent==cluster |
+                      grepl(paste0(cluster, "."), Identity, fixed=T) |
+                      grepl(paste0(cluster, "."), Parent, fixed=T))
   )
 }
 

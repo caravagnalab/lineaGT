@@ -36,3 +36,10 @@ have_tp_int = function(x) {
     return(FALSE)
   return(TRUE)
 }
+
+
+have_pop_df = function(x) {
+  if ("population.df" %in% names(x))
+    return(TRUE)
+  return(FALSE)
+}

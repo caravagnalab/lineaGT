@@ -145,3 +145,12 @@ get_adj = function(tree.k) {
     tree.k$adj_mat
   )
 }
+
+
+get_pop_df = function(x) {
+  print("GETTING POP DF")
+  if (have_pop_df(x))
+    return(x$population.df)
+  cli::cli_alert_warning("No stored population dataframe!")
+  return(NULL)
+}

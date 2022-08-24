@@ -68,17 +68,30 @@ get_muller_pop = function(x,
                           add_t0=T,
                           tree_score=1) {
 
+  if (purrr::is_empty(highlight) && have_pop_df(x))
+    return(
+      get_pop_df(x) %>%
+        dplyr::filter(Identity %in% c("P",get_highlight(x, mutations=mutations, highlight=c())))
+      )
+
   highlight = get_highlight(x, mutations=mutations, highlight=highlight)
 
   # if highlight is specified -> we want to observe the frequencies of them related one to the other
   timepoints_to_int = map_timepoints_int(x, timepoints_to_int=timepoints_to_int)
+
   value = "init"
   if (!0 %in% timepoints_to_int && add_t0)
     timepoints_to_int = c(0, timepoints_to_int) %>% setNames(nm=c(value, names(timepoints_to_int))) else
     value = which(timepoints_to_int==0) %>% names()
 
-  edges = get_muller_edges(x, mutations=mutations, highlight=highlight)
+  edges = get_muller_edges(x, mutations=mutations, highlight=highlight) %>%
+    dplyr::arrange(Parent)
 
+  # tibble with columns Identity, Generation, Lineage, Population, theta_binom, theta.par, Parent
+  # Population is the mean coverage of the cluster
+  # theta_binom is the Binomial theta
+  # theta.par is the Binomial theta of the parent, for clonal clusters it is NA
+  # Parent is the cluster parent
   means.clonal = x %>%
     get_mean_long() %>%
     dplyr::filter(labels %in% highlight) %>%
@@ -90,7 +103,7 @@ get_muller_pop = function(x,
 
 
   pop_df = x %>%
-    get_pop_muts(means=means.clonal, edges=edges, mutations=mutations) %>%
+    get_pop_muts(means.clonal=means.clonal, edges=edges, mutations=mutations) %>%
     dplyr::select(-Parent) %>%
     add_parent(x=x) %>%
     add_time_0(x=x, force=add_t0, value=value) %>%
@@ -101,10 +114,10 @@ get_muller_pop = function(x,
 }
 
 
-get_pop_muts = function(x, means, edges, mutations=F) {
+get_pop_muts = function(x, means.clonal, edges, mutations=F) {
   if (!mutations)
     return(
-      means %>%
+      means.clonal %>%
         dplyr::select(-theta.par) %>%
 
         dplyr::group_by(Generation, Lineage) %>%
@@ -116,10 +129,10 @@ get_pop_muts = function(x, means, edges, mutations=F) {
 
   # obtain the correct theta for each parent
   # columns Identity, Generation, Lineage, theta_binom, theta.par, Parent
-  pop = means %>%
+  pop = means.clonal %>%
     correct_theta(edges=edges, x=x) %>%
-    add_population(means=means, x=x, edges=edges) %>%
-    dplyr::inner_join(edges, by="Identity") %>%
+    # add_population(means.clonal=means.clonal, x=x, edges=edges) %>%
+    dplyr::inner_join(edges, by=c("Identity","Parent")) %>%
 
     group_by(Generation, Lineage) %>%
     dplyr::mutate(Frequency=ifelse(sum(Population)>0, Population / sum(Population), 0)) %>%
@@ -132,7 +145,6 @@ get_pop_muts = function(x, means, edges, mutations=F) {
     dplyr::filter(Parent != "P") %>%
     dplyr::rename(Identity=Parent)
 
-
   return(
     pop %>%
       dplyr::full_join(pop.subcl, by=c("Identity", "Generation", "Lineage")) %>%
@@ -144,49 +156,54 @@ get_pop_muts = function(x, means, edges, mutations=F) {
 }
 
 
-correct_theta = function(x, means, edges) {
-  not.clonal = get_parents(edges, clonal=F)
-  clonal = get_parents(edges, clonal=T)
-  not.parents = edges$Identity %>% unique()
+correct_theta = function(x, means.clonal, edges) {
+  clonal = get_parents(edges, clonal=T) # parents clonal
+  not.clonal = lapply(clonal, sort_clusters_edges,  # sorted based on phylogeny
+                      clusters=get_parents(edges, clonal=F),  # not clonal parents
+                      edges=edges) %>%
+    unlist()
 
   # theta of all clonal clusters of IS, with theta=1 and parent="P"
-  theta.df = means %>%
-    dplyr::select(-Population)
+  theta.df = means.clonal %>% dplyr::mutate(Pop.par=NA)
 
-  for (node in clonal) {
+  for (node in clonal)
+    # correct the theta values of direct children of the clonal cluster
     theta.df = correct_theta_node(x, theta.df, edges, node)
-  }
 
-  for (node in not.clonal) {
+  for (node in not.clonal)
     theta.df = correct_theta_node(x, theta.df, edges, node)
-  }
 
   return(
     theta.df %>%
-      # dplyr::rename(theta_binom=theta.par)
-      dplyr::select(-theta.par)
+      dplyr::select(-theta.par, -Pop.par) %>%
+      dplyr::arrange(Parent, Generation, Lineage)
     )
 }
 
 
-# given "node", it checks if its children thetas sum is lower than or equal to its own theta
+# given "node", it checks if its children thetas sum is
+# lower than or equal to its own theta
 correct_theta_node = function(x, theta.df, edges, node) {
-  # node children
+  # children of "node", might be one or more than one node
   node.c = edges %>%
     dplyr::filter(Parent==node) %>%
     dplyr::pull(Identity) %>% unique()
 
-  if (node %in% theta.df$Identity) present = TRUE else present = FALSE
+  # if FALSE, it means "node" has been evaluated already
+  # and we can correct theta of its children
+  if (!node %in% theta.df$Identity)
+    cli::cli_alert_warning("Node {node} not present in the dataframe")
+    # theta.df = correct_theta_node(x, theta.df, edges, get_parent(edges, node))
 
-  if (all(node.c %in% theta.df$Identity))
-    return(theta.df)
-  if (any(node.c %in% theta.df$Identity))
-    cli::cli_alert_warning("Only some descendants already in the dataframe, cluster {node}")
+  # if also the children have been evaluated already
+  if (all(node.c %in% theta.df$Identity)) return(theta.df)
 
+  # get theta of "node" from the dataframe
   theta.node = get_theta_node(x, theta.df, node, edges) %>%
-    dplyr::rename(theta.par=theta_binom, Parent=Identity)
+    dplyr::rename(theta.par=theta_binom, Parent=Identity, Pop.par=Population)
 
   theta.tmp = x %>%
+    # get uncorrected theta of "node" children from vaf dataframe
     get_vaf_dataframe() %>%
     dplyr::rename(Identity=labels_mut, Generation=timepoints, Lineage=lineage) %>%
     dplyr::select(Identity, Generation, Lineage, theta_binom) %>%
@@ -194,20 +211,17 @@ correct_theta_node = function(x, theta.df, edges, node) {
     dplyr::filter(Parent==node) %>%
     unique() %>%
 
+    # add the corrected theta of the parent
     dplyr::inner_join(theta.node, by=c("Parent","Generation","Lineage")) %>%
 
+    # correct children theta
     dplyr::group_by(Generation, Lineage) %>%
     dplyr::mutate(theta_binom=replace(theta_binom,
                                       sum(theta_binom) > theta.par,
                                       theta_binom / sum(theta_binom) * theta.par)) %>%
-    dplyr::ungroup()
+    dplyr::ungroup() %>%
 
-  if (!present)
-    theta.tmp = theta.tmp %>%
-      dplyr::add_row(
-        theta.node %>%
-          dplyr::rename(Identity=Parent, theta_binom=theta.par)
-      )
+    dplyr::mutate(Population=theta_binom*Pop.par)
 
   return(
     theta.df %>%
@@ -223,16 +237,18 @@ get_theta_node = function(x, theta.df, node, edges) {
     return(
       theta.df %>%
         dplyr::filter(Identity==node) %>%
-        dplyr::select(theta_binom, Identity, Generation, Lineage)
+        dplyr::select(theta_binom, Identity, Generation, Lineage, Population)
     )
 
   return(
     x %>%
       get_vaf_dataframe() %>%
+      dplyr::inner_join(get_mean_long(x), by=c("labels", "timepoints", "lineage")) %>%
       dplyr::filter(labels_mut==node) %>%
-      dplyr::select(theta_binom, labels_mut, timepoints, lineage) %>%
+      dplyr::select(theta_binom, labels_mut, timepoints, lineage, mean_cov) %>%
       unique() %>%
-      dplyr::rename(Identity=labels_mut, Generation=timepoints, Lineage=lineage)
+      dplyr::rename(Identity=labels_mut, Generation=timepoints, Lineage=lineage, Population=mean_cov) %>%
+      dplyr::mutate(Population=NA)
   )
 }
 
@@ -256,45 +272,45 @@ get_parents = function(edges, clonal) {
 }
 
 
-add_population = function(x, means, theta.df, edges) {
-  parents = edges %>% dplyr::filter(Parent!="P") %>% dplyr::pull(Parent) %>% unique()
-
-  means = means %>%
-    dplyr::select(-Parent, -theta.par)
-
-  means.par = means %>%
-    dplyr::select(-theta_binom) %>%
-    dplyr::rename(Parent=Identity, Pop.par=Population)
-
-  # first compute the population size of the parents
-  pop.parents = theta.df %>%
-    dplyr::filter(Identity %in% parents) %>%
-    dplyr::full_join(means, by=c("Identity", "Generation", "Lineage", "theta_binom")) %>%
-    dplyr::left_join(means.par, by=c("Parent", "Generation", "Lineage")) %>%
-
-    dplyr::rowwise() %>%
-    dplyr::mutate(Population=replace(Population, is.na(Population), theta_binom * Pop.par)) %>%
-    dplyr::ungroup() %>%
-
-    dplyr::select(Identity, Generation, Lineage, theta_binom, Population) %>%
-    dplyr::rename(Pop.par=Population, Parent=Identity, theta.par=theta_binom)
-
-  pop = theta.df %>%
-    # add to each clonal Identity its population
-    dplyr::full_join(means, by=c("Identity", "Generation", "Lineage", "theta_binom")) %>%
-
-    # add to each subclonal parent its parent population and compute its own pop
-    dplyr::left_join(pop.parents, by=c("Parent", "Generation", "Lineage")) %>%
-
-    # compute the population size
-    dplyr::rowwise() %>%
-    dplyr::mutate(Population=replace(Population, is.na(Population), theta_binom * Pop.par)) %>%
-    dplyr::ungroup() %>%
-
-    dplyr::select(Identity, Generation, Lineage, Population, theta_binom)
-
-  return( pop )
-}
+# add_population = function(x, means.clonal, theta.df, edges) {
+#   parents = theta.df$Parent %>% unique()
+#
+#   means.clonal = means.clonal %>%
+#     dplyr::select(-Parent, -theta.par)
+#
+#   means.clonal.par = means.clonal %>%
+#     dplyr::select(-theta_binom) %>%
+#     dplyr::rename(Parent=Identity, Pop.par=Population)
+#
+#   # first compute the population size of the parents
+#   pop.parents = theta.df %>%
+#     dplyr::filter(Identity %in% parents) %>%
+#     dplyr::full_join(means.clonal, by=c("Identity", "Generation", "Lineage", "theta_binom")) %>%
+#     dplyr::left_join(means.clonal.par, by=c("Parent", "Generation", "Lineage")) %>%
+#
+#     dplyr::rowwise() %>%
+#     dplyr::mutate(Population=replace(Population, is.na(Population), theta_binom * Pop.par)) %>%
+#     dplyr::ungroup() %>%
+#
+#     dplyr::select(Identity, Generation, Lineage, theta_binom, Population) %>%
+#     dplyr::rename(Pop.par=Population, Parent=Identity, theta.par=theta_binom)
+#
+#   pop = theta.df %>%
+#     # add to each clonal Identity its population
+#     dplyr::full_join(means.clonal, by=c("Identity", "Generation", "Lineage", "theta_binom")) %>%
+#
+#     # add to each subclonal parent its parent population and compute its own pop
+#     dplyr::left_join(pop.parents, by=c("Parent", "Generation", "Lineage")) %>%
+#
+#     # compute the population size
+#     dplyr::rowwise() %>%
+#     dplyr::mutate(Population=replace(Population, is.na(Population), theta_binom * Pop.par)) %>%
+#     dplyr::ungroup() %>%
+#
+#     dplyr::select(Identity, Generation, Lineage, Population, theta_binom)
+#
+#   return( pop )
+# }
 
 
 # Checks the fraction of non-clonal parents

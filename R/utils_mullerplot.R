@@ -76,9 +76,9 @@ convert_tp = function(pop_df,
 }
 
 
-filter_muller_df = function(df, highlight=highlight) {
+filter_muller_df = function(pop_df, highlight=highlight) {
   return(
-    df %>%
+    pop_df %>%
       dplyr::mutate(labels=Identity) %>%
       tidyr::separate(labels, into=c("labels", "labels_mut"), sep="[.]", fill="right") %>%
       dplyr::filter(labels %in% c(highlight, "P")) %>%

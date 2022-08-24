@@ -106,13 +106,16 @@ is_present_desc = function(node, parent, edges, fracs) {
 }
 
 
-get_desc_list = function(edges) {
+get_desc_list = function(edges, clonal=F) {
   desc = list()
 
-  for (pp in unique(edges$Parent))  # parents
+  for (pp in unique(edges$Parent)) {  # parents
+    if (clonal && pp != "P" && get_parent(edges, pp) != "P")
+      next
     for (cc in unique(edges$Identity))  # children
       if ((pp != cc) & (is_desc_of(edges, cc, pp)))
         desc[[pp]] = c(desc[[pp]], cc)  # if cc descends from pp
+  }
 
   return(desc)
 }
