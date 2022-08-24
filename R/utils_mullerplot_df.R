@@ -149,15 +149,17 @@ correct_theta = function(x, means, edges) {
   clonal = get_parents(edges, clonal=T)
   not.parents = edges$Identity %>% unique()
 
-  # theta of all clonal clusters if IS, with theta=1 and parent="P"
+  # theta of all clonal clusters of IS, with theta=1 and parent="P"
   theta.df = means %>%
     dplyr::select(-Population)
 
-  for (node in clonal)
+  for (node in clonal) {
     theta.df = correct_theta_node(x, theta.df, edges, node)
+  }
 
-  for (node in not.clonal)
+  for (node in not.clonal) {
     theta.df = correct_theta_node(x, theta.df, edges, node)
+  }
 
   return(
     theta.df %>%
@@ -169,12 +171,12 @@ correct_theta = function(x, means, edges) {
 
 # given "node", it checks if its children thetas sum is lower than or equal to its own theta
 correct_theta_node = function(x, theta.df, edges, node) {
+  # node children
   node.c = edges %>%
     dplyr::filter(Parent==node) %>%
     dplyr::pull(Identity) %>% unique()
 
-  if (node %in% theta.df$Identity)
-    present = TRUE
+  if (node %in% theta.df$Identity) present = TRUE else present = FALSE
 
   if (all(node.c %in% theta.df$Identity))
     return(theta.df)
