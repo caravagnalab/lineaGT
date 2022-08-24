@@ -36,7 +36,7 @@ fit_growth_rates = function(x,
   pop_df = x %>%
     get_muller_pop(mutations=mutations, timepoints_to_int=timepoints_to_int,
                    tree_score=tree_score) %>%
-    dplyr::select(-Pop.subcl, -Pop.plot, -dplyr::contains("theta"))
+    dplyr::select(-dplyr::contains("Pop.subcl"), -dplyr::contains("Pop.plot"), -dplyr::contains("theta"))
 
   rates.df = data.frame()
   evaluated = list()
@@ -73,8 +73,6 @@ fit_growth_rates = function(x,
                                 steps=steps,
                                 timepoints_to_int=timepoints_to_int,
                                 py_pkg=py_pkg)
-
-    print(rates.df)
 
     evaluated = c(cluster, evaluated)
 

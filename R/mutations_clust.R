@@ -33,7 +33,8 @@ fit_mutations = function(x,
   if (!is.null(vaf.df) && have_vaf_df(x))
     cli::cli_alert_warning("Using the input mutation data but a VAF dataframe is already present in the object.")
   if (is.null(vaf.df) && have_vaf_df(x))
-    vaf.df = x %>% get_vaf_dataframe()
+    vaf.df = x %>% get_vaf_dataframe() %>%
+      dplyr::select(-dplyr::contains("labels"), -dplyr::contains("binom"))
 
   clusters_joined = get_highlight(x, min_frac, highlight)
 
@@ -57,6 +58,7 @@ fit_mutations = function(x,
     vaf.df.fit = rbind(vaf.df.fit, x.muts.k$df)
 
     if (!purrr::is_empty(x.muts.k$fit)) x.muts[[cluster]] = x.muts.k$fit
+
 
     if (infer_phylo && !purrr::is_empty(x.muts.k$tree)) x.trees[[cluster]] = x.muts.k$tree
   }
