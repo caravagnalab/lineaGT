@@ -38,7 +38,7 @@ plot_differentiation_tree = function(x,
   plots = lapply(names(mrca.list), util_plot_diff, mrca.list=mrca.list, edges=edges, timepoints=timepoints) %>%
     purrr::discard(is.null)
 
-  if (wrap) return(patchwork::wrap_plots(plots, ncol=2, guides="collect"))
+  if (wrap) return(patchwork::wrap_plots(plots, guides="collect"))
 
   return(plots)
 }
