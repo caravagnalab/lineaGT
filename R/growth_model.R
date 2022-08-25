@@ -59,7 +59,8 @@ fit_growth_rates = function(x,
 
     # filter the dataset
     pop_df.cl = pop_df %>%
-      dplyr::filter(Identity==cluster | Parent==cluster)
+      dplyr::filter(Identity==cluster |
+                      grepl(paste0(cluster, "."), Identity, fixed=T))
 
     # get the identity-parents dataframe of clone "cluster"
     # parents = get_parents(x, highlight=cluster, tree_score=tree_score)
@@ -107,9 +108,12 @@ fit_growth_utils = function(rates.df,
                       timepoints_to_int=timepoints_to_int,
                       py_pkg=py_pkg)
 
+  subclones = c(parents$Identity, parents$Parent) %>%
+    sort_clusters_edges(edges=parents) # get the clusters sorted by tree hierarchy
+
   # fit the growth rate in all the parents
   rates.df = rates.df %>%
-    fit_growth_clones(clusters=parents$Parent %>% unique(),
+    fit_growth_clones(clusters=subclones,
                       pop_df.cl=pop_df.cl,
                       parents=parents,
                       growth_model=growth_model,
@@ -118,16 +122,17 @@ fit_growth_utils = function(rates.df,
                       timepoints_to_int=timepoints_to_int,
                       py_pkg=py_pkg)
 
-  # then in all the children
-  rates.df = rates.df %>%
-    fit_growth_clones(clusters=parents$Identity %>% unique(),
-                      pop_df.cl=pop_df.cl,
-                      parents=parents,
-                      growth_model=growth_model,
-                      steps=steps,
-                      clonal=FALSE,
-                      timepoints_to_int=timepoints_to_int,
-                      py_pkg=py_pkg)
+
+  # rates.df = rates.df %>%
+  #   fit_growth_clones(clusters=parents$Identity %>% unique(),
+  #                     pop_df.cl=pop_df.cl,
+  #                     parents=parents,
+  #                     growth_model=growth_model,
+  #                     steps=steps,
+  #                     clonal=FALSE,
+  #                     timepoints_to_int=timepoints_to_int,
+  #                     py_pkg=py_pkg)
+
 
   return(rates.df)
 }
@@ -145,24 +150,21 @@ fit_growth_clones = function(rates.df,
 
   if (!clonal & nrow(parents)==0) return(rates.df)
 
-  # get the clusters sorted by tree hierarchy
-  if (!clonal) clusters = sort_clusters_edges(clusters, parents)
+  # if (!clonal) clusters = sort_clusters_edges(clusters, parents)
 
-  for (subcl in clusters) {
-
-    par = pop_df.cl %>% dplyr::filter(Identity==subcl) %>% dplyr::pull(Parent) %>% unique()
-
-    if (!subcl %in% (rates.df$Identity) && (subcl %in% pop_df.cl$Identity) && (subcl != "P"))
+  for (subcl in clusters)
+    # par = pop_df.cl %>% dplyr::filter(Identity==subcl) %>% dplyr::pull(Parent) %>% unique()
+    if ( (!subcl %in% rates.df$Identity) && (subcl %in% pop_df.cl$Identity) && (subcl != "P") )
         rates.df = run_py_growth(rates.df,
                                  pop_df.cl=pop_df.cl,
                                  cluster=subcl,
                                  timepoints_to_int=timepoints_to_int,
-                                 p.rates=get_parent_rate(par, rates.df, subcl),
+                                 # p.rates=get_parent_rate(par, rates.df, subcl),
                                  clonal=clonal,
                                  growth_model=growth_model,
                                  steps=steps,
                                  py_pkg=py_pkg)
-  }
+
   return(rates.df)
 }
 
@@ -172,11 +174,14 @@ run_py_growth = function(rates.df,
                          cluster,
                          timepoints_to_int,
                          steps=500,
-                         p.rates=list("exp"=NULL, "log"=NULL),
+                         # p.rates=list("exp"=NULL, "log"=NULL),
                          clonal=FALSE,
                          growth_model="exp.log",
                          random_state=25,
                          py_pkg=NULL) {
+
+  par = pop_df.cl %>% dplyr::filter(Identity==cluster) %>% dplyr::pull(Parent) %>% unique()
+  p.rates = get_parent_rate(par, rates.df, cluster)
 
   torch = reticulate::import("torch")
   if (is.null(py_pkg)) py_pkg = reticulate::import("pylineaGT")

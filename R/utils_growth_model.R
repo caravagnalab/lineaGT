@@ -11,9 +11,10 @@ sort_clusters_edges = function(clusters, edges, clonal.cl=NULL) {
   cls.sort = c(root)
 
   for (i in 1:nn) {
-    if (length(node.name)>1) { cls.sort = c(cls.sort, node.name); break }
-    if (node.name %in% clusters) cls.sort = c(cls.sort, node.name)
-    node.name = edges %>% dplyr::filter(Parent==node.name) %>% dplyr::pull(Identity)
+
+    for (ii in node.name) if (ii %in% clusters) cls.sort = c(cls.sort, ii)
+    # take the lower level of the tree
+    node.name = edges %>% dplyr::filter(Parent %in% node.name) %>% dplyr::pull(Identity)
   }
 
   return(
