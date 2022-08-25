@@ -68,7 +68,7 @@ get_muller_pop = function(x,
                           add_t0=T,
                           tree_score=1) {
 
-  if (purrr::is_empty(highlight) && have_pop_df(x))
+  if (purrr::is_empty(highlight) && have_pop_df(x) && mutations)
     return(
       get_pop_df(x) %>%
         dplyr::filter(Identity %in% c("P",get_highlight(x, mutations=mutations, highlight=c())))
@@ -134,8 +134,11 @@ get_pop_muts = function(x, means.clonal, edges, mutations=F) {
     # add_population(means.clonal=means.clonal, x=x, edges=edges) %>%
     dplyr::inner_join(edges, by=c("Identity","Parent")) %>%
 
-    group_by(Generation, Lineage) %>%
-    dplyr::mutate(Frequency=ifelse(sum(Population)>0, Population / sum(Population), 0)) %>%
+    dplyr::group_by(Generation, Lineage) %>%
+    dplyr::mutate(Frequency=dplyr::case_when(
+      sum(Population)>0 ~ Population / sum(Population),
+      sum(Population)==0 ~ 0)
+      ) %>%
     dplyr::ungroup()
 
   pop.subcl = pop %>%
@@ -152,7 +155,7 @@ get_pop_muts = function(x, means.clonal, edges, mutations=F) {
       dplyr::mutate(Pop.plot=Population - Pop.subcl)
   )
 
-  return(pop)
+  # return(pop)
 }
 
 
