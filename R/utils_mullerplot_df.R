@@ -152,7 +152,8 @@ get_pop_muts = function(x, means.clonal, edges, mutations=F) {
     pop %>%
       dplyr::full_join(pop.subcl, by=c("Identity", "Generation", "Lineage")) %>%
       replace(is.na(.), 0) %>%
-      dplyr::mutate(Pop.plot=Population - Pop.subcl)
+      dplyr::mutate(Pop.plot=Population - Pop.subcl) %>%
+      dplyr::mutate(Pop.plot=replace(Pop.plot, Pop.plot < 0, 0))
   )
 
   # return(pop)

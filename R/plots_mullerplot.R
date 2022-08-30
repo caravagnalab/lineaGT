@@ -48,13 +48,13 @@ plot_mullerplot = function(x,
     dplyr::select(-Population, -Frequency, -Parent, -theta_binom, -dplyr::contains("Pop.subcl")) %>%
     dplyr::rename(Population=Pop.plot) %>%
 
-    dplyr::mutate(Identity=factor(Identity, levels=lvls)) %>%
+    # dplyr::mutate(Identity=factor(Identity, levels=lvls)) %>%
     dplyr::arrange(Identity, Generation, Lineage)
 
   edges_df = get_muller_edges(x,
                               mutations=mutations,
                               tree_score=tree_score) %>%
-    dplyr::mutate(Parent=factor(Parent, levels=lvls)) %>%
+    # dplyr::mutate(Parent=factor(Parent, levels=lvls)) %>%
     dplyr::arrange(Parent) #%>% dplyr::mutate(Parent=as.character(Parent))
 
 
