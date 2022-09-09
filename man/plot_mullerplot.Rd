@@ -13,8 +13,7 @@ plot_mullerplot(
   mutations = F,
   single_clone = T,
   tree_score = 1,
-  legend.pos = "right",
-  wrap = T
+  legend.pos = "right"
 )
 }
 \arguments{
@@ -38,8 +37,6 @@ reported in \code{highlight} and the respective subclones will be visualised.}
 \item{tree_score}{add}
 
 \item{legend.pos}{add}
-
-\item{wrap}{Boolean. If set to \code{TRUE}, a single plot with the mullerplots for each lineage will be returned.}
 }
 \description{
 Function to visualize the mullerplot for the fitted object.

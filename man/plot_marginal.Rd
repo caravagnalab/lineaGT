@@ -10,7 +10,8 @@ plot_marginal(
   highlight = c(),
   binwidth = 10,
   show_dens = T,
-  timepoints_to_int = list()
+  timepoints_to_int = list(),
+  single_plot = F
 )
 }
 \arguments{

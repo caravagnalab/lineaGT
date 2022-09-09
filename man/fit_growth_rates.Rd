@@ -12,7 +12,8 @@ fit_growth_rates(
   growth_model = "exp.log",
   force = T,
   tree_score = 1,
-  py_pkg = NULL
+  py_pkg = NULL,
+  mutations = F
 )
 }
 \arguments{

@@ -66,7 +66,8 @@ get_muller_pop = function(x,
                           timepoints_to_int=c(),
                           highlight=c(),
                           add_t0=T,
-                          tree_score=1) {
+                          tree_score=1,
+                          edges=NULL) {
 
   if (purrr::is_empty(highlight) && have_pop_df(x) && mutations)
     return(
@@ -84,8 +85,9 @@ get_muller_pop = function(x,
     timepoints_to_int = c(0, timepoints_to_int) %>% setNames(nm=c(value, names(timepoints_to_int))) else
     value = which(timepoints_to_int==0) %>% names()
 
-  edges = get_muller_edges(x, mutations=mutations, highlight=highlight) %>%
-    dplyr::arrange(Parent)
+  if (is.null(edges))
+    edges = get_muller_edges(x, mutations=mutations, highlight=highlight) %>%
+      dplyr::arrange(Parent)
 
   # tibble with columns Identity, Generation, Lineage, Population, theta_binom, theta.par, Parent
   # Population is the mean coverage of the cluster

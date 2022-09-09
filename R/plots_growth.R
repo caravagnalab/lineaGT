@@ -44,12 +44,6 @@ plot_growth_regression = function(x,
   color_palette = c("firebrick","steelblue"); names(color_palette) = c("Exponential","Logistic")
   color_palette = c(color_palette, x$color_palette)
 
-  # geom_line(aes(month, N, group = Event.Clearance.SubGroup),
-  #           data = groupSummaries, colour = alpha("grey", 0.7)) +
-  #   geom_line(aes(month, N, group = Event.Clearance.SubGroup, colour = Event.Clearance.SubGroup),
-  #             data = groupSummariesF)
-
-
   return(
     pop_df %>%
       ggplot() +

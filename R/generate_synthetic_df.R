@@ -10,6 +10,9 @@ generate_synthetic_df = function(N_values,
                                  filename="",
                                  run=T) {
 
+  if (!endsWith(path, "/"))
+    path = paste0(path, "/")
+
   torch = reticulate::import("torch")
   py_pkg = reticulate::import("pylineaGT")
 
@@ -17,11 +20,19 @@ generate_synthetic_df = function(N_values,
 
   for (n_df in 1:n_datasets) {
     for (nn in N_values) {
+
+      if (!dir.exists(paths=paste0(path, "N", nn)))
+        dir.create(paste0(path, "N", nn))
+
       for (tt in T_values) {
         for (kk in K_values) {
 
           tmp_name = paste0("N", nn, ".T", tt, ".K", kk)
           subpath = paste0(path, "N", nn, "/", tmp_name, "/")
+
+          if (!dir.exists(paths=subpath))
+            dir.create(subpath)
+
           files_list = list.files(path=subpath)
 
           print(paste0(tmp_name, ".", n_df, ".data.Rds"))

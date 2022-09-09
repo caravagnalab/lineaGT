@@ -90,7 +90,13 @@ plot_2D = function(x, dim1, dim2, color_palette, highlight, dens=NULL, ...) {
 #'
 #' @export plot_marginal
 
-plot_marginal = function(x, min_frac=0, highlight=c(), binwidth=10, show_dens=T, timepoints_to_int=list()) {
+plot_marginal = function(x,
+                         min_frac=0,
+                         highlight=c(),
+                         binwidth=10,
+                         show_dens=T,
+                         timepoints_to_int=list(),
+                         single_plot=F) {
 
   timepoints_to_int = map_timepoints_int(x)
 
@@ -99,30 +105,69 @@ plot_marginal = function(x, min_frac=0, highlight=c(), binwidth=10, show_dens=T,
   highlight = get_highlight(x, min_frac, highlight)
   color_palette = highlight_palette(x, highlight)
 
-  if (show_dens) {
-    dd = x %>%
+  dd = x %>%
     get_cov_dataframe() %>%
     dplyr::mutate(timepoints=factor(timepoints, levels=tp)) %>%
     dplyr::filter(labels %in% highlight)
 
-  means = x %>%
-    get_mean_long() %>%
-    dplyr::mutate(timepoints=factor(timepoints, levels=tp)) %>%
-    dplyr::filter(labels %in% highlight)
+  if (show_dens) {
+    means = x %>%
+      get_mean_long() %>%
+      dplyr::mutate(timepoints=factor(timepoints, levels=tp)) %>%
+      dplyr::filter(labels %in% highlight)
 
-  vars = x %>%
-    get_variance_long() %>%
-    dplyr::mutate(timepoints=factor(timepoints, levels=tp)) %>%
-    dplyr::filter(labels %in% highlight)
+    vars = x %>%
+      get_variance_long() %>%
+      dplyr::mutate(timepoints=factor(timepoints, levels=tp)) %>%
+      dplyr::filter(labels %in% highlight)
 
-  weights = (get_ISs(x) / sum(get_ISs(x))) %>%
-    data.frame() %>% setNames("weights") %>%
-    tibble::rownames_to_column(var="labels")
+    weights = (get_ISs(x) / sum(get_ISs(x))) %>%
+      data.frame() %>% setNames("weights") %>%
+      tibble::rownames_to_column(var="labels")
 
-  params = dplyr::inner_join(means, vars, by=c("labels", "timepoints", "lineage")) %>%
-    dplyr::inner_join(weights, by="labels") %>%
-    dplyr::mutate(labels=factor(labels, levels=highlight))
+    params = dplyr::inner_join(means, vars, by=c("labels", "timepoints", "lineage")) %>%
+      dplyr::inner_join(weights, by="labels") %>%
+      dplyr::mutate(labels=factor(labels, levels=highlight))
   }
+
+
+
+  if (single_plot) {
+    colors = Polychrome::createPalette(length(x$lineages),
+                                       seedcolors=c("#1e8449", "#ca6f1e", "#1f618d"),
+                                       M=1000, range=c(20,80)) %>%
+      setNames(x$lineages)
+    p = dd %>%
+      dplyr::mutate(tp_lin=interaction(timepoints, lineage)) %>%
+      ggplot() +
+      geom_histogram(aes(x=coverage, fill=lineage, y=..count../sum(..count..)),
+                     position="identity", alpha=1, binwidth=binwidth,
+                     color="#FFFFFF00") +
+      scale_fill_manual(values=colors, breaks=x$lineages) +
+      facet_grid(tp_lin ~ labels) + #, scale="free_y") +
+      ylab("Counts") + xlab("Coverage") +
+      labs(fill="Lineage") +
+      my_ggplot_theme()
+
+    if (show_dens) {
+      dens.df = params %>%
+        dplyr::group_by(timepoints, labels) %>%
+        dplyr::mutate(dens=list(rnorm(1000, mean=mean_cov, sd=sigma))) %>%
+        tidyr::unnest(dens) %>%
+        dplyr::filter(dens>=0) %>%
+        dplyr::ungroup() %>%
+        mutate(tp_lin=interaction(timepoints, lineage))
+
+      p = p +
+        geom_density(data=dens.df, aes(x=dens, y=..count../sum(..count..)*binwidth, color=lineage, fill=lineage),
+                     linetype="solid", size=.1, inherit.aes=F, alpha=0.3) +
+        scale_color_manual(values=colors, breaks=x$lineages) +
+        ylab("Density") + guides(color="none")
+    }
+
+    return(p + xlim(0, max(x$cov.dataframe$coverage)))
+  }
+
 
   p = list()
   lineages = x %>% get_lineages()
@@ -132,9 +177,8 @@ plot_marginal = function(x, min_frac=0, highlight=c(), binwidth=10, show_dens=T,
       dplyr::filter(lineage==ll) %>%
       ggplot() +
       geom_histogram(aes(x=coverage, fill=labels, y=..count../sum(..count..)),
-                     position="identity", alpha=.7, binwidth=binwidth, inherit.aes=F) +
+                     position="identity", alpha=1, binwidth=binwidth, color="#FFFFFF00") +
       scale_fill_manual(values=color_palette, breaks=highlight) +
-      scale_color_manual(values=color_palette, breaks=highlight) +
       facet_grid(timepoints ~ labels) +
       ylab("Counts") + xlab("Coverage") +
       labs(fill="Clusters", subtitle=ll) +
@@ -150,11 +194,13 @@ plot_marginal = function(x, min_frac=0, highlight=c(), binwidth=10, show_dens=T,
         dplyr::ungroup()
 
       p[[ll]] = p[[ll]] +
-        geom_density(data=dens.df, aes(x=dens, y=..count../sum(..count..)*binwidth, color=labels),
-                     linetype="solid", size=.1, inherit.aes=F) +
-        guides(color="none")
+        geom_density(data=dens.df, aes(x=dens, y=..count../sum(..count..)*binwidth, color=labels, fill=labels),
+                     linetype="solid", size=.1, inherit.aes=F, alpha=0.3) +
+        # geom_histogram(data=dens.df, aes(x=dens, y=(..count..)/sum(..count..)/60*binwidth, fill=labels),
+        #                inherit.aes=F, color="#FFFFFF00", alpha=.3, binwidth=60) +
+        scale_color_manual(values=color_palette, breaks=highlight) +
+        ylab("Density") + guides(color="none")
     }
-
   }
 
   return(p)

@@ -26,8 +26,8 @@ fit(
   store_losses = TRUE,
   store_params = FALSE,
   seed_optim = TRUE,
-  seed = 5,
-  init_seed = 5,
+  seed = 6,
+  init_seed = 6,
   sample_id = ""
 )
 }

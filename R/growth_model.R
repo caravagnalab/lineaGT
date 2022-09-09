@@ -25,13 +25,14 @@ fit_growth_rates = function(x,
                             growth_model="exp.log",
                             force=T,
                             tree_score=1,
-                            py_pkg=NULL) {
+                            py_pkg=NULL,
+                            mutations=F) {
 
   highlight.cov = get_highlight(x, highlight=highlight, mutations=F)
   highlight.muts = get_highlight(x, highlight=highlight, mutations=T)
   timepoints_to_int = map_timepoints_int(x, timepoints_to_int)
 
-  if (have_muts_fit(x)) mutations = T else mutations = F
+  if (!mutations && have_muts_fit(x)) mutations = T
 
   pop_df = x %>%
     get_muller_pop(mutations=mutations, timepoints_to_int=timepoints_to_int,

@@ -14,7 +14,6 @@
 #' reported in \code{highlight} and the respective subclones will be visualised.
 #' @param tree_score add
 #' @param legend.pos add
-#' @param wrap Boolean. If set to \code{TRUE}, a single plot with the mullerplots for each lineage will be returned.
 #'
 #' @examples
 #' if (FALSE) plot_mullerplot(x, wrap=T)
@@ -33,8 +32,7 @@ plot_mullerplot = function(x,
                            mutations=F,
                            single_clone=T,
                            tree_score=1,
-                           legend.pos="right",
-                           wrap=T) {
+                           legend.pos="right") {
 
   timepoints_to_int = map_timepoints_int(x, timepoints_to_int)
 
@@ -48,14 +46,12 @@ plot_mullerplot = function(x,
     dplyr::select(-Population, -Frequency, -Parent, -theta_binom, -dplyr::contains("Pop.subcl")) %>%
     dplyr::rename(Population=Pop.plot) %>%
 
-    # dplyr::mutate(Identity=factor(Identity, levels=lvls)) %>%
     dplyr::arrange(Identity, Generation, Lineage)
 
   edges_df = get_muller_edges(x,
                               mutations=mutations,
                               tree_score=tree_score) %>%
-    # dplyr::mutate(Parent=factor(Parent, levels=lvls)) %>%
-    dplyr::arrange(Parent) #%>% dplyr::mutate(Parent=as.character(Parent))
+    dplyr::arrange(Parent)
 
 
   if (single_clone && mutations) {
@@ -89,21 +85,23 @@ plot_mullerplot = function(x,
 
 
 mullerplot_util = function(mullerdf, which, color_palette, highlight, legend.pos="right") {
-  if (which == "fitness") {
-    exp_limits = c(min(mullerdf$lm_r), max(mullerdf$lm_r))
-
-    return(
-      mullerdf %>% ggplot() +
-        geom_area(aes_string(x="Generation", y="Frequency", group="Group_id", fill="lm_r")) +
-        geom_vline(xintercept=mullerdf$Generation %>% unique(), linetype="dashed") +
-        guides(linetype="none", color="none") +
-        facet_wrap(~Lineage, nrow=1) +
-        xlab("Time") +
-        labs(fill="Exp rate") +
-        my_ggplot_theme(legend.pos=legend.pos) +
-        scale_fill_gradient2(mid="white", low="blue", high="red", limits=exp_limits, na.value="#FFFFFF00")
-    )
-  }
+  # if (which == "fitness") {
+  #   exp_limits = c(min(mullerdf$lm_r), max(mullerdf$lm_r))
+  #
+  #   return(
+  #     mullerdf %>%
+  #       ggplot() +
+  #       geom_area(aes_string(x="Generation", y="Frequency", group="Group_id", fill="lm_r")) +
+  #       geom_vline(xintercept=mullerdf$Generation %>% unique(), linetype="dashed") +
+  #       guides(linetype="none", color="none") +
+  #       facet_wrap(~Lineage, nrow=1) +
+  #       xlab("Time") +
+  #       labs(fill="Exp rate") +
+  #       my_ggplot_theme(legend.pos=legend.pos) +
+  #       scale_fill_gradient2(mid="white", low="blue", high="red",
+  #                            limits=exp_limits, na.value="#FFFFFF00")
+  #   )
+  # }
 
   if (which == "frac")
     y = "Frequency"
@@ -114,17 +112,19 @@ mullerplot_util = function(mullerdf, which, color_palette, highlight, legend.pos
 
   return(
     mullerdf %>%
-      # dplyr::mutate(Identity=factor(Identity, levels=lvls)) %>%
-      # dplyr::arrange(Identity, Group_id) %>%
       ggplot() +
-      geom_area(aes_string(x="Generation", y=y, group="Group_id", fill="Identity", colour="Identity")) +
+      geom_area(aes_string(x="Generation",
+                           y=y,
+                           group="Group_id",
+                           fill="Identity"), alpha=1, lwd=0) +
       geom_vline(xintercept=mullerdf$Generation %>% unique(), linetype="dashed") +
       guides(linetype="none", color="none") +
       facet_wrap(~Lineage, nrow=1) +
-      scale_fill_manual(name="Clusters", values=color_palette, na.value="#FFFFFF00", breaks=highlight) +
-      scale_color_manual(values=color_palette, na.value="#FFFFFF00", breaks=highlight) +
+      scale_fill_manual(name="Clusters", values=color_palette, na.value="white", breaks=highlight) +
+      # scale_color_manual(values=color_palette, na.value="#FFFFFF00", breaks=highlight) +
       xlab("Time") +
-      my_ggplot_theme(legend.pos=legend.pos)
+      my_ggplot_theme(legend.pos=legend.pos) +
+      theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank())
   )
 
 }
