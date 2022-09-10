@@ -83,7 +83,7 @@ fit = function(cov.df,
                store_params=FALSE,
                seed_optim=TRUE,
                seed=6,
-               init_seed=6,
+               # init_seed=NULL,
                sample_id="") {
 
   py_pkg = reticulate::import("pylineaGT")
@@ -114,8 +114,9 @@ fit = function(cov.df,
                                  store_params=store_params,
 
                                  seed_optim=seed_optim,
-                                 seed=as.integer(seed),
-                                 init_seed=as.integer(init_seed))
+                                 seed=as.integer(seed)
+                                 # init_seed=as.integer(init_seed)
+                                 )
   cli::cli_process_done()
 
   selection = list("ic"=out[[1]], "losses"=out[[2]], "grads"=out[[3]], "params"=out[[4]]) %>%
