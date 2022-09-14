@@ -35,7 +35,7 @@ plot_losses = function(x, train=FALSE) {
            geom_line(aes(x=index, y=losses, color=K, group=id.K), size=.5) +
            facet_wrap(~run) +
            scale_x_continuous(breaks=function(x) unique(floor(pretty(seq(0, (max(x) + 1) * 1.1))))) +
-           ylab("ELBO") + xlab("Iterations") +
+           ylab("-ELBO") + xlab("Iterations") +
            my_ggplot_theme()
          )
 

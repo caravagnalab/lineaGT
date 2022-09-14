@@ -49,9 +49,11 @@ plot_2D = function(x, dim1, dim2, color_palette, highlight, dens=NULL, ...) {
   inputs = eval(substitute(alist(...))) %>% purrr::map(as.list)
 
   pl = ggplot2::ggplot() +
-    geom_point(data=long_to_wide_cov(get_cov_dataframe(x)),
-               aes_string(x=dim1, y=dim2, color="labels"),
-               alpha=.4, size=.8) +
+    geom_point(
+      data=long_to_wide_cov(get_cov_dataframe(x)),
+      # data = dens %>% filter(labels %in% highlight),
+      aes_string(x=dim1, y=dim2, color="labels"),
+      alpha=.4, size=.8) +
     scale_color_manual(values=color_palette, breaks=highlight) +
     labs(color="Clusters") +
     xlab(split_to_camelcase(dim1)) +
@@ -63,10 +65,14 @@ plot_2D = function(x, dim1, dim2, color_palette, highlight, dens=NULL, ...) {
   try({ pl = pl + ylim(inputs$ylim) }, silent=T)
   try({ pl = pl + xlim(inputs$xlim) }, silent=T)
 
-  if (!is.null(dens)) pl = pl +
-    geom_density_2d(data=dens %>% filter(labels %in% highlight),
-                    aes_string(x=dim1, y=dim2, color="labels"),
-                    inherit.aes=F, contour_var="ndensity", size=.1)
+  if (!is.null(dens))
+    pl = pl +
+      stat_density_2d(data=dens %>% filter(labels %in% highlight),
+                      aes_string(x=dim1, y=dim2, alpha="..level..", fill="labels"),
+                      geom="polygon", inherit.aes=F, contour_var="ndensity", bins=5) +
+      scale_fill_manual(values=color_palette, breaks=highlight) +
+      scale_alpha_continuous(range=c(0.01,0.4)) +
+      labs(fill="Clusters") + guides(alpha="none", color="none")
 
   return(pl)
 }
@@ -176,7 +182,9 @@ plot_marginal = function(x,
     p[[ll]] = dd %>%
       dplyr::filter(lineage==ll) %>%
       ggplot() +
-      geom_histogram(aes(x=coverage, fill=labels, y=..count../sum(..count..)),
+      geom_histogram(aes(x=coverage,
+                         y=..count../sum(..count..),
+                         fill=labels),
                      position="identity", alpha=1, binwidth=binwidth, color="#FFFFFF00") +
       scale_fill_manual(values=color_palette, breaks=highlight) +
       facet_grid(timepoints ~ labels) +
@@ -194,11 +202,12 @@ plot_marginal = function(x,
         dplyr::ungroup()
 
       p[[ll]] = p[[ll]] +
-        geom_density(data=dens.df, aes(x=dens, y=..count../sum(..count..)*binwidth, color=labels, fill=labels),
-                     linetype="solid", size=.1, inherit.aes=F, alpha=0.3) +
-        # geom_histogram(data=dens.df, aes(x=dens, y=(..count..)/sum(..count..)/60*binwidth, fill=labels),
-        #                inherit.aes=F, color="#FFFFFF00", alpha=.3, binwidth=60) +
-        scale_color_manual(values=color_palette, breaks=highlight) +
+        geom_density(data=dens.df,
+                     aes(x=dens,
+                         # y=..count../sum(..count..)*binwidth,
+                         fill=labels),
+                     size=.1, inherit.aes=F, alpha=0.3, color="#FFFFFF00") +
+
         ylab("Density") + guides(color="none")
     }
   }

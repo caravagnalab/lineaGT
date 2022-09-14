@@ -58,7 +58,7 @@ compute_density = function(x) {
 
   density = data.frame()
   for (cl in get_unique_labels(x)) {
-    dd = as.data.frame(MASS::mvrnorm(n=1000, mu=mean[cl,], Sigma=sigma[[cl]]))
+    dd = as.data.frame(MASS::mvrnorm(n=500, mu=mean[cl,], Sigma=sigma[[cl]], empirical=T))
     colnames(dd) = x$dimensions
     dd$labels = cl
     density = rbind(density, dd)
