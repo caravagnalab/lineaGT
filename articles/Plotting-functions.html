@@ -97,41 +97,83 @@
 <span><span class="co">#&gt; Warning: replacing previous import 'crayon::%+%' by 'ggplot2::%+%' when loading</span></span>
 <span><span class="co">#&gt; 'VIBER'</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Loading <span style="color: #00BB00;">VIBER</span>, <span style="font-style: italic;">'Variational inference for multivariate Binomial mixtures'</span>. Support : <span style="color: #0000BB; font-style: italic;">&lt;https://caravagn.github.io/VIBER/&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Loading <span style="color: #00BB00;">lineaGT</span>, <span style="font-style: italic;">'Lineage inference from gene therapy'</span>. Support : <span style="color: #0000BB; font-style: italic;">&lt;https://caravagnalab.github.io/lineaGT/&gt;</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Loading <span style="color: #00BB00;">lineaGT</span>, <span style="font-style: italic;">'Lineage inference from gene therapy'</span>. Support : <span style="color: #0000BB; font-style: italic;">&lt;https://caravagnalab.github.io/lineaGT/&gt;</span></span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://patchwork.data-imaginist.com" class="external-link">patchwork</a></span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">x.example</span><span class="op">)</span></span>
+<span><span class="va">x.example</span></span>
+<span><span class="co">#&gt; ── <span style="color: #000000; background-color: #BBBB00;">[ lineaGT ] </span> ──── <span style="font-weight: bold;">Python:</span> <span style="color: #555555;">/usr/share/miniconda/envs/lineagt-env/bin/python</span> ──</span></span>
+<span><span class="co">#&gt; → Lineages: <span style="color: #00BB00;">l1</span> and <span style="color: #00BB00;">l2</span>.</span></span>
+<span><span class="co">#&gt; → Timepoints: <span style="color: #00BB00;">t1</span> and <span style="color: #00BB00;">t2</span>.</span></span>
+<span><span class="co">#&gt; → Number of Insertion Sites: <span style="color: #00BB00;">66</span>.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Optimal IS model with <span style="color: #00BB00;">k = 8</span>.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     <span style="color: #BBBB00;">C2</span> (20 ISs) : <span style="color: #0000BB;">l1</span> [168, 202]; <span style="color: #0000BB;">l2</span> [ 24, 333] </span></span>
+<span><span class="co">#&gt;     <span style="color: #BBBB00;">C6</span> (17 ISs) : <span style="color: #0000BB;">l1</span> [342, 236]; <span style="color: #0000BB;">l2</span> [ 78, 557] </span></span>
+<span><span class="co">#&gt;      <span style="color: #BBBB00;">C1</span> (7 ISs) : <span style="color: #0000BB;">l1</span> [ 92, 119]; <span style="color: #0000BB;">l2</span> [197, 678] </span></span>
+<span><span class="co">#&gt;      <span style="color: #BBBB00;">C4</span> (7 ISs) : <span style="color: #0000BB;">l1</span> [  2, 663]; <span style="color: #0000BB;">l2</span> [  1, 920] </span></span>
+<span><span class="co">#&gt;      <span style="color: #BBBB00;">C5</span> (6 ISs) : <span style="color: #0000BB;">l1</span> [267, 226]; <span style="color: #0000BB;">l2</span> [ 61, 523] </span></span>
+<span><span class="co">#&gt;      <span style="color: #BBBB00;">C7</span> (5 ISs) : <span style="color: #0000BB;">l1</span> [  1, 270]; <span style="color: #0000BB;">l2</span> [  1, 124] </span></span>
+<span><span class="co">#&gt;      <span style="color: #BBBB00;">C0</span> (2 ISs) : <span style="color: #0000BB;">l1</span> [  2, 847]; <span style="color: #0000BB;">l2</span> [  0, 344] </span></span>
+<span><span class="co">#&gt;      <span style="color: #BBBB00;">C3</span> (2 ISs) : <span style="color: #0000BB;">l1</span> [156, 239]; <span style="color: #0000BB;">l2</span> [ 33, 575]</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="scatterplot">Scatterplot<a class="anchor" aria-label="anchor" href="#scatterplot"></a>
 </h2>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># plots = plot_scatter_density(x_fit)</span></span>
-<span><span class="co"># plots$`cov_early.L2:cov_early.L1` # to visualize a single plot</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">plots</span> <span class="op">=</span> <span class="fu"><a href="../reference/plot_scatter_density.html">plot_scatter_density</a></span><span class="op">(</span><span class="va">x.example</span><span class="op">)</span></span>
+<span><span class="va">plots</span><span class="op">$</span><span class="va">`cov.t1.l1:cov.t2.l2`</span> <span class="co"># to visualize a single plot</span></span></code></pre></div>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
 </div>
 <div class="section level2">
 <h2 id="marginal-distributions">Marginal distributions<a class="anchor" aria-label="anchor" href="#marginal-distributions"></a>
 </h2>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># plot_marginal(x_fit)</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_marginal.html">plot_marginal</a></span><span class="op">(</span><span class="va">x.example</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span>nrow<span class="op">=</span><span class="fl">2</span>, guides<span class="op">=</span><span class="st">"collect"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
 </div>
 <div class="section level2">
 <h2 id="mullerplot">Mullerplot<a class="anchor" aria-label="anchor" href="#mullerplot"></a>
 </h2>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># plot_mullerplot(x_fit, which="frac", wrap=T)</span></span></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># plot_mullerplot(x_fit, which="pop", wrap=T)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_mullerplot.html">plot_mullerplot</a></span><span class="op">(</span><span class="va">x.example</span>, which<span class="op">=</span><span class="st">"frac"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># plot_mullerplot(x_fit, which="fitness", wrap=T)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_mullerplot.html">plot_mullerplot</a></span><span class="op">(</span><span class="va">x.example</span>, which<span class="op">=</span><span class="st">"pop"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># plot_mullerplot(x.example, which="fitness", wrap=T)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="vaf">VAF<a class="anchor" aria-label="anchor" href="#vaf"></a>
+</h2>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_vaf.html">plot_vaf</a></span><span class="op">(</span><span class="va">x.example</span>, wrap<span class="op">=</span><span class="cn">T</span><span class="op">)</span></span></code></pre></div>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_vaf_time.html">plot_vaf_time</a></span><span class="op">(</span><span class="va">x.example</span>, highlight<span class="op">=</span><span class="st">"C3"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
+</div>
+<div class="section level2">
+<h2 id="phylogenetic-evolution">Phylogenetic evolution<a class="anchor" aria-label="anchor" href="#phylogenetic-evolution"></a>
+</h2>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_phylogeny.html">plot_phylogeny</a></span><span class="op">(</span><span class="va">x.example</span><span class="op">)</span></span>
+<span><span class="co">#&gt; list()</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="clonal-growth">Clonal Growth<a class="anchor" aria-label="anchor" href="#clonal-growth"></a>
 </h2>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># plot_exp_fit(x_fit)</span></span></code></pre></div>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># plot_exp_rate(x_fit)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="vaf-scatterplot">VAF scatterplot<a class="anchor" aria-label="anchor" href="#vaf-scatterplot"></a>
-</h2>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_growth_regression.html">plot_growth_regression</a></span><span class="op">(</span><span class="va">x.example</span><span class="op">)</span></span></code></pre></div>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_growth_regression.html">plot_growth_regression</a></span><span class="op">(</span><span class="va">x.example</span>, highlight<span class="op">=</span><span class="st">"C0"</span>, mutations<span class="op">=</span><span class="cn">T</span><span class="op">)</span></span></code></pre></div>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_growth_rates.html">plot_growth_rates</a></span><span class="op">(</span><span class="va">x.example</span><span class="op">)</span></span></code></pre></div>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
