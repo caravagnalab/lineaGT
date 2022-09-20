@@ -137,39 +137,41 @@ plot_marginal = function(x,
   }
 
 
-
   if (single_plot) {
-    colors = Polychrome::createPalette(length(x$lineages),
-                                       seedcolors=c("#1e8449", "#ca6f1e", "#1f618d"),
-                                       M=1000, range=c(20,80)) %>%
-      setNames(x$lineages)
-    p = dd %>%
-      dplyr::mutate(tp_lin=interaction(timepoints, lineage)) %>%
-      ggplot() +
-      geom_histogram(aes(x=coverage, fill=lineage, y=..count../sum(..count..)),
-                     position="identity", alpha=1, binwidth=binwidth,
-                     color="#FFFFFF00") +
-      scale_fill_manual(values=colors, breaks=x$lineages) +
-      facet_grid(tp_lin ~ labels) + #, scale="free_y") +
+    max_val = max(dd$coverage)
+    dens.df = params %>%
+      dplyr::group_by(timepoints, labels) %>%
+      dplyr::mutate(dens=list(weights * dnorm(1:max_val, mean=mean_cov, sd=sigma)),
+                    coverage=list(1:max_val)) %>%
+      tidyr::unnest(c(dens, coverage)) %>%
+      dplyr::filter(dens>=0) %>%
+      dplyr::ungroup()
+
+    dens.all = dens.df %>%
+      group_by(timepoints, lineage, coverage) %>%
+      dplyr::summarise(dens=sum(dens)) %>%
+      unique()
+
+    p = ggplot() +
+      geom_density(data=dens.all,
+                   aes(x=coverage, y=dens*binwidth),
+                   stat="identity", inherit.aes=F, fill="#FFFFFF00") +
+      geom_density(data=dens.df,
+                   aes(x=coverage, y=dens*binwidth, fill=labels), alpha=.3,
+                   stat="identity", inherit.aes=F, color="#FFFFFF00") +
+      geom_rug(data=dd, aes(x=coverage, color=labels)) +
+
+      scale_fill_manual(values=color_palette) +
       ylab("Counts") + xlab("Coverage") +
-      labs(fill="Lineage") +
-      my_ggplot_theme()
+      labs(fill="Clone") +
+      my_ggplot_theme() +
+      scale_color_manual(values=color_palette) +
+      ylab("Density") + guides(color="none") +
+      guides(fill=guide_legend(override.aes=list(alpha=1)))
 
-    if (show_dens) {
-      dens.df = params %>%
-        dplyr::group_by(timepoints, labels) %>%
-        dplyr::mutate(dens=list(rnorm(1000, mean=mean_cov, sd=sigma))) %>%
-        tidyr::unnest(dens) %>%
-        dplyr::filter(dens>=0) %>%
-        dplyr::ungroup() %>%
-        mutate(tp_lin=interaction(timepoints, lineage))
-
-      p = p +
-        geom_density(data=dens.df, aes(x=dens, y=..count../sum(..count..)*binwidth, color=lineage, fill=lineage),
-                     linetype="solid", size=.1, inherit.aes=F, alpha=0.3) +
-        scale_color_manual(values=colors, breaks=x$lineages) +
-        ylab("Density") + guides(color="none")
-    }
+    if ((dd$lineage %>% unique() %>% length()) >= 1)
+      p = p + facet_grid(timepoints ~ lineage, scale="free_y") else
+        p = p + facet_grid(timepoints ~ ., scale="free_y")
 
     return(p + xlim(0, max(x$cov.dataframe$coverage)))
   }
@@ -183,7 +185,7 @@ plot_marginal = function(x,
       dplyr::filter(lineage==ll) %>%
       ggplot() +
       geom_histogram(aes(x=coverage,
-                         y=..count../sum(..count..),
+                         y=..count../sum(..count..)/binwidth,
                          fill=labels),
                      position="identity", alpha=1, binwidth=binwidth, color="#FFFFFF00") +
       scale_fill_manual(values=color_palette, breaks=highlight) +
@@ -196,20 +198,21 @@ plot_marginal = function(x,
       dens.df = params %>%
         dplyr::filter(lineage==ll) %>%
         dplyr::group_by(timepoints, labels) %>%
-        dplyr::mutate(dens=list(rnorm(1000, mean=mean_cov, sd=sigma))) %>%
-        tidyr::unnest(dens) %>%
-        dplyr::filter(dens>=0) %>%
+        # dplyr::mutate(dens=list(rnorm(1000, mean=mean_cov, sd=sigma))) %>%
+        dplyr::mutate(dens=list(dnorm(1:max(dd$coverage), mean=mean_cov, sd=sigma)),
+                      coverage=list(1:max(dd$coverage))) %>%
+        tidyr::unnest(c(coverage, dens)) %>%
+        # dplyr::filter(dens>=0) %>%
         dplyr::ungroup()
 
       p[[ll]] = p[[ll]] +
         geom_density(data=dens.df,
-                     aes(x=dens,
-                         # y=..count../sum(..count..)*binwidth,
-                         fill=labels),
-                     size=.1, inherit.aes=F, alpha=0.3, color="#FFFFFF00") +
-
+                     aes(x=coverage, y=dens, fill=labels),
+                     stat="identity",
+                     position="identity", color="#FFFFFF00", inherit.aes=F, alpha=.3) +
         ylab("Density") + guides(color="none")
     }
+
   }
 
   return(p)

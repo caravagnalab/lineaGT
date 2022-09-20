@@ -1,7 +1,18 @@
+get_default_hyperparameters = function() {
+  py_pkg = reticulate::import("pylineaGT")
+  x = initialize_object(K=1,
+                        cov.df=data.frame(coverage=1:10, IS=1:10, timepoints=1, lineage=1),
+                        py_pkg=py_pkg)
+
+  hyper = x$params$hyperparameters
+
+  return(hyper %>% dplyr::filter(!hyperparameter %in%c("mean_scale","mean_loc")))
+}
+
+
 # function to get parameters from either the Python model or the mvnmm object
 get_params = function(x=NULL, py_model=NULL) {
   if (!is.null(x) && !train) return( x$params )
-  # if (!is.null(x) && train) return( x$params_train )
   if(!is.null(py_model)) return( get_python_params(py_model) )
   cli::format_error("Not able to return any 'params' object!")
 }
