@@ -2,8 +2,8 @@ generate_synthetic_df = function(N_values,
                                  T_values,
                                  K_values,
                                  n_datasets=30,
-                                 var_loc=120,
-                                 var_scale=130,
+                                 var_loc=110,
+                                 var_scale=195,
                                  mean_loc=200,
                                  mean_scale=1000,
                                  path=".",
@@ -75,7 +75,7 @@ generate_synthetic_df = function(N_values,
                       default_lm=TRUE,
 
                       seed_optim=TRUE,
-                      init_seed=5,
+                      # init_seed=5,
                       sample_id=x$sim_id)
 
           x_fit$cov.dataframe = tibble::as_tibble(x$dataset) %>%
