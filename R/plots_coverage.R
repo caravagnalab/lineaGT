@@ -53,7 +53,7 @@ plot_2D = function(x, dim1, dim2, color_palette, highlight, dens=NULL, ...) {
       data=long_to_wide_cov(get_cov_dataframe(x)),
       # data = dens %>% filter(labels %in% highlight),
       aes_string(x=dim1, y=dim2, color="labels"),
-      alpha=.4, size=.8) +
+      alpha=.8, size=.8) +
     scale_color_manual(values=color_palette, breaks=highlight) +
     labs(color="Clusters") +
     xlab(split_to_camelcase(dim1)) +
@@ -69,9 +69,10 @@ plot_2D = function(x, dim1, dim2, color_palette, highlight, dens=NULL, ...) {
     pl = pl +
       stat_density_2d(data=dens %>% filter(labels %in% highlight),
                       aes_string(x=dim1, y=dim2, alpha="..level..", fill="labels"),
-                      geom="polygon", inherit.aes=F, contour_var="ndensity", bins=5) +
+                      geom="polygon", inherit.aes=F, contour_var="ndensity", bins=10) +
+
       scale_fill_manual(values=color_palette, breaks=highlight) +
-      scale_alpha_continuous(range=c(0.01,0.4)) +
+      scale_alpha_continuous(range=c(0.01,0.3)) +
       labs(fill="Clusters") + guides(alpha="none", color="none")
 
   return(pl)

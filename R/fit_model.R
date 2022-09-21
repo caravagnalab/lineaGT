@@ -83,6 +83,7 @@ fit = function(cov.df,
                store_params=FALSE,
                seed_optim=TRUE,
                seed=6,
+               seed_init=reticulate::py_none(),
                sample_id="") {
 
   py_pkg = reticulate::import("pylineaGT")
