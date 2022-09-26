@@ -141,7 +141,7 @@ plot_marginal = function(x,
   if (single_plot) {
     max_val = max(dd$coverage)
     dens.df = params %>%
-      dplyr::group_by(timepoints, labels) %>%
+      dplyr::group_by(lineage, timepoints, labels) %>%
       dplyr::mutate(dens=list(weights * dnorm(1:max_val, mean=mean_cov, sd=sigma)),
                     coverage=list(1:max_val)) %>%
       tidyr::unnest(c(dens, coverage)) %>%
@@ -162,11 +162,11 @@ plot_marginal = function(x,
                    stat="identity", inherit.aes=F, color="#FFFFFF00") +
       geom_rug(data=dd, aes(x=coverage, color=labels)) +
 
-      scale_fill_manual(values=color_palette) +
+      scale_fill_manual(values=color_palette, breaks=get_unique_labels(x)) +
+      scale_color_manual(values=color_palette, breaks=get_unique_labels(x)) +
       ylab("Counts") + xlab("Coverage") +
       labs(fill="Clone") +
       my_ggplot_theme() +
-      scale_color_manual(values=color_palette) +
       ylab("Density") + guides(color="none") +
       guides(fill=guide_legend(override.aes=list(alpha=1)))
 

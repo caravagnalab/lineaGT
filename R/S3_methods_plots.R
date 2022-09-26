@@ -15,9 +15,9 @@ plot.mvnmm = function(x, ...) {
   plot_mullerplot(x, wrap=T, ...)
 }
 
-my_ggplot_theme = function(cex=1, legend.pos="right") {
+my_ggplot_theme = function(cex=1, legend.pos="right", text_size=9) {
   theme_light(base_size=10 * cex) +
     theme(legend.position=legend.pos, legend.key.size=unit(.3*cex, "cm"),
           panel.background=element_rect(fill='white'), legend.key.width=unit(.5*cex, 'cm'),
-          text=element_text(size=9))
+          text=element_text(size=text_size))
 }
