@@ -6,6 +6,7 @@ fit_singleK = function(k,
                        hyperparams,
                        lr,
                        p,
+                       min_steps,
                        check_conv,
                        store_params,
                        default_lm,
@@ -25,6 +26,7 @@ fit_singleK = function(k,
                     lr=as.numeric(lr),
 
                     check_conv=check_conv,
+                    min_steps=as.integer(min_steps),
                     p=as.numeric(p),
 
                     covariance=covariance,
@@ -126,6 +128,7 @@ run_inference = function(x,
                          hyperparams,
 
                          check_conv,
+                         min_steps,
                          p,
 
                          store_params,
@@ -143,6 +146,7 @@ run_inference = function(x,
                  lr=as.numeric(lr),
 
                  check_conv=check_conv,
+                 min_steps=as.integer(min_steps),
                  p=as.numeric(p),
 
                  default_lm=default_lm,

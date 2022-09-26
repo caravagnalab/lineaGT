@@ -12,26 +12,26 @@ get_selection_df = function(selection) {
 
 
 get_best_k = function(selection, method="BIC") {
-  best_k = selection$IC %>%
-    dplyr::mutate(K=as.integer(K), run=as.integer(run), value=as.numeric(value)) %>%
-    dplyr::rename(mm=method) %>%
-    dplyr::filter(mm==method) %>%
-    dplyr::filter(value==min(value)) %>%
-    dplyr::pull(K) %>% unique()
-
-  best_init = selection$IC %>%
-
-    dplyr::mutate(K=as.integer(K), run=as.integer(run), value=as.numeric(value)) %>%
-    dplyr::rename(mm=method) %>%
-    dplyr::filter(mm==method) %>%
-
-    tidyr::separate("id", into=c("K.init", "else"), sep="[.]") %>%
-    dplyr::mutate(K.init=as.integer(K.init)) %>%
-    dplyr::filter(K.init==best_k) %>%
-    dplyr::select(K, seed, init_seed) %>% unique() %>% as.list()
-
-  if (!all(purrr::is_empty(best_init %>% unlist())))
-    return(best_init)
+  # best_k = selection$IC %>%
+  #   dplyr::mutate(K=as.integer(K), run=as.integer(run), value=as.numeric(value)) %>%
+  #   dplyr::rename(mm=method) %>%
+  #   dplyr::filter(mm==method) %>%
+  #   dplyr::filter(value==min(value)) %>%
+  #   dplyr::pull(K) %>% unique()
+  #
+  # best_init = selection$IC %>%
+  #
+  #   dplyr::mutate(K=as.integer(K), run=as.integer(run), value=as.numeric(value)) %>%
+  #   dplyr::rename(mm=method) %>%
+  #   dplyr::filter(mm==method) %>%
+  #
+  #   tidyr::separate("id", into=c("K.init", "else"), sep="[.]") %>%
+  #   dplyr::mutate(K.init=as.integer(K.init)) %>%
+  #   dplyr::filter(K.init==best_k) %>%
+  #   dplyr::select(K, seed, init_seed) %>% unique() %>% as.list()
+  #
+  # if (!all(purrr::is_empty(best_init %>% unlist())))
+  #   return(best_init)
 
   return(
     selection$IC %>%

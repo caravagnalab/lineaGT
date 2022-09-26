@@ -68,6 +68,7 @@ fit = function(cov.df,
                k_interval=c(5,15),
                n_runs=1,
                steps=500,
+               min_steps=20,
                lr=0.005,
                p=1,
                min_frac=0,
@@ -102,6 +103,7 @@ fit = function(cov.df,
                                  lr=as.numeric(lr),
 
                                  check_conv=check_conv,
+                                 min_steps=as.integer(min_steps),
                                  p=as.numeric(p),
 
                                  default_lm=default_lm,
@@ -136,6 +138,7 @@ fit = function(cov.df,
 
                   lr=lr,
                   p=p,
+                  min_steps=min_steps,
                   check_conv=check_conv,
 
                   store_params=store_params,
