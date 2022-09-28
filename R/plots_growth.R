@@ -21,7 +21,8 @@ plot_growth_regression = function(x,
                                   min_frac=0,
                                   mutations=F,
                                   timepoints_to_int=list(),
-                                  fit=F) {
+                                  fit=F,
+                                  show_best=T) {
 
   timepoints_to_int = map_timepoints_int(x, timepoints_to_int)
   highlight = get_highlight(x, min_frac, highlight, mutations=mutations)
@@ -44,30 +45,35 @@ plot_growth_regression = function(x,
   color_palette = c("firebrick","steelblue"); names(color_palette) = c("Exponential","Logistic")
   color_palette = c(color_palette, x$color_palette)
 
-  return(
-    pop_df %>%
-      ggplot() +
+  pl = pop_df %>%
+    ggplot() +
 
-      geom_point(aes(x=Generation, y=Population), alpha=.5, size=.7) +
+    geom_point(aes(x=Generation, y=Population), alpha=.5, size=.7) +
 
-      geom_line(data=filter(regr.df, type==best_model), aes(x=x, y=y, color=type), size=.7, alpha=.9) +
-      geom_line(data=filter(regr.df, type!=best_model), aes(x=x, y=y, color="gainsboro"), size=.4, alpha=.7) +
+    geom_line(data=filter(regr.df, type==best_model), aes(x=x, y=y, color=type), size=.7, alpha=.9) +
 
-      geom_vline(data=filter(regr.df, type==best_model),
-                 aes(xintercept=init_t, color=type), linetype="dashed", size=.3, alpha=.7) +
-      geom_vline(data=filter(regr.df, type!=best_model),
-                 aes(xintercept=init_t, color="gainsboro"), linetype="dashed", size=.1, alpha=.4) +
+    geom_vline(data=filter(regr.df, type==best_model),
+               aes(xintercept=init_t, color=type), linetype="dashed", size=.3, alpha=.7) +
 
-      geom_errorbar(data=filter(regr.df, type==best_model), aes(x=x, y=y, ymin=y.min, ymax=y.max, color=type),
-                    width=.5, position=position_dodge(width=0.5), alpha=.9, size=.6) +
-      geom_errorbar(data=filter(regr.df, type!=best_model), aes(x=x, y=y, ymin=y.min, ymax=y.max, color="gainsboro"),
-                    width=.5, position=position_dodge(width=0.5), alpha=.7, size=.4) +
 
-      facet_grid(rows=vars(Identity), cols=vars(Lineage), scales="free_y") +
-      scale_color_manual(values=color_palette, breaks=c("Exponential","Logistic")) +
-      labs(color="") + my_ggplot_theme()
-  )
-  return(p)
+    geom_errorbar(data=filter(regr.df, type==best_model), aes(x=x, y=y, ymin=y.min, ymax=y.max, color=type),
+                  width=.5, position=position_dodge(width=0.5), alpha=.9, size=.6) +
+
+    facet_grid(rows=vars(Identity), cols=vars(Lineage), scales="free_y") +
+    scale_color_manual(values=color_palette, breaks=c("Exponential","Logistic")) +
+    labs(color="") + my_ggplot_theme()
+
+  if (!show_best)
+    return(
+      pl +
+        geom_line(data=filter(regr.df, type!=best_model), aes(x=x, y=y, color="gainsboro"), size=.4, alpha=.7) +
+        geom_vline(data=filter(regr.df, type!=best_model),
+                   aes(xintercept=init_t, color="gainsboro"), linetype="dashed", size=.1, alpha=.4) +
+        geom_errorbar(data=filter(regr.df, type!=best_model), aes(x=x, y=y, ymin=y.min, ymax=y.max, color="gainsboro"),
+                      width=.5, position=position_dodge(width=0.5), alpha=.7, size=.4)
+    )
+
+  return( pl )
 }
 
 

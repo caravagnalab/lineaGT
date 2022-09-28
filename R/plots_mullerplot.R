@@ -85,23 +85,28 @@ plot_mullerplot = function(x,
 
 
 mullerplot_util = function(mullerdf, which, color_palette, highlight, legend.pos="right") {
-  # if (which == "fitness") {
-  #   exp_limits = c(min(mullerdf$lm_r), max(mullerdf$lm_r))
-  #
-  #   return(
-  #     mullerdf %>%
-  #       ggplot() +
-  #       geom_area(aes_string(x="Generation", y="Frequency", group="Group_id", fill="lm_r")) +
-  #       geom_vline(xintercept=mullerdf$Generation %>% unique(), linetype="dashed") +
-  #       guides(linetype="none", color="none") +
-  #       facet_wrap(~Lineage, nrow=1) +
-  #       xlab("Time") +
-  #       labs(fill="Exp rate") +
-  #       my_ggplot_theme(legend.pos=legend.pos) +
-  #       scale_fill_gradient2(mid="white", low="blue", high="red",
-  #                            limits=exp_limits, na.value="#FFFFFF00")
-  #   )
-  # }
+  if (which == "fitness") {
+    mullerdf = x %>% get_growth_rates() %>%
+      dplyr::filter(type==best_model) %>%
+      dplyr::select(Lineage, Identity, rate) %>%
+      dplyr::full_join(mullerdf, by=c("Lineage","Identity")) %>%
+      dplyr::mutate(rate=replace(rate, is.na(rate), 0))
+    exp_limits = c(min(mullerdf$rate), max(mullerdf$rate))
+
+    return(
+      mullerdf %>%
+        ggplot() +
+        geom_area(aes_string(x="Generation", y="Frequency", group="Group_id", fill="rate")) +
+        geom_vline(xintercept=mullerdf$Generation %>% unique(), linetype="dashed") +
+        guides(linetype="none", color="none") +
+        facet_wrap(~Lineage, nrow=1) +
+        xlab("Time") +
+        labs(fill="Exp rate") +
+        my_ggplot_theme(legend.pos=legend.pos) +
+        scale_fill_gradient2(mid="white", low="blue", high="red",
+                             limits=exp_limits, na.value="#FFFFFF00")
+    )
+  }
 
   if (which == "frac")
     y = "Frequency"

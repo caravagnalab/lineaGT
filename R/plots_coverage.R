@@ -114,19 +114,16 @@ plot_marginal = function(x,
 
   dd = x %>%
     get_cov_dataframe() %>%
-    dplyr::mutate(timepoints=factor(timepoints, levels=tp)) %>%
-    dplyr::filter(labels %in% highlight)
+    dplyr::mutate(timepoints=factor(timepoints, levels=tp))
 
   if (show_dens) {
     means = x %>%
       get_mean_long() %>%
-      dplyr::mutate(timepoints=factor(timepoints, levels=tp)) %>%
-      dplyr::filter(labels %in% highlight)
+      dplyr::mutate(timepoints=factor(timepoints, levels=tp))
 
     vars = x %>%
       get_variance_long() %>%
-      dplyr::mutate(timepoints=factor(timepoints, levels=tp)) %>%
-      dplyr::filter(labels %in% highlight)
+      dplyr::mutate(timepoints=factor(timepoints, levels=tp))
 
     weights = (get_ISs(x) / sum(get_ISs(x))) %>%
       data.frame() %>% setNames("weights") %>%
@@ -134,7 +131,7 @@ plot_marginal = function(x,
 
     params = dplyr::inner_join(means, vars, by=c("labels", "timepoints", "lineage")) %>%
       dplyr::inner_join(weights, by="labels") %>%
-      dplyr::mutate(labels=factor(labels, levels=highlight))
+      dplyr::mutate(labels=factor(labels, levels=get_unique_labels(x)))
   }
 
 
@@ -160,10 +157,10 @@ plot_marginal = function(x,
       geom_density(data=dens.df,
                    aes(x=coverage, y=dens*binwidth, fill=labels), alpha=.3,
                    stat="identity", inherit.aes=F, color="#FFFFFF00") +
-      geom_rug(data=dd, aes(x=coverage, color=labels)) +
+      geom_rug(data=filter(dd, labels %in% highlight), aes(x=coverage, color=labels)) +
 
-      scale_fill_manual(values=color_palette, breaks=get_unique_labels(x)) +
-      scale_color_manual(values=color_palette, breaks=get_unique_labels(x)) +
+      scale_fill_manual(values=color_palette, breaks=highlight) +
+      scale_color_manual(values=color_palette, breaks=highlight) +
       ylab("Counts") + xlab("Coverage") +
       labs(fill="Clone") +
       my_ggplot_theme() +
@@ -183,6 +180,7 @@ plot_marginal = function(x,
   for (ll in lineages) {
 
     p[[ll]] = dd %>%
+      dplyr::filter(labels %in% highlight) %>%
       dplyr::filter(lineage==ll) %>%
       ggplot() +
       geom_histogram(aes(x=coverage,
