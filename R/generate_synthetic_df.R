@@ -8,10 +8,14 @@ generate_synthetic_df = function(N_values,
                                  mean_scale=1000,
                                  path=".",
                                  filename="",
+                                 check_present=T,
                                  run=T) {
 
   if (!endsWith(path, "/"))
     path = paste0(path, "/")
+
+  if (!dir.exists(path))
+    dir.create(path)
 
   torch = reticulate::import("torch")
   py_pkg = reticulate::import("pylineaGT")
@@ -37,7 +41,8 @@ generate_synthetic_df = function(N_values,
 
           print(paste0(tmp_name, ".", n_df, ".data.Rds"))
 
-          if ( (paste0(tmp_name, ".", n_df, ".data.Rds") %in% files_list)  &
+          if ( check_present &
+               (paste0(tmp_name, ".", n_df, ".data.Rds") %in% files_list)  &
                (paste0(tmp_name, ".", n_df, ".fit.Rds") %in% files_list) )
             next
 
