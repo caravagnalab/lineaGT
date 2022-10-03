@@ -4,11 +4,11 @@ long_to_wide_cov = function(cov.df) {
 
   return(
     cov.df %>%
-      dplyr::select("coverage", "IS", "timepoints", "lineage", dplyr::contains("labels")) %>%
+      dplyr::select(dplyr::starts_with("cov"), "IS", "timepoints", "lineage", dplyr::contains("labels")) %>%
       tidyr::pivot_wider(names_from=c("timepoints","lineage"),
                          names_prefix="cov.",
                          names_sep=".",
-                         values_from="coverage",
+                         values_from=dplyr::starts_with("cov"),
                          values_fill=0) # fill missing values with 0 -> means 0 coverage
     )
 }

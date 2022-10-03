@@ -5,7 +5,7 @@ generate_synthetic_df = function(N_values,
                                  var_loc=110,
                                  var_scale=195,
                                  mean_loc=200,
-                                 mean_scale=1000,
+                                 max_value=8000,
                                  path=".",
                                  filename="",
                                  check_present=T,
@@ -53,8 +53,8 @@ generate_synthetic_df = function(N_values,
                                 label=as.character(n_df),
                                 var_loc=as.integer(var_loc),
                                 var_scale=as.integer(var_scale),
-                                mean_loc=as.integer(mean_loc),
-                                mean_scale=as.integer(mean_scale))
+                                # mean_loc=as.integer(mean_loc),
+                                max_value=as.integer(max_value))
 
           sim$generate_dataset()
           filename = sim$sim_id

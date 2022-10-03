@@ -121,8 +121,11 @@ map_timepoints_int = function(x, timepoints_to_int=list()) {
   # if is numeric or integer
   if (is.numeric(tp)) return( tp %>% sort() )
   else # check if they are convertible to numeric
-    tryCatch(expr = { return( as.numeric(tp) %>% sort() %>% setNames( as.character(tp) ) ) },
-             warning = function(w) {} )
+    tryCatch(expr = {
+      tp = as.numeric(tp) %>% sort()
+      return( tp %>% setNames( as.character(tp) ) )
+      },
+      warning = function(w) {} )
 
   if ( is.factor(tp) ) {
     cli::cli_alert_warning("The provided timepoints are Factors.

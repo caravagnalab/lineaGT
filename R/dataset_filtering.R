@@ -24,6 +24,10 @@ filter_dataset = function(cov.df,
                           metric="calinski_harabasz_score",
                           seed=5) {
 
+  if (!is.factor(cov.df$timepoints))
+    cov.df = cov.df %>%
+      dplyr::mutate(timepoints=as.character(timepoints))
+
   cov.df = cov.df %>%
     check_cov_dimensions() %>%
     dplyr::group_by(IS) %>%
