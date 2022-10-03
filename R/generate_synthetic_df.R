@@ -87,6 +87,8 @@ generate_synthetic_df = function(N_values,
             dplyr::mutate(coverage=as.integer(coverage)) %>%
             dplyr::inner_join(x_fit$cov.dataframe, by=c("IS","timepoints","lineage","coverage"))
 
+          print(aricode::ARI(x_fit$cov.dataframe$labels, x_fit$cov.dataframe$labels_true))
+
           saveRDS(x_fit, paste0(subpath, filename, ".fit.Rds"))
         }
       }
