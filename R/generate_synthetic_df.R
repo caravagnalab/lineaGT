@@ -79,6 +79,7 @@ generate_synthetic_df = function(N_values,
                       covariance="full",
                       check_conv=TRUE,
                       default_lm=TRUE,
+                      steps=steps,
 
                       seed_optim=TRUE,
                       # init_seed=5,
