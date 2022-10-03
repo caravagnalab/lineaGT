@@ -12,6 +12,7 @@ fit(
   k_interval = c(5, 15),
   n_runs = 1,
   steps = 500,
+  min_steps = 20,
   lr = 0.005,
   p = 1,
   min_frac = 0,

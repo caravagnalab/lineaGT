@@ -10,7 +10,8 @@ plot_growth_regression(
   min_frac = 0,
   mutations = F,
   timepoints_to_int = list(),
-  fit = F
+  fit = F,
+  show_best = T
 )
 }
 \arguments{
