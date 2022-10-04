@@ -26,13 +26,12 @@ check_conda = function(use_default=F) {
 
     if (use_default) answ = "yes"
     else {
-      cat("The Miniconda installer will be downloaded and used to install Miniconda. Proceed?\n")
-      cat("(yes/no)\n")
+      cli::cli_alert_warning("The Miniconda installer will be downloaded and used to install Miniconda. Proceed? (yes/no)\n")
       answ = readline()
     }
 
     if (answ == "yes") install_miniconda_lineagt()
-    else { cat("Miniconda will not be installed."); return() }
+    else { cli::cli_alert_info("Miniconda will not be installed."); return() }
   }
 }
 
@@ -41,16 +40,16 @@ check_conda_env = function(envname="lineagt-env", use_default=F) {
   if (have_loaded_env()) {
     envname = sapply(reticulate::conda_list()$name, grepl, reticulate::py_discover_config()$python) %>%
       which() %>% names()
+    cli::cli_alert_warning(paste0("The '", envname, "' environment is already loaded!"))
     return(envname)
   }
 
   if (!have_conda_env("lineagt-env")) {
-    cat("The environment 'lineagt-env' is not present.\n")
+    cli::cli_alert_info("The environment 'lineagt-env' is not present.\n")
 
     if (use_default) answ = "create"
     else {
-      cat("Do you want to load an existing environment, to create a new one named 'lineagt-env' or to cancel?\n")
-      cat("(load/create/cancel)\n")
+      cli::cli_alert_warning("Do you want to load an existing environment, to create a new one named 'lineagt-env' or to cancel? (load/create/cancel)\n")
       answ = readline()
       }
 
@@ -58,14 +57,15 @@ check_conda_env = function(envname="lineagt-env", use_default=F) {
       envname = "lineagt-env"
       create_conda_env()
     } else if (answ == "load") {
-      cat("Insert the environment name: \n")
+      cli::cli_alert_info("Insert the environment name: ")
       envname = readline()
     } else {
-      cat("No environment will be loaded nor created.")
+      cli::cli_alert_info("No environment will be loaded nor created.")
       return()
     }
+
   } else {
-    # cat("The environment 'lineagt-env' is already present and will be loaded!\n")
+    cli::cli_alert_info("The environment 'lineagt-env' is already present and will be loaded!\n")
     envname = "lineagt-env"
   }
 
@@ -76,7 +76,7 @@ check_conda_env = function(envname="lineagt-env", use_default=F) {
 
 
 check_python_deps = function(envname="lineagt-env", use_default=F) {
-  try(install_python_deps(envname), silent=T)
+  install_python_deps(envname)
 
   # if (!have_python_deps(envname)) {
   #   cat(paste("The required Python packages are not installed in the '", envname, "' environment.\n", sep=""))
