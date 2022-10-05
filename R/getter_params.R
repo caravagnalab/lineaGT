@@ -259,17 +259,22 @@ get_ISs_single_cluster = function(x, cluster) {
 #'
 #' @export get_labels
 
-get_labels = function(x) {
+get_labels = function(x, init=F) {
   py_model = get_model(x)
   tryCatch(
     expr = {
-      clusters_sort = get_unique_labels(py_model)
-      labels = factor(paste("C", py_model$params$clusters$detach()$numpy(), sep=""), levels=clusters_sort)
-      return(labels) },
+      clusters_sort = get_unique_labels(py_model, init=init)
+
+      if (init)
+        return(factor(paste("C", py_model$init_params$clusters$detach()$numpy(), sep=""), levels=clusters_sort))
+      return(factor(paste("C", py_model$params$clusters$detach()$numpy(), sep=""), levels=clusters_sort))
+      },
     error = function(e) return(list()) )
 
   check_params(x)
-  if ("labels" %in% names(x$params)) return(x$params$labels)
+  if ("labels" %in% names(x$params) && !init) return(x$params$labels)
+
+  else if ("labels_init" %in% names(x$params) && init) return(x$params$labels_init)
 
   cli::cli_alert_warning("No labels assignments stored in the object.")
   return(list())
@@ -288,10 +293,22 @@ get_labels = function(x) {
 #'
 #' @export get_unique_labels
 
-get_unique_labels = function(x) {
-  try(expr = { labels = x$params$labels %>% levels(); if (!purrr::is_empty(labels)) return(labels) }, silent = T)
+get_unique_labels = function(x, init=FALSE) {
+  if (init)
+    try(expr = { labels = x$params$labels_init %>% levels(); if (!purrr::is_empty(labels)) return(labels) },
+        silent = T)
+  try(expr = { labels = x$params$labels %>% levels(); if (!purrr::is_empty(labels)) return(labels) },
+      silent = T)
 
   py_model = get_model(x)
+  if (init)
+    tryCatch(
+      expr = {
+        clusters_sort = paste("C", py_model$init_params$clusters$detach()$numpy() %>% unique() %>% sort(), sep="")
+        print(clusters_sort)
+        return(clusters_sort) },
+      error = function(e) return(0:(py_model$params$K - 1)) )
+
   tryCatch(
     expr = {
       clusters_sort = paste("C", py_model$params$clusters$detach()$numpy() %>% unique() %>% sort(), sep="")

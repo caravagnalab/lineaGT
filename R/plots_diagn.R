@@ -67,7 +67,7 @@ plot_gradient_norms = function(x) {
   return(grads %>%
            ggplot() +
            geom_line(aes(x=index, y=grad_norm, color=K, group=id.K), size=.5) +
-           facet_grid(rows=vars(param), cols=vars(run)) +
+           facet_grid(rows=vars(param), cols=vars(run), scales="free_y") +
            scale_x_continuous(breaks=function(x) unique(floor(pretty(seq(0, (max(x) + 1) * 1.1))))) +
            ylab("Gradient Norms") + xlab("Iterations") +
            my_ggplot_theme()

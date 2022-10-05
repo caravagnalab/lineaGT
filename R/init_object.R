@@ -48,6 +48,7 @@ get_python_params = function(py_model) {
   params$probabilites = suppressMessages( get_z_probs(py_model) )
   params$labels = suppressMessages( get_labels(py_model) )
   params$hyperparameters = suppressMessages( get_hyperpar(py_model) )
+  params$labels_init = suppressMessages( get_labels(py_model, init=T) )
   return(params)
 }
 
