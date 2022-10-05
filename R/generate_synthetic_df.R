@@ -11,6 +11,7 @@ generate_synthetic_df = function(N_values,
                                  path=".",
                                  filename="",
                                  check_present=T,
+                                 default_lm=T,
                                  run=T) {
 
   if (!endsWith(path, "/"))
@@ -80,7 +81,7 @@ generate_synthetic_df = function(N_values,
                       infer_phylogenies=F,
                       covariance="full",
                       check_conv=TRUE,
-                      default_lm=TRUE,
+                      default_lm=default_lm,
                       steps=steps,
 
                       seed_optim=TRUE,
