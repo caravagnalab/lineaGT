@@ -91,6 +91,7 @@ plot_2D = function(x, dim1, dim2, color_palette, highlight, dens=NULL, ...) {
 #' @importFrom dplyr mutate filter inner_join group_by ungroup
 #' @importFrom tidyr unnest
 #' @importFrom tibble rownames_to_column
+#' @importFrom ggh4x facet_nested
 #'
 #' @examples
 #' if (FALSE) plot_marginal(x)
