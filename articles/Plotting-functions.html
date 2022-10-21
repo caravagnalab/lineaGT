@@ -111,14 +111,14 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ── Optimal IS model with <span style="color: #00BB00;">k = 8</span>.</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     <span style="color: #BBBB00;">C2</span> (20 ISs) : <span style="color: #0000BB;">l1</span> [168, 202]; <span style="color: #0000BB;">l2</span> [ 24, 333] </span></span>
-<span><span class="co">#&gt;     <span style="color: #BBBB00;">C6</span> (17 ISs) : <span style="color: #0000BB;">l1</span> [342, 236]; <span style="color: #0000BB;">l2</span> [ 78, 557] </span></span>
-<span><span class="co">#&gt;      <span style="color: #BBBB00;">C1</span> (7 ISs) : <span style="color: #0000BB;">l1</span> [ 92, 119]; <span style="color: #0000BB;">l2</span> [197, 678] </span></span>
-<span><span class="co">#&gt;      <span style="color: #BBBB00;">C4</span> (7 ISs) : <span style="color: #0000BB;">l1</span> [  2, 663]; <span style="color: #0000BB;">l2</span> [  1, 920] </span></span>
-<span><span class="co">#&gt;      <span style="color: #BBBB00;">C5</span> (6 ISs) : <span style="color: #0000BB;">l1</span> [267, 226]; <span style="color: #0000BB;">l2</span> [ 61, 523] </span></span>
-<span><span class="co">#&gt;      <span style="color: #BBBB00;">C7</span> (5 ISs) : <span style="color: #0000BB;">l1</span> [  1, 270]; <span style="color: #0000BB;">l2</span> [  1, 124] </span></span>
-<span><span class="co">#&gt;      <span style="color: #BBBB00;">C0</span> (2 ISs) : <span style="color: #0000BB;">l1</span> [  2, 847]; <span style="color: #0000BB;">l2</span> [  0, 344] </span></span>
-<span><span class="co">#&gt;      <span style="color: #BBBB00;">C3</span> (2 ISs) : <span style="color: #0000BB;">l1</span> [156, 239]; <span style="color: #0000BB;">l2</span> [ 33, 575]</span></span></code></pre></div>
+<span><span class="co">#&gt;     <span style="color: #BBBB00;">C4</span> (19 ISs) : <span style="color: #0000BB;">l1</span> [285, 209]; <span style="color: #0000BB;">l2</span> [ 51, 492] </span></span>
+<span><span class="co">#&gt;     <span style="color: #BBBB00;">C1</span> (15 ISs) : <span style="color: #0000BB;">l1</span> [245, 177]; <span style="color: #0000BB;">l2</span> [ 23, 289] </span></span>
+<span><span class="co">#&gt;      <span style="color: #BBBB00;">C0</span> (6 ISs) : <span style="color: #0000BB;">l1</span> [145, 240]; <span style="color: #0000BB;">l2</span> [ 32, 373] </span></span>
+<span><span class="co">#&gt;      <span style="color: #BBBB00;">C2</span> (6 ISs) : <span style="color: #0000BB;">l1</span> [  1, 547]; <span style="color: #0000BB;">l2</span> [  1, 388] </span></span>
+<span><span class="co">#&gt;      <span style="color: #BBBB00;">C3</span> (6 ISs) : <span style="color: #0000BB;">l1</span> [ 92, 109]; <span style="color: #0000BB;">l2</span> [245, 751] </span></span>
+<span><span class="co">#&gt;      <span style="color: #BBBB00;">C5</span> (6 ISs) : <span style="color: #0000BB;">l1</span> [  0, 551]; <span style="color: #0000BB;">l2</span> [  1, 828] </span></span>
+<span><span class="co">#&gt;      <span style="color: #BBBB00;">C6</span> (4 ISs) : <span style="color: #0000BB;">l1</span> [330,  16]; <span style="color: #0000BB;">l2</span> [ 17,  38] </span></span>
+<span><span class="co">#&gt;      <span style="color: #BBBB00;">C7</span> (4 ISs) : <span style="color: #0000BB;">l1</span> [  0, 426]; <span style="color: #0000BB;">l2</span> [  1, 198]</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="scatterplot">Scatterplot<a class="anchor" aria-label="anchor" href="#scatterplot"></a>
 </h2>
@@ -161,18 +161,32 @@
 </h2>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_phylogeny.html">plot_phylogeny</a></span><span class="op">(</span><span class="va">x.example</span><span class="op">)</span></span>
-<span><span class="co">#&gt; list()</span></span></code></pre></div>
+<span><span class="co">#&gt; Warning: Duplicated aesthetics after name standardisation: na.rm</span></span>
+<span><span class="co">#&gt; Duplicated aesthetics after name standardisation: na.rm</span></span>
+<span><span class="co">#&gt; Duplicated aesthetics after name standardisation: na.rm</span></span>
+<span><span class="co">#&gt; $C0</span></span>
+<span><span class="co">#&gt; Warning: Removed 1 rows containing missing values (geom_point).</span></span></code></pre></div>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
+<pre><code><span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $C1</span></span>
+<span><span class="co">#&gt; Warning: Removed 1 rows containing missing values (geom_point).</span></span></code></pre>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-10-2.png" width="700"></p>
+<pre><code><span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $C7</span></span>
+<span><span class="co">#&gt; Warning: Removed 1 rows containing missing values (geom_point).</span></span></code></pre>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-10-3.png" width="700"></p>
 </div>
 <div class="section level2">
 <h2 id="clonal-growth">Clonal Growth<a class="anchor" aria-label="anchor" href="#clonal-growth"></a>
 </h2>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_growth_regression.html">plot_growth_regression</a></span><span class="op">(</span><span class="va">x.example</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Plotting-functions_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_growth_regression.html">plot_growth_regression</a></span><span class="op">(</span><span class="va">x.example</span>, highlight<span class="op">=</span><span class="st">"C0"</span>, mutations<span class="op">=</span><span class="cn">T</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_growth_regression.html">plot_growth_regression</a></span><span class="op">(</span><span class="va">x.example</span>, highlight<span class="op">=</span><span class="st">"C0"</span>, mutations<span class="op">=</span><span class="cn">T</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "GETTING POP DF"</span></span></code></pre></div>
 <p><img src="Plotting-functions_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_growth_rates.html">plot_growth_rates</a></span><span class="op">(</span><span class="va">x.example</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Plotting-functions_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
 </div>
