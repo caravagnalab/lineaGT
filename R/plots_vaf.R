@@ -132,12 +132,12 @@ plot_vaf_time = function(x,
   return(
     vaf.df %>%
       ggplot() +
-      geom_point(aes(x=timepoints, y=vaf, color=labels_mut), alpha=.5, size=.7) +
+      geom_point(aes(x=timepoints, y=vaf, color=labels_mut), alpha=.8, size=.7) +
       geom_line(aes(x=timepoints, y=vaf, color=labels_mut, group=mutation),
-                alpha=.6, size=.5, linetype="solid") +
+                size=.5, linetype="solid") +
       geom_point(aes(x=timepoints, y=theta_binom*100, color=labels_mut), shape=15, size=1.5) +
       geom_vline(xintercept=vaf.df$timepoints %>% unique(), linetype="dashed", size=.4, alpha=.5) +
-      facet_wrap(labels~lineage, ncol=x %>% get_lineages() %>% length()) +
+      ggh4x::facet_nested(labels~lineage) + #, cols=x %>% get_lineages() %>% length()) +
       scale_color_manual(values=color_palette, breaks=highlight.m) +
       ylab("VAF") + xlab("Time") + labs(color="Clusters") +
       ylim(0,100) + my_ggplot_theme()

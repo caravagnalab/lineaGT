@@ -60,7 +60,7 @@ plot_growth_regression = function(x,
                   width=.5, position=position_dodge(width=0.5), alpha=.9, size=.6) +
 
     facet_grid(rows=vars(Identity), cols=vars(Lineage), scales="free_y") +
-    scale_color_manual(values=color_palette, breaks=c("Exponential","Logistic")) +
+    scale_color_manual(values=color_palette, breaks=unique(filter(regr.df, type==best_model)$best_model)) +
     labs(color="") + my_ggplot_theme()
 
   if (!show_best)
@@ -70,7 +70,8 @@ plot_growth_regression = function(x,
         geom_vline(data=filter(regr.df, type!=best_model),
                    aes(xintercept=init_t, color="gainsboro"), linetype="dashed", size=.1, alpha=.4) +
         geom_errorbar(data=filter(regr.df, type!=best_model), aes(x=x, y=y, ymin=y.min, ymax=y.max, color="gainsboro"),
-                      width=.5, position=position_dodge(width=0.5), alpha=.7, size=.4)
+                      width=.5, position=position_dodge(width=0.5), alpha=.7, size=.4) +
+        scale_color_manual(values=color_palette, breaks=unique(regr.df$best_model))
     )
 
   return( pl )
@@ -147,7 +148,8 @@ plot_growth_rates = function(x,
                          min_frac=0,
                          mutations=F,
                          timepoints_to_int=list(),
-                         fit=F) {
+                         fit=F,
+                         show_best=T) {
 
   if (purrr::is_empty(timepoints_to_int)) timepoints_to_int = map_timepoints_int(x, timepoints_to_int=timepoints_to_int)
   highlight = get_highlight(x, min_frac, highlight, mutations=mutations)
@@ -164,17 +166,44 @@ plot_growth_rates = function(x,
     dplyr::mutate(best_model=ifelse(best_model=="exp", "Exponential", "Logistic")) %>%
     dplyr::filter(Identity %in% highlight)
 
-  color_palette = c("firebrick","steelblue"); names(color_palette) = c("Exponential","Logistic")
+  # color_palette = c("firebrick","steelblue"); names(color_palette) = c("Exponential","Logistic")
+  color_palette = RColorBrewer::brewer.pal(get_lineages(x) %>% length(), "Dark2")
 
-  p = rates %>%
-    ggplot(aes(x=Identity, y=rate, ymax=rate, ymin=0, color=ifelse(type==best_model, type, "gainsboro"))) +
+  if (!show_best) {
+    p = rates %>%
+      # ggplot(aes(x=Identity, y=rate, ymax=rate, ymin=0, color=ifelse(type==best_model, type, "gainsboro"))) +
+      ggplot(aes(x=Identity, group=Lineage, color=Lineage, y=rate, ymax=rate, ymin=0,
+                 linetype=type)) +
+      geom_linerange(alpha=.8, position=position_dodge2(width=.5)) +
+      geom_point(alpha=.8, position=position_dodge2(width=.5)) +
+
+      # facet_wrap(~Lineage) +
+      scale_color_manual(values=color_palette) +
+      scale_linetype_manual(values=c("solid","dashed") %>% setNames(c("Exponential","Logistic"))) +
+      my_ggplot_theme() + theme(panel.grid.major.x=element_blank()) +
+      xlab("Clusters") + ylab("Growth rate") + labs(color="Lineage", linetype="")
+
+    return(p)
+  }
+
+  dd = rates %>%
+    dplyr::filter(type==best_model)
+
+  if (length(dd$best_model %>% unique()) == 1)
+    linetps = c("solid") %>% setNames(dd$best_model %>% unique())
+  else
+    linetps = c("solid","dashed") %>% setNames(c("Logistic","Exponential"))
+
+  p = dd %>%
+    ggplot(aes(x=Identity, group=Lineage, color=Lineage, y=rate, ymax=rate, ymin=0, linetype=type)) +
     geom_linerange(alpha=.8, position=position_dodge2(width=.5)) +
     geom_point(alpha=.8, position=position_dodge2(width=.5)) +
 
-    facet_wrap(~Lineage) +
+    # facet_wrap(~Lineage) +
     scale_color_manual(values=color_palette) +
-    my_ggplot_theme() +
-    xlab("Clusters") + ylab("Growth rate") + labs(color="")
+    scale_linetype_manual(values=linetps) +
+    my_ggplot_theme() + theme(panel.grid.major.x=element_blank()) +
+    xlab("Clusters") + ylab("Growth rate") + labs(color="Lineage", linetype="")
 
   return(p)
 }

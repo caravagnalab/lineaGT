@@ -101,7 +101,7 @@ util_plot_diff = function(cls,
                               size=2.5*cex) +
 
     ggraph::scale_edge_color_manual(values=col_palette, guide="none") +
-    ggraph::scale_edge_width_continuous(range=edge_range, breaks=sort(purrr::discard(layout$n_clones, is.na)),
+    ggraph::scale_edge_width_continuous(range=edge_range, breaks=unique(sort(purrr::discard(layout$n_clones, is.na))),
                                         name="Cluster Number") +
 
     theme_void(base_size=9*cex) +

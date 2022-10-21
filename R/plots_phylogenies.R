@@ -68,7 +68,7 @@ plot_ctree_mod = function (x.tree,
       ggraph::geom_node_text(aes(label=cluster), colour="black", vjust=0.4) +
       coord_cartesian(clip="off") +
       scale_color_manual(values=node_palette) +
-      scale_size(range=c(3, 10) * cex) +
+      scale_size(range=c(3, 10) * cex, breaks=unique(sort(layout$nMuts))) +
       guides(color="none", size=guide_legend("Clone size", nrow=1)) +
       labs(title=paste(cluster_id),
            subtitle=paste0("Scores ", format(tree$score, scientific=T), ".")) +
