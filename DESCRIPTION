@@ -34,6 +34,7 @@ Imports:
     patchwork,
     ctree,
     ggraph,
+    ggh4x,
     RColorBrewer,
     R.utils
 Remotes:
