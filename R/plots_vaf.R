@@ -29,7 +29,7 @@ plot_vaf = function(x,
   dataframe = x %>% get_vaf_dataframe()
 
   dataframe = dataframe %>%
-    dplyr::mutate(theta_binom=theta_binom*100) %>%
+    dplyr::mutate(theta_binom=theta_binom) %>%
     dplyr::select(-contains("ref"), -contains("dp"), -contains("alt")) %>%
     tidyr::pivot_wider(names_from=c("timepoints"),
                        names_sep=".",
@@ -78,8 +78,8 @@ plot_vaf_2D = function(dataframe,
     scale_color_manual(values=color_palette) +
     xlab(split_to_camelcase(dims.vaf[1])) +
     ylab(split_to_camelcase(dims.vaf[2])) +
-    ylim(0, 100) +
-    xlim(0, 100) +
+    ylim(0, 1) +
+    xlim(0, 1) +
     labs(color = "Clusters") +
     my_ggplot_theme()
 

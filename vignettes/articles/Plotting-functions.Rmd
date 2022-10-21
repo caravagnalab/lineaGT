@@ -43,11 +43,6 @@ plot_mullerplot(x.example, which="frac")
 plot_mullerplot(x.example, which="pop")
 ```
 
-```{r warning=FALSE}
-# plot_mullerplot(x.example, which="fitness", wrap=T)
-```
-
-
 
 # VAF
 ```{r}
@@ -56,9 +51,19 @@ plot_vaf(x.example, wrap=T)
 
 
 ```{r}
-plot_vaf_time(x.example, highlight="C3")
+plot_vaf_time(x.example, highlight="C4")
 ```
 
+
+# Mullerplot with mutations
+
+```{r warning=FALSE}
+plot_mullerplot(x.example, which="frac", mutations=T)
+```
+
+```{r warning=FALSE}
+plot_mullerplot(x.example, which="pop", mutations=T)
+```
 
 
 # Phylogenetic evolution
@@ -74,14 +79,16 @@ plot_phylogeny(x.example)
 plot_growth_regression(x.example)
 ```
 
-```{r}
-plot_growth_regression(x.example, highlight="C0", mutations=T)
+```{r warning=FALSE}
+plot_growth_regression(x.example, highlight="C5", mutations=T)
 ```
-
 
 
 ```{r warning=FALSE}
 plot_growth_rates(x.example)
 ```
 
+```{r}
+plot_growth_rates(x.example, highlight="C5", mutations=T)
+```
 
