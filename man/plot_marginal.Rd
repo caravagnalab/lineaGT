@@ -11,6 +11,7 @@ plot_marginal(
   binwidth = 10,
   show_dens = T,
   timepoints_to_int = list(),
+  facet_lin = F,
   single_plot = F
 )
 }

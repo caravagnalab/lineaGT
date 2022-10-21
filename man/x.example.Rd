@@ -5,7 +5,7 @@
 \alias{x.example}
 \title{Example mutation data}
 \format{
-An object of class \code{mvnmm} of length 19.
+An object of class \code{mvnmm} of length 20.
 }
 \usage{
 data(vaf.df.example)

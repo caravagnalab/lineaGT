@@ -11,9 +11,6 @@
 
 \item{...}{Default extra paramaters}
 }
-\value{
-
-}
 \description{
 Mullerplot showing the longitudinal clonal evolution per lineage.
 }

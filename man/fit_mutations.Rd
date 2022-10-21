@@ -26,9 +26,6 @@ fit_mutations(
 
 \item{highlight}{add}
 }
-\value{
-
-}
 \description{
 Fit the mutations clustering
 }

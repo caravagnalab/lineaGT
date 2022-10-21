@@ -29,9 +29,6 @@ fit_phylogenies(
 
 \item{lineages}{add}
 }
-\value{
-
-}
 \description{
 Fit the phylogenetic trees
 }

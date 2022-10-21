@@ -24,9 +24,6 @@ plot_differentiation_tree(
 
 \item{wrap}{add}
 }
-\value{
-
-}
 \description{
 Visualize the number of subclones on the differentiatio tree
 }

@@ -4,7 +4,8 @@ add_theta_to_vaf = function(vaf.df, x.muts.k, cluster) {
   if (purrr::is_empty(theta))  # if there is no object fitted
     return(
       vaf.df %>%
-        mutate(theta_binom=as.numeric(vaf)/100, labels_mut=paste(labels, labels_binom, sep=".")) %>%
+        # mutate(theta_binom=as.numeric(vaf)/100, labels_mut=paste(labels, labels_binom, sep=".")) %>%
+        mutate(theta_binom=as.numeric(vaf), labels_mut=paste(labels, labels_binom, sep=".")) %>%
         dplyr::select(-"labels_binom")
     )
 
@@ -65,7 +66,8 @@ check_dp = function(x, thr=10) {
     dplyr::mutate(dp=replace(dp, dp < thr, thr)) %>%
 
     # correct the variant allele reads
-    dplyr::mutate(alt=ceiling(vaf/100*dp)) %>%
+    # dplyr::mutate(alt=ceiling(vaf/100*dp)) %>%
+    dplyr::mutate(alt=ceiling(vaf*dp)) %>%
 
     dplyr::select(dp, alt, vaf, mutation, IS, lineage, timepoints, true_dp, dplyr::starts_with("ref"),
                   dplyr::starts_with("labels"), dplyr::starts_with("theta"), dplyr::starts_with("pi"))

@@ -4,7 +4,7 @@
 \alias{get_unique_labels}
 \title{Extract the list of unique observations labels.}
 \usage{
-get_unique_labels(x)
+get_unique_labels(x, init = FALSE)
 }
 \arguments{
 \item{x}{a mvnmm object.}

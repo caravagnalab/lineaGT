@@ -15,9 +15,6 @@ plot_phylogeny(x, show_best = 1, min_frac = 0, highlight = c())
 
 \item{highlight}{a list of labels ID to show.}
 }
-\value{
-
-}
 \description{
 Clonal evolution trees
 }
