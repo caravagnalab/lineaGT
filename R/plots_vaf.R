@@ -123,6 +123,10 @@ plot_vaf_time = function(x,
     dplyr::mutate(timepoints=as.character(timepoints_to_int[timepoints])) %>%
     dplyr::mutate(timepoints=as.integer(timepoints))
 
+  if (any(vaf.df$vaf > 1))
+    vaf.df = vaf.df %>%
+      dplyr::mutate(vaf=vaf/100)
+
   if (nrow(vaf.df) == 0)
     return(NULL)
 
