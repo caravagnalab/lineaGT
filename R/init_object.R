@@ -28,7 +28,7 @@ get_python_dataframe = function(py_model) {
 
   try(expr = {
     colnames(dataset) = py_model$dimensions
-    dataset$IS = py_model$IS
+    dataset$IS = py_model$IS %>% as.character()
     try(expr = {
       labels = suppressMessages( get_labels(py_model) )
       dataset$labels = labels }, silent = T)

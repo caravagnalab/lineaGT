@@ -1,13 +1,17 @@
 get_mean_long = function(x) {
-  return(
-    x %>%
-      get_mean() %>%
-      as.data.frame() %>% tibble::rownames_to_column(var="labels") %>%
-      dplyr::mutate(labels=factor(labels, levels=unique(labels))) %>%
-      tidyr::pivot_longer(cols=starts_with("cov"), names_to="cov.timepoints.lineage", values_to="mean_cov") %>%
-      tidyr::separate(cov.timepoints.lineage, into=c("else", "timepoints", "lineage"), sep="[.]") %>%
-      dplyr::mutate("else"=NULL)
-  )
+  means = x %>%
+    get_mean() %>%
+    as.data.frame() %>% tibble::rownames_to_column(var="labels") %>%
+    dplyr::mutate(labels=factor(labels, levels=unique(labels))) %>%
+    tidyr::pivot_longer(cols=starts_with("cov"), names_to="cov.timepoints.lineage", values_to="mean_cov") %>%
+    tidyr::separate(cov.timepoints.lineage, into=c("else", "timepoints", "lineage"), sep="[.]") %>%
+    dplyr::mutate("else"=NULL)
+
+  try(expr = {
+    means = means %>%
+      dplyr::mutate(timepoints=as.integer(timepoints))
+  })
+  return(means)
 }
 
 

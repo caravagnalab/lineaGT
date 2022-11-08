@@ -176,26 +176,36 @@ fit = function(cov.df,
 
 
 check_cov_dimensions = function(cov.df) {
-  tp = cov.df %>% dplyr::pull(timepoints) %>% unique()
-  lin = cov.df %>% dplyr::pull(lineage) %>% unique()
+  tp = cov.df %>% dplyr::pull(timepoints) %>% unique() %>% as.character()
+  lin = cov.df %>% dplyr::pull(lineage) %>% unique() %>% as.character()
+
+  # all the possible combinations of timepoints.lineage
   dimensions = apply(expand.grid(tp, lin), 1, paste, collapse=".")
 
+  # find the combinations of timepoints.lineage present in the data
   combs = cov.df %>%
     long_to_wide_cov() %>%
     dplyr::select(starts_with("cov")) %>%
     colnames() %>%
     str_replace_all("cov.","")
 
-  missing = setdiff(dimensions, combs) %>%
+  # find the combinations not present in the data
+  missing.vals = setdiff(dimensions, combs) %>%
     tibble::as_tibble() %>%
     tidyr::separate(value, into=c("timepoints", "lineage"), sep="[.]") %>%
     dplyr::mutate(coverage=0) %>%
     dplyr::mutate(IS=cov.df$IS[1])
 
+  try(expr = {
+    missing.vals = missing.vals %>%
+      dplyr::mutate(timepoints=as.integer(timepoints))
+  }, silent=T)
+
   return(
     cov.df %>%
+      dplyr::ungroup() %>%
       dplyr::add_row(
-        missing
+        missing.vals
       )
     )
 

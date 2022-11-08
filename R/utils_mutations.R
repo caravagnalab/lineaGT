@@ -45,7 +45,7 @@ check_dp = function(x, thr=10) {
 
   if (!"vaf" %in% colnames(vaf.df))
     vaf.df = vaf.df %>%
-    dplyr::mutate(vaf=alt/dp)
+      dplyr::mutate(vaf=alt/dp)
 
   joined = dplyr::inner_join(vaf.df, means, by=c("labels", "timepoints", "lineage")) %>%
 
@@ -99,29 +99,34 @@ check_dp = function(x, thr=10) {
 # of lineages and timepoints) are missing in the mutation data
 check_vaf_dimensions = function(vaf.df, x) {
   vaf.df = vaf.df %>%
-    ungroup() %>%
+    dplyr::ungroup() %>%
     long_to_wide_muts() %>%
     wide_to_long_muts()
 
   vaf.dims = vaf.df %>%
-    group_by(lineage, timepoints) %>%
+    dplyr::group_by(lineage, timepoints) %>%
     dplyr::summarise(nn=dplyr::n(), .groups="keep") %>%
-    mutate(dimensions=paste("cov",timepoints,lineage,sep=".")) %>%
+    dplyr::mutate(dimensions=paste("cov",timepoints,lineage,sep=".")) %>%
     dplyr::pull(dimensions)
 
   cov.dims = x %>% get_dimensions()
 
-  missing = setdiff(cov.dims, vaf.dims) %>%
+  missing.vals = setdiff(cov.dims, vaf.dims) %>%
     reshape2::melt() %>%
     separate(value, into=c("else","timepoints","lineage")) %>%
     dplyr::mutate("else"=NULL)
 
-  if (purrr::is_empty(missing)) return( vaf.df )
+  if (purrr::is_empty(missing.vals)) return( vaf.df )
+
+  try(expr = {
+    missing.vals = missing.vals %>%
+      dplyr::mutate(timepoints=as.integer(timepoints))
+  })
 
   return(
     vaf.df %>%
       dplyr::add_row(
-        missing %>%
+        missing.vals %>%
           dplyr::mutate(mutation=vaf.df[1,] %>% dplyr::pull(mutation),
                         IS=vaf.df[1,] %>% dplyr::pull(IS))
         ) %>%
