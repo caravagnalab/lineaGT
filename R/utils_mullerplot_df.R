@@ -80,7 +80,7 @@ get_muller_pop = function(x,
   # if highlight is specified -> we want to observe the frequencies of them related one to the other
   timepoints_to_int = map_timepoints_int(x, timepoints_to_int=timepoints_to_int)
 
-  value = "init"
+  if(is.integer(timepoints_to_int)) value = 0 else value = "init"
   if (!0 %in% timepoints_to_int && add_t0)
     timepoints_to_int = c(0, timepoints_to_int) %>% setNames(nm=c(value, names(timepoints_to_int))) else
     value = which(timepoints_to_int==0) %>% names()

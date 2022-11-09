@@ -38,40 +38,48 @@ long_to_wide_muts = function(vaf.df) {
 
 
 wide_to_long_cov = function(cov.df) {
-  long.df = cov.df %>%
-    tidyr::pivot_longer(cols=starts_with("cov"),
-                        names_to="else.time.lineage",
-                        values_to="coverage") %>%
-    tidyr::separate("else.time.lineage",
-                    into=c("else","timepoints","lineage"),
-                    sep="[.]") %>%
-    dplyr::mutate("else"=NULL)
+  return(
+    cov.df %>%
+      tidyr::pivot_longer(cols=starts_with("cov"),
+                          names_to="else.time.lineage",
+                          values_to="coverage") %>%
+      tidyr::separate("else.time.lineage",
+                      into=c("else","timepoints","lineage"),
+                      sep="[.]") %>%
+      dplyr::mutate("else"=NULL) %>%
 
-  try(expr = {long.df = long.df %>%
-    dplyr::mutate(timepoints=as.integer(timepoints))})
+      mutate_tp(fn=as.integer, colnm="timepoints")
+  )
 
-  return(long.df)
+  # try(expr = {long.df = long.df %>%
+  #   dplyr::mutate(timepoints=as.integer(timepoints))})
+
+  # return(long.df)
 }
 
 
 wide_to_long_muts = function(vaf.df) {
-  long.df = vaf.df %>%
-    tidyr::pivot_longer(cols=c(dplyr::starts_with("alt"),
-                               dplyr::starts_with("ref"),
-                               dplyr::starts_with("dp"),
-                               dplyr::starts_with("theta"),
-                               dplyr::starts_with("vaf")),
-                        names_to="type.timepoints.lineage") %>%
-    tidyr::separate("type.timepoints.lineage",
-                    into=c("type", "timepoints", "lineage"),
-                    sep="[.]") %>%
-    tidyr::pivot_wider(names_from="type",
-                       values_from="value")
+  return(
+    vaf.df %>%
+      tidyr::pivot_longer(cols=c(dplyr::starts_with("alt"),
+                                 dplyr::starts_with("ref"),
+                                 dplyr::starts_with("dp"),
+                                 dplyr::starts_with("theta"),
+                                 dplyr::starts_with("vaf")),
+                          names_to="type.timepoints.lineage") %>%
+      tidyr::separate("type.timepoints.lineage",
+                      into=c("type", "timepoints", "lineage"),
+                      sep="[.]") %>%
+      tidyr::pivot_wider(names_from="type",
+                         values_from="value") %>%
 
-  try(expr = {long.df = long.df %>%
-    dplyr::mutate(timepoints=as.integer(timepoints))})
+      mutate_tp(fn=as.integer, colnm="timepoints")
+  )
 
-  return(long.df)
+  # try(expr = {long.df = long.df %>%
+  #   dplyr::mutate(timepoints=as.integer(timepoints))})
+
+  # return(long.df)
 }
 
 

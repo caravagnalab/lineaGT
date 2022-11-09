@@ -32,6 +32,7 @@ get_binomial_theta_cluster = function(x.muts.k, cluster) {
       mutate(labels_mut=paste(cluster, v_cluster, sep="."), v_cluster=NULL, labels=cluster) %>%
       tidyr::pivot_longer(cols=dplyr::starts_with("v"), names_to="v.tp.lin", values_to="theta_binom") %>%
       tidyr::separate("v.tp.lin", into=c("else","timepoints","lineage")) %>%
+      mutate_tp(fn=as.integer) %>%
       dplyr::select(-"else")
   )
 }

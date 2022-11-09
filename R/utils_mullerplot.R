@@ -69,9 +69,10 @@ add_time_0 = function(pop_df,
 convert_tp = function(pop_df,
                       timepoints_to_int) {
   # if (is.null(timepoints_to_int)) return(pop_df)
+  if(is.numeric(pop_df$Generation)) pop_df = pop_df %>% dplyr::mutate(Generation=as.character(Generation))
   return(
     pop_df %>%
-      mutate(Generation=timepoints_to_int[Generation])
+      dplyr::mutate(Generation=timepoints_to_int[Generation])
   )
 }
 

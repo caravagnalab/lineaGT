@@ -55,7 +55,6 @@ plot_growth_regression = function(x,
     geom_vline(data=filter(regr.df, type==best_model),
                aes(xintercept=init_t, color=type), linetype="dashed", size=.3, alpha=.7) +
 
-
     geom_errorbar(data=filter(regr.df, type==best_model), aes(x=x, y=y, ymin=y.min, ymax=y.max, color=type),
                   width=.5, position=position_dodge(width=0.5), alpha=.9, size=.6) +
 

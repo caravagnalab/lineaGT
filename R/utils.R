@@ -146,4 +146,14 @@ map_timepoints_int = function(x, timepoints_to_int=list()) {
 }
 
 
+mutate_tp = function(dataset, fn, colnm="timepoints") {
+  try(expr = {
+    dataset = dataset %>%
+      dplyr::mutate(dplyr::across(!!colnm, fn))
+  }, silent=T)
+
+  return(dataset)
+}
+
+
 

@@ -120,6 +120,7 @@ plot_vaf_time = function(x,
   vaf.df = x %>%
     get_vaf_dataframe() %>%
     dplyr::filter(labels %in% highlight.c) %>%
+    mutate_tp(fn=as.character, colnm="timepoints") %>%
     dplyr::mutate(timepoints=as.character(timepoints_to_int[timepoints])) %>%
     dplyr::mutate(timepoints=as.integer(timepoints))
 

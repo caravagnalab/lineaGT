@@ -73,22 +73,28 @@ get_growth_params = function(timepoints_to_int,
 
 
 get_growth_rates_exp = function(rates.df, lineages, cluster, timepoints_to_int) {
+  pars = data.frame() %>%
+
+    # initialize the columns
+    tibble::add_column("Lineage"=as.character(NA),
+                       "fitness.exp"=NA,
+                       "init_t.exp"=NA,
+                       "p_rate.exp"=NA,
+                       "sigma.exp"=NA,
+                       "rate.exp"=as.numeric(NA)) %>%
+
+    # add the values
+    tibble::add_row(Lineage=lineages,
+                    p_rate.exp=rates.df$parent_rate,
+                    fitness.exp=rates.df$fitness %>% as.numeric(),
+                    init_t.exp=rates.df$init_time %>% as.integer())
+
+  try(expr = {
+    pars = pars %>% dplyr::mutate(p_rate.exp=as.numeric(p_rate.exp))
+  })
+
   return(
-    data.frame() %>%
-
-      # initialize the columns
-      tibble::add_column("Lineage"=as.character(NA),
-                         "fitness.exp"=NA,
-                         "init_t.exp"=NA,
-                         "p_rate.exp"=NA,
-                         "sigma.exp"=NA,
-                         "rate.exp"=as.numeric(NA)) %>%
-
-      # add the values
-      tibble::add_row(Lineage=lineages,
-                      p_rate.exp=rates.df$parent_rate,
-                      fitness.exp=rates.df$fitness,
-                      init_t.exp=rates.df$init_time) %>%
+    pars %>%
 
       # compute the rates for subclones
       dplyr::mutate(rate.exp=replace( rate.exp, !is.na(p_rate.exp), p_rate.exp * (1+fitness.exp) ),
@@ -102,21 +108,27 @@ get_growth_rates_exp = function(rates.df, lineages, cluster, timepoints_to_int) 
 
 
 get_growth_rates_log = function(rates.df, lineages, cluster, timepoints_to_int) {
-  return(
-    data.frame() %>%
-      tibble::add_column("Lineage"=as.character(NA),
-                         "fitness.log"=NA,
-                         "K.log"=NA,
-                         "init_t.log"=NA,
-                         "p_rate.log"=NA,
-                         "sigma.log"=NA,
-                         "rate.log"=as.numeric(NA)) %>%
+  pars = data.frame() %>%
+    tibble::add_column("Lineage"=as.character(NA),
+                       "fitness.log"=NA,
+                       "K.log"=NA,
+                       "init_t.log"=NA,
+                       "p_rate.log"=NA,
+                       "sigma.log"=NA,
+                       "rate.log"=as.numeric(NA)) %>%
 
-      tibble::add_row(fitness.log=rates.df$fitness,
-                      K.log=rates.df$carr_capac,
-                      init_t.log=rates.df$init_time,
-                      Lineage=lineages,
-                      p_rate.log=rates.df$parent_rate) %>%
+    tibble::add_row(fitness.log=rates.df$fitness %>% as.numeric(),
+                    K.log=rates.df$carr_capac %>% as.integer(),
+                    init_t.log=rates.df$init_time %>% as.integer(),
+                    Lineage=lineages,
+                    p_rate.log=rates.df$parent_rate)
+
+  try(expr = {
+    pars = pars %>% dplyr::mutate(p_rate.log=as.numeric(p_rate.log))
+  })
+
+  return(
+    pars %>%
 
       dplyr::mutate(rate.log=replace( rate.log, !is.na(p_rate.log), p_rate.log * (1+fitness.log) ),
                     rate.log=replace( rate.log, is.na(p_rate.log), fitness.log ),
