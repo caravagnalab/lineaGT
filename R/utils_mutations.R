@@ -117,17 +117,18 @@ check_vaf_dimensions = function(vaf.df, x) {
     separate(value, into=c("else","timepoints","lineage")) %>%
     dplyr::mutate("else"=NULL)
 
-  if (purrr::is_empty(missing.vals)) return( vaf.df )
+  if (nrow(missing.vals) == 0) return( vaf.df )
 
-  try(expr = {
-    missing.vals = missing.vals %>%
-      dplyr::mutate(timepoints=as.integer(timepoints))
-  })
+  # try(expr = {
+  #   missing.vals = missing.vals %>%
+  #     dplyr::mutate(timepoints=as.integer(timepoints))
+  # })
 
   return(
     vaf.df %>%
       dplyr::add_row(
         missing.vals %>%
+          mutate_tp(fn=as.integer, colnm="timepoints") %>%
           dplyr::mutate(mutation=vaf.df[1,] %>% dplyr::pull(mutation),
                         IS=vaf.df[1,] %>% dplyr::pull(IS))
         ) %>%
