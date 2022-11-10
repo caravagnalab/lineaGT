@@ -69,11 +69,17 @@ get_muller_pop = function(x,
                           tree_score=1,
                           edges=NULL) {
 
-  if (purrr::is_empty(highlight) && have_pop_df(x) && mutations)
+  if (purrr::is_empty(highlight) && mutations && have_pop_df_muts(x))
     return(
       get_pop_df(x) %>%
-        dplyr::filter(Identity %in% c("P",get_highlight(x, mutations=mutations, highlight=c())))
+        dplyr::filter(Identity %in% c("P", get_highlight(x, mutations=mutations, highlight=c())))
       )
+
+  if (purrr::is_empty(highlight) && !mutations && have_pop_df(x))
+    return(
+      get_pop_df(x) %>%
+        dplyr::filter(Identity %in% c("P", get_highlight(x, mutations=mutations, highlight=c())))
+    )
 
   highlight = get_highlight(x, mutations=mutations, highlight=highlight)
 

@@ -55,12 +55,15 @@ fit_phylogenies = function(x, vaf.df=NULL, min_frac=0, highlight=list(), fit_mut
 
 
 # to infer the tree on a single cluster
-fit_trees = function(fit_viber, cluster) {
+fit_trees = function(x.muts.k, cluster) {
+  if (purrr::is_empty(x.muts.k))
+    return(list())
+
   tree = list()
-  if (fit_viber$K > 1)
+  if (x.muts.k$K > 1)
     tryCatch(
-      expr = { tree = suppressWarnings(withTimeout(run_ctree(fit_viber, cluster), timeout=300, onTimeout="error")) },
-      error = function(e) {}
+      expr = { tree = suppressWarnings(withTimeout(run_ctree(x.muts.k, cluster), timeout=300, onTimeout="error")) },
+      error = function(e) {print(e)}
     )
 
   return(tree)
@@ -124,13 +127,15 @@ run_ctree = function(viber_run, clonal) {
 
   cli::cli_process_start(paste0("Starting phylogeny inference of clone ", clonal))
 
-  tt = ctree::ctrees(CCF_clusters=cluster_table,
+  tt = invisible(
+    ctree::ctrees(CCF_clusters=cluster_table,
                   drivers=drivers_table,
                   samples=colnames(cx),
                   patient=patientID,
                   sspace.cutoff=100,
                   store.max=50,
                   n.sampling=100)
+  )
 
   cli::cli_process_done()
 

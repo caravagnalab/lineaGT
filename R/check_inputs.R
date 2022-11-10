@@ -43,3 +43,12 @@ have_pop_df = function(x) {
     return(TRUE)
   return(FALSE)
 }
+
+
+have_pop_df_muts = function(x) {
+  muts_labs = get_unique_muts_labels(x)
+  if ("population.df" %in% names(x) && sum(muts_labs %in% get_pop_df(x)$Identity)==length(muts_labs))
+    return(TRUE)
+  return(FALSE)
+}
+

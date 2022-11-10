@@ -72,6 +72,8 @@ fit_mutations = function(x,
 
   if (infer_phylo) x = add_phylo(x, x.trees)
 
+  x$population.df = get_muller_pop(x, mutations=T, timepoints_to_int=get_tp_to_int(x))
+
   return(x)
 }
 
@@ -88,34 +90,29 @@ fit_cluster_viber = function(input_viber, cluster, x, infer_phylo=TRUE, max_IS=N
   x.muts.k = tree = list()
 
   # fit the bmm only for the clones with number of IS <= max_IS
-  if (is.null(max_IS) || (get_ISs_single_cluster(x, cluster) <= max_IS)) {
-    tryCatch(expr = {
+  if ((k > 1) && (is.null(max_IS) || (get_ISs_single_cluster(x, cluster) <= max_IS))) {
+    cli::cli_process_start(paste0("Starting clustering of clone ", cluster, " mutations"), msg_failed=NULL)
 
-      cli::cli_process_start(paste0("Starting clustering of clone ", cluster, " mutations"), msg_failed=NULL)
+    x.muts.k = fit_viber(x, input.k$successes[,colnames.list], input.k$trials[,colnames.list], k)
 
-      x.muts.k = fit_viber(x, input.k$successes[,colnames.list], input.k$trials[,colnames.list], k)
+    cli::cli_process_done()
 
-      cli::cli_process_done()
+    # change values of theta != 0 when all mutations in a lineage are == 0
+    theta_k.mod = check_muts_theta(x.muts.k)
+    x.muts.k$theta_k = theta_k.mod
 
-      # change values of theta != 0 when all mutations in a lineage are == 0
-      theta_k.mod = check_muts_theta(x.muts.k)
-      x.muts.k$theta_k = theta_k.mod
+    labels = x.muts.k$labels$cluster.Binomial
 
-      # change clusters from "Cn" to "Sn"
-      x.muts.k = x.muts.k %>% replace_labels_muts(pattern="C", replacement="S")
+    input.k$vaf.df$labels_binom = labels
+    input.k$vaf.df$pi_binom = x.muts.k$pi_k[labels] %>% as.vector()
 
-      labels = x.muts.k$labels$cluster.Binomial
-
-      input.k$vaf.df$labels_binom = labels
-      input.k$vaf.df$pi_binom = x.muts.k$pi_k[labels] %>% as.vector()
-
-      if (infer_phylo) tree = fit_trees(x.muts.k, cluster)
-    },
-    warning = function(w) {},
-    error = function(e) { cli::cli_progress_cleanup() } )
+    if (infer_phylo) tree = fit_trees(x.muts.k, cluster)
+    # },
+    # warning = function(w) {print(w)},
+    # error = function(e) { print(e); cli::cli_progress_cleanup() } )
   }
 
-  if (purrr::is_empty(x.muts.k)) {
+  if (k == 1 && purrr::is_empty(x.muts.k)) {
     input.k$vaf.df$labels_binom = "S1"
     input.k$vaf.df$pi_binom = 1
   }
@@ -132,17 +129,28 @@ fit_cluster_viber = function(input_viber, cluster, x, infer_phylo=TRUE, max_IS=N
 
 fit_viber = function(x, successes, trials, k) {
   data_annotations = get_data_annotation(k)
-  x.muts.k = VIBER::variational_fit(successes,
-                                    trials,
-                                    K=k,
-                                    # a_0=input.k$alpha_0[,colnames.list] %>% list() %>% unlist(),
-                                    data=data_annotations)
+  x.muts.k = invisible(
+    VIBER::variational_fit(successes,
+                           trials,
+                           K=k,
+                           # a_0=input.k$alpha_0[,colnames.list] %>% list() %>% unlist(),
+                           data=data_annotations)
+  )
 
   pi_cutoff = .5 / k  # we are not reducing the clusters but it changes the labels
   x.muts.k = VIBER::choose_clusters(x.muts.k,
                                     binomial_cutoff=0,
                                     dimensions_cutoff=0,
                                     pi_cutoff=pi_cutoff)
+
+  # change clusters from "Cn" to "Sn"
+  x.muts.k = x.muts.k %>% replace_labels_muts(pattern="C", replacement="S")
+
+  # n_cls = x.muts.k$labels %>% dplyr::pull(cluster.Binomial) %>% unique() %>% length()
+  # new_labs = paste0("S", 1:n_cls) %>% setNames(x.muts.k$labels)
+  # x.muts.k = VIBER::rename_clusters(x.muts.k, new_labs)
+
+  # print(x.muts.k$labels)
 
   return(x.muts.k)
 }
@@ -158,7 +166,7 @@ check_muts_theta = function(x.muts.k) {
     reshape2::melt(id=c("cluster.Binomial","mut.id"), variable.name="tp.lin", value.name="ref")
 
   vaf = dplyr::inner_join(alt, ref, by=c("cluster.Binomial","mut.id","tp.lin")) %>%
-    dplyr::mutate(vaf=alt / (alt+ref))
+    dplyr::mutate(vaf=alt/(alt+ref))
 
   theta = x.muts.k$theta_k %>%
     as.data.frame %>% rownames_to_column(var="tp.lin") %>%

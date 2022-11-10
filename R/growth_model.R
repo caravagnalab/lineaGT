@@ -123,18 +123,6 @@ fit_growth_utils = function(rates.df,
                       timepoints_to_int=timepoints_to_int,
                       py_pkg=py_pkg)
 
-
-  # rates.df = rates.df %>%
-  #   fit_growth_clones(clusters=parents$Identity %>% unique(),
-  #                     pop_df.cl=pop_df.cl,
-  #                     parents=parents,
-  #                     growth_model=growth_model,
-  #                     steps=steps,
-  #                     clonal=FALSE,
-  #                     timepoints_to_int=timepoints_to_int,
-  #                     py_pkg=py_pkg)
-
-
   return(rates.df)
 }
 
@@ -188,7 +176,7 @@ run_py_growth = function(rates.df,
   if (is.null(py_pkg)) py_pkg = reticulate::import("pylineaGT")
 
   input.clone = pop_df.cl %>%
-    filter(Identity == cluster) %>%
+    dplyr::filter(Identity == cluster) %>%
     dplyr::select(-Frequency) %>%
     dplyr::mutate(Population=ifelse((Generation == 0 & clonal), 1, Population)) %>%
     tidyr::pivot_wider(id_cols="Generation", names_from="Lineage", values_from="Population") %>%
