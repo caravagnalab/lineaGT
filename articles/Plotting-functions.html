@@ -43,12 +43,14 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item">
+  <a class="nav-link" href="../articles/lineaGT.html">Get started</a>
+</li>
+<li class="nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
 <li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/Get-started.html">Get started</a>
     <a class="dropdown-item" href="../articles/Input-formats.html">Input formats</a>
     <a class="dropdown-item" href="../articles/Lineage-inference.html">Lineage inference</a>
     <a class="dropdown-item" href="../articles/Plotting-functions.html">Plotting functions</a>
@@ -124,7 +126,11 @@
 </h2>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plots</span> <span class="op">=</span> <span class="fu"><a href="../reference/plot_scatter_density.html">plot_scatter_density</a></span><span class="op">(</span><span class="va">x.example</span><span class="op">)</span></span>
-<span><span class="va">plots</span><span class="op">$</span><span class="va">`cov.t1.l1:cov.t2.l2`</span> <span class="co"># to visualize a single plot</span></span></code></pre></div>
+<span><span class="va">plots</span><span class="op">$</span><span class="va">`cov.t1.l1:cov.t2.l2`</span> <span class="co"># to visualize a single plot</span></span>
+<span><span class="co">#&gt; Warning: The dot-dot notation (`..level..`) was deprecated in ggplot2 3.4.0.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `after_stat(level)` instead.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The deprecated feature was likely used in the <span style="color: #0000BB;">lineaGT</span> package.</span></span>
+<span><span class="co">#&gt;   Please report the issue to the authors.</span></span></code></pre></div>
 <p><img src="Plotting-functions_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
 </div>
 <div class="section level2">
@@ -171,19 +177,19 @@
 </h2>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_phylogeny.html">plot_phylogeny</a></span><span class="op">(</span><span class="va">x.example</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Duplicated aesthetics after name standardisation: na.rm</span></span>
-<span><span class="co">#&gt; Duplicated aesthetics after name standardisation: na.rm</span></span>
-<span><span class="co">#&gt; Duplicated aesthetics after name standardisation: na.rm</span></span>
+<span><span class="co">#&gt; Warning: Duplicated aesthetics after name standardisation: <span style="color: #00BB00;">na.rm</span></span></span>
+<span><span class="co">#&gt; Duplicated aesthetics after name standardisation: <span style="color: #00BB00;">na.rm</span></span></span>
+<span><span class="co">#&gt; Duplicated aesthetics after name standardisation: <span style="color: #00BB00;">na.rm</span></span></span>
 <span><span class="co">#&gt; $C0</span></span>
-<span><span class="co">#&gt; Warning: Removed 1 rows containing missing values (geom_point).</span></span></code></pre></div>
+<span><span class="co">#&gt; Warning: Removed 1 rows containing missing values (`geom_point()`).</span></span></code></pre></div>
 <p><img src="Plotting-functions_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $C1</span></span>
-<span><span class="co">#&gt; Warning: Removed 1 rows containing missing values (geom_point).</span></span></code></pre>
+<span><span class="co">#&gt; Warning: Removed 1 rows containing missing values (`geom_point()`).</span></span></code></pre>
 <p><img src="Plotting-functions_files/figure-html/unnamed-chunk-11-2.png" width="700"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $C7</span></span>
-<span><span class="co">#&gt; Warning: Removed 1 rows containing missing values (geom_point).</span></span></code></pre>
+<span><span class="co">#&gt; Warning: Removed 1 rows containing missing values (`geom_point()`).</span></span></code></pre>
 <p><img src="Plotting-functions_files/figure-html/unnamed-chunk-11-3.png" width="700"></p>
 </div>
 <div class="section level2">
