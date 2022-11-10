@@ -11,6 +11,9 @@
 
 \item{...}{Default extra paramaters}
 }
+\value{
+Prints to screen information regarding the fitted object.
+}
 \description{
 add
 }

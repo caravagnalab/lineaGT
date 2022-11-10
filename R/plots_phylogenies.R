@@ -5,7 +5,7 @@
 #' @param min_frac value in \code{[0,1]} representing the minimum abundance to show the clusters.
 #' @param highlight a list of labels ID to show.
 #'
-#' @return
+#' @return A list of \code{ggplot} objects with the estimated clone trees.
 #'
 #' @importFrom ggraph create_layout ggraph geom_edge_link geom_node_point geom_node_text circle
 #' @importFrom stringr str_replace_all

@@ -26,6 +26,9 @@ fit_mutations(
 
 \item{highlight}{add}
 }
+\value{
+A \code{mvnmm} object with the additional list \code{x.muts} containing the estimated subclones from somatic mutations.
+}
 \description{
 Fit the mutations clustering
 }

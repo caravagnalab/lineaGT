@@ -87,7 +87,7 @@ iteration will be stored.}
 \item{sample_id}{add}
 }
 \value{
-a \code{mvnmm} object, containing the input dataset, annotated with IS_values, N, K, T
+A \code{mvnmm} object, containing the input dataset, annotated with IS_values, N, K, T
 specific of the dataset, the input IS and column names, a list params that will contain the
 inferred parameters, the python object
 }

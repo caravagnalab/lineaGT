@@ -31,5 +31,5 @@ filter_dataset(
 a dataset of the same shape as the input one, with filtered observations.
 }
 \description{
-Filters the input dataset.
+Function used to filter observations, i.e. ISs, in the input dataframe with coverage values.
 }

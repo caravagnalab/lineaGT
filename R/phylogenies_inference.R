@@ -9,7 +9,8 @@
 #' @param fit_viber add
 #' @param lineages add
 #'
-#' @return
+#' @return A \code{mvnmm} object with the additional list \code{x.trees} containing the estimated clone trees.
+#'
 #' @export fit_phylogenies
 
 fit_phylogenies = function(x, vaf.df=NULL, min_frac=0, highlight=list(), fit_muts=FALSE) {

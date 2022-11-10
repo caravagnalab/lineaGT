@@ -15,6 +15,9 @@ plot_phylogeny(x, show_best = 1, min_frac = 0, highlight = c())
 
 \item{highlight}{a list of labels ID to show.}
 }
+\value{
+A list of \code{ggplot} objects with the estimated clone trees.
+}
 \description{
 Clonal evolution trees
 }

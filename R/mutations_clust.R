@@ -11,7 +11,7 @@
 #' @param max_IS add
 #' @param highlight add
 #'
-#' @return
+#' @return A \code{mvnmm} object with the additional list \code{x.muts} containing the estimated subclones from somatic mutations.
 #'
 #' @importFrom VIBER variational_fit choose_clusters
 #' @importFrom reshape2 melt

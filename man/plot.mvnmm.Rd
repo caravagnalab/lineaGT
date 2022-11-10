@@ -9,7 +9,10 @@
 \arguments{
 \item{x}{An object of class mvnmm}
 
-\item{...}{Default extra paramaters}
+\item{...}{Default extra parameters}
+}
+\value{
+A ggplot object with the mullerplot for the fitted object.
 }
 \description{
 Mullerplot showing the longitudinal clonal evolution per lineage.

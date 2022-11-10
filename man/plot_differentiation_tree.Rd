@@ -2,7 +2,7 @@
 % Please edit documentation in R/plots_differentiation_tree.R
 \name{plot_differentiation_tree}
 \alias{plot_differentiation_tree}
-\title{Visualize the number of subclones on the differentiatio tree}
+\title{Visualize the number of subclones on the differentiation tree}
 \usage{
 plot_differentiation_tree(
   x,
@@ -24,6 +24,9 @@ plot_differentiation_tree(
 
 \item{wrap}{add}
 }
+\value{
+A \code{ggplot} object showing the identified subclones in the hematopoietic tree.
+}
 \description{
-Visualize the number of subclones on the differentiatio tree
+Visualize the number of subclones on the differentiation tree
 }

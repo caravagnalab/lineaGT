@@ -305,7 +305,6 @@ get_unique_labels = function(x, init=FALSE) {
     tryCatch(
       expr = {
         clusters_sort = paste("C", py_model$init_params$clusters$detach()$numpy() %>% unique() %>% sort(), sep="")
-        print(clusters_sort)
         return(clusters_sort) },
       error = function(e) return(0:(py_model$params$K - 1)) )
 

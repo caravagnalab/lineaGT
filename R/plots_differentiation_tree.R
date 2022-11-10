@@ -1,4 +1,4 @@
-#' Visualize the number of subclones on the differentiatio tree
+#' Visualize the number of subclones on the differentiation tree
 #'
 #' @param x add
 #' @param edges add
@@ -6,7 +6,8 @@
 #' @param single_tree add
 #' @param wrap add
 #'
-#' @return
+#' @return A \code{ggplot} object showing the identified subclones in the hematopoietic tree.
+#'
 #' @export plot_differentiation_tree
 
 plot_differentiation_tree = function(x,

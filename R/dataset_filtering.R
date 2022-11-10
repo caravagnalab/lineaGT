@@ -1,6 +1,6 @@
 #' Filters the input dataset.
 #'
-#' @description
+#' @description Function used to filter observations, i.e. ISs, in the input dataframe with coverage values.
 #'
 #' @param cov.df Input coverage dataset. It must have at least the columns \code{coverage}, \code{timepoints},
 #' \code{lineage}, \code{IS}, with the coverage values, timepoint, lineage and IS, respectively.

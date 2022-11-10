@@ -34,7 +34,7 @@
 #' @param sample_id add
 #' @param default_lm add
 #'
-#' @return a \code{mvnmm} object, containing the input dataset, annotated with IS_values, N, K, T
+#' @return A \code{mvnmm} object, containing the input dataset, annotated with IS_values, N, K, T
 #' specific of the dataset, the input IS and column names, a list params that will contain the
 #' inferred parameters, the python object
 #'
@@ -195,6 +195,9 @@ check_cov_dimensions = function(cov.df) {
     tidyr::separate(value, into=c("timepoints", "lineage"), sep="[.]") %>%
     dplyr::mutate(coverage=0) %>%
     dplyr::mutate(IS=cov.df$IS[1])
+
+  if (nrow(missing.vals) == 0)
+    return(cov.df %>% dplyr::ungroup())
 
   try(expr = {
     missing.vals = missing.vals %>%

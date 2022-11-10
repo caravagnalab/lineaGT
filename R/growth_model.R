@@ -11,7 +11,7 @@
 #' @param force if the model has already been fitted, setting \code{force} to \code{FALSE} will keep the
 #' computed rates. Setting \code{force} to \code{TRUE} will fit the model again for the specified clusters.
 #'
-#' @return
+#' @return A \code{mvnmm} object with the additional tibble \code{growth.rates} containing the estimated population genetics parameters.
 #'
 #' @importFrom purrr is_empty
 #' @importFrom dplyr select filter add_row mutate pull contains select

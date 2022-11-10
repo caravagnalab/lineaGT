@@ -29,6 +29,9 @@ fit_phylogenies(
 
 \item{lineages}{add}
 }
+\value{
+A \code{mvnmm} object with the additional list \code{x.trees} containing the estimated clone trees.
+}
 \description{
 Fit the phylogenetic trees
 }

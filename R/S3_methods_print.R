@@ -5,7 +5,7 @@
 #' @param x An object of class mvnmm
 #' @param ... Default extra paramaters
 #'
-#' @return
+#' @return Prints to screen information regarding the fitted object.
 #'
 #' @exportS3Method print mvnmm
 #' @export print.mvnmm
@@ -30,7 +30,7 @@ print.mvnmm = function(x, ...) {
   cli::cli_text(clisymbols::symbol$arrow_right, " Timepoints: {.field {tp}}.")
   cli::cli_text(clisymbols::symbol$arrow_right, " Number of Insertion Sites: {.field {x$data.shape[1]}}.")
 
-  pi = x %>% lineaGT::get_weights() %>% round(2) %>% sort(decreasing = TRUE)
+  pi = x %>% get_weights() %>% round(2) %>% sort(decreasing = TRUE)
   n_IS = x %>% get_ISs() %>% sort(decreasing=T)
 
   cli::cli_h3("Optimal IS model with {.field k = {pi %>% length}}.")

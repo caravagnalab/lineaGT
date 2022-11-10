@@ -3,9 +3,9 @@
 #' @description Mullerplot showing the longitudinal clonal evolution per lineage.
 #'
 #' @param x An object of class mvnmm
-#' @param ... Default extra paramaters
+#' @param ... Default extra parameters
 #'
-#' @return
+#' @return A ggplot object with the mullerplot for the fitted object.
 #'
 #' @exportS3Method plot mvnmm
 #' @export plot.mvnmm

@@ -1,15 +1,15 @@
 long_to_wide_cov = function(cov.df) {
   ## transforms the input dataset from long to wide format
   ## input columns are: "coverage", "timepoints", "lineage", "IS"
-  wide.df = cov.df %>%
-    dplyr::select(dplyr::starts_with("cov"), "IS", "timepoints", "lineage", dplyr::contains("labels")) %>%
-    tidyr::pivot_wider(names_from=c("timepoints","lineage"),
-                       names_prefix="cov.",
-                       names_sep=".",
-                       values_from=dplyr::starts_with("cov"),
-                       values_fill=0) # fill missing values with 0 -> means 0 coverage
-
-  return(wide.df)
+  return(
+    cov.df %>%
+     dplyr::select(dplyr::starts_with("cov"), "IS", "timepoints", "lineage", dplyr::contains("labels")) %>%
+     tidyr::pivot_wider(names_from=c("timepoints","lineage"),
+                        names_prefix="cov.",
+                        names_sep=".",
+                        values_from=dplyr::starts_with("cov"),
+                        values_fill=0) # fill missing values with 0 -> means 0 coverage
+    )
 }
 
 
@@ -50,11 +50,6 @@ wide_to_long_cov = function(cov.df) {
 
       mutate_tp(fn=as.integer, colnm="timepoints")
   )
-
-  # try(expr = {long.df = long.df %>%
-  #   dplyr::mutate(timepoints=as.integer(timepoints))})
-
-  # return(long.df)
 }
 
 
@@ -75,11 +70,6 @@ wide_to_long_muts = function(vaf.df) {
 
       mutate_tp(fn=as.integer, colnm="timepoints")
   )
-
-  # try(expr = {long.df = long.df %>%
-  #   dplyr::mutate(timepoints=as.integer(timepoints))})
-
-  # return(long.df)
 }
 
 
