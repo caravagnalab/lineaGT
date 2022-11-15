@@ -52,3 +52,15 @@ have_pop_df_muts = function(x) {
   return(FALSE)
 }
 
+
+have_corrected_pops = function(x, estimate_npops) {
+  if (have_pop_df(x) && !estimate_npops)
+    return(TRUE)
+
+  if (have_pop_df(x) && estimate_npops && ("Population.corr" %in% colnames(get_pop_df(x))))
+    return(TRUE)
+
+  return(FALSE)
+
+}
+

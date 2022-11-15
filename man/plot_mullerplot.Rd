@@ -9,6 +9,7 @@ plot_mullerplot(
   which = "frac",
   highlight = c(),
   min_frac = 0,
+  estimate_npops = TRUE,
   timepoints_to_int = c(),
   mutations = F,
   single_clone = T,

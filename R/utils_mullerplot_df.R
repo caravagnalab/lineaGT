@@ -67,15 +67,16 @@ get_muller_pop = function(x,
                           highlight=c(),
                           add_t0=T,
                           tree_score=1,
+                          estimate_npops=TRUE,
                           edges=NULL) {
 
-  if (purrr::is_empty(highlight) && mutations && have_pop_df_muts(x))
+  if (purrr::is_empty(highlight) && mutations && have_pop_df_muts(x) && have_corrected_pops(x, estimate_npops))
     return(
       get_pop_df(x) %>%
         dplyr::filter(Identity %in% c("P", get_highlight(x, mutations=mutations, highlight=c())))
       )
 
-  if (purrr::is_empty(highlight) && !mutations && have_pop_df(x))
+  if (purrr::is_empty(highlight) && !mutations && have_pop_df(x) && have_corrected_pops(x, estimate_npops))
     return(
       get_pop_df(x) %>%
         dplyr::filter(Identity %in% c("P", get_highlight(x, mutations=mutations, highlight=c())))
@@ -109,6 +110,12 @@ get_muller_pop = function(x,
     dplyr::arrange(Identity, Lineage, Generation) %>%
     dplyr::mutate(theta_binom=1, theta.par=NA, Parent="P")
 
+  if (estimate_npops) {
+    n_pops = data.frame(estimate_n_pops(x)) %>% setNames("n_pops") %>% tibble::rownames_to_column(var="Identity")
+    means.clonal = dplyr::inner_join(means.clonal, n_pops, by="Identity") %>%
+      dplyr::rename(Population.orig=Population) %>%
+      dplyr::mutate(Population=Population.orig*n_pops)
+  }
 
   pop_df = x %>%
     get_pop_muts(means.clonal=means.clonal, edges=edges, mutations=mutations) %>%
@@ -117,6 +124,11 @@ get_muller_pop = function(x,
     add_time_0(x=x, force=add_t0, value=value) %>%
     convert_tp(timepoints_to_int=timepoints_to_int) %>%
     dplyr::full_join(edges, by="Identity")
+
+  if (estimate_npops)
+    pop_df = pop_df %>%
+      dplyr::rename(Population.corr=Population) %>%
+      dplyr::rename(Population=Population.orig)
 
   return(pop_df)
 }

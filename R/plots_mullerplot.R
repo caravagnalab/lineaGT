@@ -28,6 +28,7 @@ plot_mullerplot = function(x,
                            which="frac",
                            highlight=c(),
                            min_frac=0,
+                           estimate_npops=TRUE,
                            timepoints_to_int=c(),
                            mutations=F,
                            single_clone=T,
@@ -42,11 +43,15 @@ plot_mullerplot = function(x,
 
   lvls = c("P", get_unique_muts_labels(x), get_unique_labels(x))
 
-  pop_df = get_muller_pop(x, mutations=mutations, timepoints_to_int=timepoints_to_int) %>%
+  pop_df = get_muller_pop(x, mutations=mutations, timepoints_to_int=timepoints_to_int, estimate_npops=estimate_npops) %>%
     dplyr::select(-Population, -Frequency, -Parent, -theta_binom, -dplyr::contains("Pop.subcl")) %>%
     dplyr::rename(Population=Pop.plot) %>%
-
     dplyr::arrange(Identity, Generation, Lineage)
+
+  if (estimate_npops)
+    pop_df = pop_df %>%
+      dplyr::rename(Population.orig=Population) %>%
+      dplyr::rename(Population=Population.corr)
 
   edges_df = get_muller_edges(x,
                               mutations=mutations,

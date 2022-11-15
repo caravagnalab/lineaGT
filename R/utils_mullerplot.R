@@ -134,3 +134,43 @@ pop_df_add_empty = function(mullerdf) {
 }
 
 
+estimate_mean_ISs = function(x) {
+  cov.df = x %>% get_cov_dataframe() %>% long_to_wide_cov() %>% dplyr::select(dplyr::starts_with("cov"))
+
+  cums = apply(cov.df, 2, function(x) return(ecdf(x)))
+  qntls = lapply(cums, function(x)
+    return(max(1, quantile(x, probs=0.95) %>% setNames(NULL)))) %>% unlist()
+
+  qntls.df = data.frame(qntls) %>%
+    tibble::rownames_to_column() %>%
+    tidyr::separate(rowname, into=c("else","timepoints","lineage")) %>%
+    dplyr::select(-"else") %>%
+    tibble::as_tibble() %>%
+    mutate_tp(fn=as.integer)
+
+  mean.long = x %>% get_mean_long()
+
+  cov.qntls = dplyr::inner_join(mean.long, qntls.df, by=c("timepoints","lineage"))
+
+  keep = cov.qntls %>%
+    dplyr::group_by(labels) %>%
+    dplyr::filter(any(mean_cov>qntls)) %>%
+    dplyr::pull(labels) %>% unique()
+
+  # fixx = setdiff(get_unique_labels(x), keep)
+  mean_ISs = get_ISs(x)[keep] %>% mean() %>% ceiling()
+
+  return(mean_ISs)
+}
+
+
+estimate_n_pops = function(x, highlight=c()) {
+  n_ISs = get_ISs(x)
+  mean_ISs = estimate_mean_ISs(x)
+
+  n_pops = sapply(get_unique_labels(x), function(cls) return(max(1, round(n_ISs[[cls]] / mean_ISs))) )
+
+  return(n_pops)
+}
+
+
