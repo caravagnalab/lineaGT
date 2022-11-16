@@ -58,7 +58,9 @@ plot_vaf_time(x.example, highlight="C4")
 # Mullerplot with mutations
 
 ```{r warning=FALSE}
-plot_mullerplot(x.example, which="frac", mutations=T, estimate_npops=T)
+mp1 = plot_mullerplot(x.example, which="frac", mutations=T, estimate_npops=T)
+mp2 = plot_mullerplot(x.example, which="frac", mutations=T, estimate_npops=F)
+patchwork::wrap_plots(mp1, mp2, ncol=1)
 ```
 
 ```{r warning=FALSE}

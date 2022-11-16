@@ -181,7 +181,7 @@ plot_marginal = function(x,
       dplyr::filter(labels %in% highlight) %>%
       ggplot() +
       geom_histogram(aes(x=coverage,
-                         y=..count../sum(..count..)/binwidth,
+                         y=after_stat(count)/sum(after_stat(count))/binwidth,
                          fill=labels),
                      position="identity", alpha=1, binwidth=binwidth, color="#FFFFFF00") +
       scale_fill_manual(values=color_palette, breaks=highlight) +
@@ -219,7 +219,7 @@ plot_marginal = function(x,
     dplyr::filter(labels %in% highlight) %>%
     ggplot() +
     geom_histogram(aes(x=coverage,
-                       y=..count../sum(..count..)/binwidth,
+                       y=after_stat(count)/sum(after_stat(count))/binwidth,
                        fill=labels),
                    position="identity", alpha=1, binwidth=binwidth, color="#FFFFFF00") +
     scale_fill_manual(values=color_palette, breaks=highlight) +
@@ -233,11 +233,9 @@ plot_marginal = function(x,
     dens.df = params %>%
       dplyr::filter(labels %in% highlight) %>%
       dplyr::group_by(timepoints, labels, lineage) %>%
-      # dplyr::mutate(dens=list(rnorm(1000, mean=mean_cov, sd=sigma))) %>%
       dplyr::mutate(dens=list(dnorm(1:max(dd$coverage), mean=mean_cov, sd=sigma)),
                     coverage=list(1:max(dd$coverage))) %>%
       tidyr::unnest(c(coverage, dens)) %>%
-      # dplyr::filter(dens>=0) %>%
       dplyr::ungroup()
 
     p = p +
@@ -258,7 +256,7 @@ plot_marginal = function(x,
       dplyr::filter(lineage==ll) %>%
       ggplot() +
       geom_histogram(aes(x=coverage,
-                         y=..count../sum(..count..)/binwidth,
+                         y=after_stat(count)/sum(after_stat(count))/binwidth,
                          fill=labels),
                      position="identity", alpha=1, binwidth=binwidth, color="#FFFFFF00") +
       scale_fill_manual(values=color_palette, breaks=highlight) +

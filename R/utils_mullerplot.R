@@ -137,7 +137,7 @@ pop_df_add_empty = function(mullerdf) {
 estimate_mean_ISs = function(x) {
   cov.df = x %>% get_cov_dataframe() %>% long_to_wide_cov() %>% dplyr::select(dplyr::starts_with("cov"))
 
-  # cums = apply(cov.df, 2, function(x) return(ecdf(x)))
+  cums = apply(cov.df, 2, function(x) return(ecdf(x)))
   qntls = apply(cov.df, 2, function(x)
     return(max(1, quantile(x, probs=0.95) %>% setNames(NULL)))) %>% unlist()
 
@@ -156,6 +156,9 @@ estimate_mean_ISs = function(x) {
     dplyr::group_by(labels) %>%
     dplyr::filter(any(mean_cov>qntls)) %>%
     dplyr::pull(labels) %>% unique()
+
+  if (length(keep) == 0)
+    return(get_ISs(x) %>% mean() %>% ceiling())
 
   # fixx = setdiff(get_unique_labels(x), keep)
   mean_ISs = get_ISs(x)[keep] %>% mean() %>% ceiling()

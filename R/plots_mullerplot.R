@@ -29,6 +29,7 @@ plot_mullerplot = function(x,
                            highlight=c(),
                            min_frac=0,
                            estimate_npops=FALSE,
+                           rm_mixt=FALSE,
                            timepoints_to_int=c(),
                            mutations=F,
                            single_clone=T,
@@ -39,14 +40,33 @@ plot_mullerplot = function(x,
 
   highlight.cov = get_highlight(x, min_frac=min_frac, highlight=highlight)
   highlight = get_highlight(x, min_frac, highlight.cov, mutations=mutations)
-  color_palette = highlight_palette(x, highlight)
 
+  if (rm_mixt) {
+    n_pops = estimate_n_pops(x, highlight=highlight.cov)
+
+    if (length(names(n_pops[n_pops==1])) == length(highlight.cov))
+      cli::cli_alert_info("All the estimated clusters represent a single population. No clusters are removed.")
+
+    if (length(names(n_pops[n_pops==1])) < length(highlight.cov))
+      cli::cli_alert_info("Clusters {.field {names(n_pops[n_pops>1])}} represent more than one population. They will be removed from the visualisation.")
+
+    highlight.cov = intersect(highlight.cov, names(n_pops[n_pops==1]))
+  }
+
+  highlight = get_highlight(x, min_frac, highlight.cov, mutations=mutations)
+  color_palette = highlight_palette(x, highlight)
   lvls = c("P", get_unique_muts_labels(x), get_unique_labels(x))
 
-  pop_df = get_muller_pop(x, mutations=mutations, timepoints_to_int=timepoints_to_int, estimate_npops=estimate_npops) %>%
+  pop_df = get_muller_pop(x,
+                          mutations=mutations,
+                          timepoints_to_int=timepoints_to_int,
+                          highlight=highlight.cov,
+                          estimate_npops=estimate_npops) %>%
     dplyr::select(-Population, -Frequency, -Parent, -theta_binom, -dplyr::contains("Pop.subcl")) %>%
     dplyr::rename(Population=Pop.plot) %>%
     dplyr::arrange(Identity, Generation, Lineage)
+
+
 
   if (estimate_npops)
     pop_df = pop_df %>%
