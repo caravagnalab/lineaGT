@@ -137,7 +137,7 @@
 <h2 id="marginal-distributions">Marginal distributions<a class="anchor" aria-label="anchor" href="#marginal-distributions"></a>
 </h2>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_marginal.html">plot_marginal</a></span><span class="op">(</span><span class="va">x.example</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span>nrow<span class="op">=</span><span class="fl">2</span>, guides<span class="op">=</span><span class="st">"collect"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_marginal.html">plot_marginal</a></span><span class="op">(</span><span class="va">x.example</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Plotting-functions_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
 </div>
 <div class="section level2">
@@ -164,7 +164,9 @@
 <h2 id="mullerplot-with-mutations">Mullerplot with mutations<a class="anchor" aria-label="anchor" href="#mullerplot-with-mutations"></a>
 </h2>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_mullerplot.html">plot_mullerplot</a></span><span class="op">(</span><span class="va">x.example</span>, which<span class="op">=</span><span class="st">"frac"</span>, mutations<span class="op">=</span><span class="cn">T</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">mp1</span> <span class="op">=</span> <span class="fu"><a href="../reference/plot_mullerplot.html">plot_mullerplot</a></span><span class="op">(</span><span class="va">x.example</span>, which<span class="op">=</span><span class="st">"frac"</span>, mutations<span class="op">=</span><span class="cn">T</span>, estimate_npops<span class="op">=</span><span class="cn">T</span><span class="op">)</span></span>
+<span><span class="va">mp2</span> <span class="op">=</span> <span class="fu"><a href="../reference/plot_mullerplot.html">plot_mullerplot</a></span><span class="op">(</span><span class="va">x.example</span>, which<span class="op">=</span><span class="st">"frac"</span>, mutations<span class="op">=</span><span class="cn">T</span>, estimate_npops<span class="op">=</span><span class="cn">F</span><span class="op">)</span></span>
+<span><span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span><span class="va">mp1</span>, <span class="va">mp2</span>, ncol<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Plotting-functions_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_mullerplot.html">plot_mullerplot</a></span><span class="op">(</span><span class="va">x.example</span>, which<span class="op">=</span><span class="st">"pop"</span>, mutations<span class="op">=</span><span class="cn">T</span><span class="op">)</span></span></code></pre></div>
@@ -178,6 +180,7 @@
 <span><span class="co">#&gt; Warning: Duplicated aesthetics after name standardisation: <span style="color: #00BB00;">na.rm</span></span></span>
 <span><span class="co">#&gt; Duplicated aesthetics after name standardisation: <span style="color: #00BB00;">na.rm</span></span></span>
 <span><span class="co">#&gt; Duplicated aesthetics after name standardisation: <span style="color: #00BB00;">na.rm</span></span></span>
+<span><span class="co">#&gt; Duplicated aesthetics after name standardisation: <span style="color: #00BB00;">na.rm</span></span></span>
 <span><span class="co">#&gt; $C0</span></span>
 <span><span class="co">#&gt; Warning: Removed 1 rows containing missing values (`geom_point()`).</span></span></code></pre></div>
 <p><img src="Plotting-functions_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
@@ -186,23 +189,27 @@
 <span><span class="co">#&gt; Warning: Removed 1 rows containing missing values (`geom_point()`).</span></span></code></pre>
 <p><img src="Plotting-functions_files/figure-html/unnamed-chunk-11-2.png" width="700"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $C7</span></span>
+<span><span class="co">#&gt; $C4</span></span>
 <span><span class="co">#&gt; Warning: Removed 1 rows containing missing values (`geom_point()`).</span></span></code></pre>
 <p><img src="Plotting-functions_files/figure-html/unnamed-chunk-11-3.png" width="700"></p>
+<pre><code><span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $C7</span></span>
+<span><span class="co">#&gt; Warning: Removed 1 rows containing missing values (`geom_point()`).</span></span></code></pre>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-11-4.png" width="700"></p>
 </div>
 <div class="section level2">
 <h2 id="clonal-growth">Clonal Growth<a class="anchor" aria-label="anchor" href="#clonal-growth"></a>
 </h2>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_growth_regression.html">plot_growth_regression</a></span><span class="op">(</span><span class="va">x.example</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Plotting-functions_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_growth_regression.html">plot_growth_regression</a></span><span class="op">(</span><span class="va">x.example</span>, highlight<span class="op">=</span><span class="st">"C5"</span>, mutations<span class="op">=</span><span class="cn">T</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Plotting-functions_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_growth_rates.html">plot_growth_rates</a></span><span class="op">(</span><span class="va">x.example</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Plotting-functions_files/figure-html/unnamed-chunk-14-1.png" width="700"></p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_growth_rates.html">plot_growth_rates</a></span><span class="op">(</span><span class="va">x.example</span>, highlight<span class="op">=</span><span class="st">"C5"</span>, mutations<span class="op">=</span><span class="cn">T</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in RColorBrewer::brewer.pal(get_lineages(x) %&gt;% length(), "Dark2"): minimal value for n is 3, returning requested palette with 3 different levels</span></span></code></pre></div>
 <p><img src="Plotting-functions_files/figure-html/unnamed-chunk-15-1.png" width="700"></p>
