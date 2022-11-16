@@ -80,16 +80,22 @@ plot_mullerplot = function(x,
   }
 
   return(
-    mullerplot_util(mullerdf %>% filter(Generation %in% (timepoints_to_int %>% unlist())),
+    mullerplot_util(x, mullerdf %>% filter(Generation %in% (timepoints_to_int %>% unlist())),
                     which=which,
                     highlight=highlight,
                     color_palette=color_palette,
-                    legend.pos=legend.pos)
+                    legend.pos=legend.pos,
+                    estimate_npops=estimate_npops)
   )
 }
 
 
-mullerplot_util = function(mullerdf, which, color_palette, highlight, legend.pos="right") {
+mullerplot_util = function(x, mullerdf, which, color_palette, highlight, legend.pos="right", estimate_npops=F) {
+  if (!which %in% c("fitness", "frac", "pop")) {
+    cli::format_warning('`which` must be one among "frac","pop","fitness". Using `which`="frac".')
+    which = "frac"
+  }
+
   if (which == "fitness") {
     mullerdf = x %>% get_growth_rates() %>%
       dplyr::filter(type==best_model) %>%
@@ -120,6 +126,36 @@ mullerplot_util = function(mullerdf, which, color_palette, highlight, legend.pos
     mullerdf = mullerdf %>% pop_df_add_empty()
   }
 
+
+  fillname = "Clusters"
+  if (estimate_npops) {
+    pp = x %>% estimate_n_pops()
+    names(color_palette) = sapply(names(color_palette),
+                                  function(a) {
+                                    if (a %in% names(pp)) return(paste0(a, " - ", pp[[a]]))
+                                    return(a)
+                                  } ) %>%
+      setNames(NULL)
+
+    highlight = sapply(highlight, function(a) {
+      if (a %in% names(pp)) return(paste0(a, " - ", pp[[a]]))
+      return(a)
+      } ) %>% setNames(NULL)
+
+    fillname = "Clusters - # pops"
+
+    if (!"n_pops" %in% colnames(mullerdf))
+      mullerdf = data.frame(pp) %>%
+        tibble::rownames_to_column(var="Identity") %>%
+        dplyr::inner_join(mullerdf, by="Identity")
+
+    mullerdf = mullerdf %>%
+      dplyr::rowwise() %>%
+      dplyr::mutate(n_pops=as.character(n_pops),
+                    Identity=replace(Identity, (!is.na(n_pops) && n_pops!="0"), paste0(Identity, " - ", n_pops))) %>%
+      dplyr::ungroup()
+  }
+
   return(
     mullerdf %>%
       ggplot() +
@@ -130,12 +166,10 @@ mullerplot_util = function(mullerdf, which, color_palette, highlight, legend.pos
       geom_vline(xintercept=mullerdf$Generation %>% unique(), linetype="dashed") +
       guides(linetype="none", color="none") +
       facet_wrap(~Lineage, nrow=1) +
-      scale_fill_manual(name="Clusters", values=color_palette, na.value="white", breaks=highlight) +
-      # scale_color_manual(values=color_palette, na.value="#FFFFFF00", breaks=highlight) +
+      scale_fill_manual(name=fillname, values=color_palette, na.value="white", breaks=highlight) +
       xlab("Time") +
       my_ggplot_theme(legend.pos=legend.pos) +
       theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank())
   )
-
 }
 

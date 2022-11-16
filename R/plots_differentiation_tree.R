@@ -18,7 +18,7 @@ plot_differentiation_tree = function(x,
                                      timepoints=c()) {
 
   highlight = get_highlight(x, highlight=highlight)
-  if (purrr::is_empty(timepoints)) timepoints = x %>% get_timepoints()
+  if (purrr::is_empty(timepoints)) timepoints = x %>% get_tp_to_int() %>% names()
 
   if (length(intersect(timepoints, get_timepoints(x)))==0) return(NULL)
 

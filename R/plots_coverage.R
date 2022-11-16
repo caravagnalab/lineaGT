@@ -292,3 +292,32 @@ plot_marginal = function(x,
 
   return(p)
 }
+
+
+
+plot_mixture_weights = function(x) {
+  weights = x %>%
+    get_weights() %>%
+    data.frame() %>%
+    tibble::rownames_to_column() %>%
+    setNames(c("labels","weights"))
+
+  ISs = x %>%
+    get_ISs() %>%
+    data.frame() %>%
+    tibble::rownames_to_column() %>%
+    setNames(c("labels","ISs"))
+
+  return(
+    dplyr::inner_join(weights, ISs, by="labels") %>%
+      ggplot() +
+      geom_bar(aes(x=labels, y=weights, fill=labels), stat="identity") +
+      geom_bar(aes(x=labels, y=ISs, fill=labels), stat="identity") +
+      scale_y_continuous(name="Mixture weights",
+                         sec.axis=sec_axis(~., name="Number of ISs")) +
+      scale_fill_manual(values=x %>% get_color_palette()) +
+      guides(fill="none") +
+      xlab("Clusters") + my_ggplot_theme() +
+      theme(axis.title.y.right=element_text(angle=90))
+  )
+}

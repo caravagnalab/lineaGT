@@ -137,8 +137,8 @@ pop_df_add_empty = function(mullerdf) {
 estimate_mean_ISs = function(x) {
   cov.df = x %>% get_cov_dataframe() %>% long_to_wide_cov() %>% dplyr::select(dplyr::starts_with("cov"))
 
-  cums = apply(cov.df, 2, function(x) return(ecdf(x)))
-  qntls = lapply(cums, function(x)
+  # cums = apply(cov.df, 2, function(x) return(ecdf(x)))
+  qntls = apply(cov.df, 2, function(x)
     return(max(1, quantile(x, probs=0.95) %>% setNames(NULL)))) %>% unlist()
 
   qntls.df = data.frame(qntls) %>%
