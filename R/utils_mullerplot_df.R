@@ -67,7 +67,7 @@ get_muller_pop = function(x,
                           highlight=c(),
                           add_t0=T,
                           tree_score=1,
-                          estimate_npops=TRUE,
+                          estimate_npops=FALSE,
                           edges=NULL) {
 
   if (purrr::is_empty(highlight) && mutations && have_pop_df_muts(x) && have_corrected_pops(x, estimate_npops))

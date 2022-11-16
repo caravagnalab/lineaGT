@@ -72,7 +72,7 @@ fit_mutations = function(x,
 
   if (infer_phylo) x = add_phylo(x, x.trees)
 
-  x$population.df = get_muller_pop(x, mutations=T, timepoints_to_int=get_tp_to_int(x))
+  x$population.df = get_muller_pop(x, mutations=T, timepoints_to_int=get_tp_to_int(x), estimate_npops=FALSE)
 
   return(x)
 }

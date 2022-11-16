@@ -161,7 +161,7 @@ fit = function(cov.df,
   }
 
   if (have_muts_fit(x)) mutations = T else mutations = F
-  x$population.df = get_muller_pop(x, mutations=mutations, timepoints_to_int=timepoints_to_int)
+  x$population.df = get_muller_pop(x, mutations=mutations, timepoints_to_int=timepoints_to_int, estimate_npops=F)
 
   if (infer_growth) {
     cli::cli_process_start("Fitting model to estimate population growth rates")
