@@ -30,7 +30,7 @@ plots$`cov.t1.l1:cov.t2.l2` # to visualize a single plot
 
 # Marginal distributions
 ```{r}
-plot_marginal(x.example) %>% patchwork::wrap_plots(nrow=2, guides="collect")
+plot_marginal(x.example)
 ```
 
 
@@ -58,7 +58,7 @@ plot_vaf_time(x.example, highlight="C4")
 # Mullerplot with mutations
 
 ```{r warning=FALSE}
-plot_mullerplot(x.example, which="frac", mutations=T)
+plot_mullerplot(x.example, which="frac", mutations=T, estimate_npops=T)
 ```
 
 ```{r warning=FALSE}
