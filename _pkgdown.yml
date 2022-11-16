@@ -45,6 +45,7 @@ reference:
   desc: Functions to visualize the fit results.
   contents:
   - plot_scatter_density
+  - plot_mixture_weights
   - plot_marginal
   - plot_mullerplot
   - plot_growth_regression
