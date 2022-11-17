@@ -76,8 +76,8 @@ plot_vaf_2D = function(dataframe,
     geom_point(aes_string(x=dims.theta[1], y=dims.theta[2], color="labels_mut"), shape=15, inherit.aes=F, size=1.5) +
     facet_grid(lineage ~ labels) +
     scale_color_manual(values=color_palette) +
-    xlab(split_to_camelcase(dims.vaf[1])) +
-    ylab(split_to_camelcase(dims.vaf[2])) +
+    xlab(stringr::str_replace_all(dims.vaf[[1]], pattern="vaf.", replacement="VAF ")) +
+    ylab(stringr::str_replace_all(dims.vaf[[2]], pattern="vaf.", replacement="VAF ")) +
     ylim(0, 1) +
     xlim(0, 1) +
     labs(color = "Clusters") +

@@ -51,16 +51,14 @@ plot_2D = function(x, dim1, dim2, color_palette, highlight, dens=NULL, ...) {
   pl = ggplot2::ggplot() +
     geom_point(
       data=long_to_wide_cov(get_cov_dataframe(x)),
-      # data = dens %>% filter(labels %in% highlight),
       aes_string(x=dim1, y=dim2, color="labels"),
       alpha=.8, size=.8) +
     scale_color_manual(values=color_palette, breaks=highlight) +
     labs(color="Clusters") +
-    xlab(split_to_camelcase(dim1)) +
-    ylab(split_to_camelcase(dim2)) +
+    xlab(stringr::str_replace_all(dim1, pattern=c("cov."), replacement=c("Coverage "))) +
+    ylab(stringr::str_replace_all(dim2, pattern=c("cov."), replacement=c("Coverage "))) +
     my_ggplot_theme() +
     theme(legend.position="bottom")
-    # coord_fixed(ratio=1)
 
   try({ pl = pl + ylim(inputs$ylim) }, silent=T)
   try({ pl = pl + xlim(inputs$xlim) }, silent=T)
@@ -68,7 +66,7 @@ plot_2D = function(x, dim1, dim2, color_palette, highlight, dens=NULL, ...) {
   if (!is.null(dens))
     pl = pl +
       stat_density_2d(data=dens %>% filter(labels %in% highlight),
-                      aes_string(x=dim1, y=dim2, alpha="..level..", fill="labels"),
+                      aes_string(x=dim1, y=dim2, alpha="after_stat(level)", fill="labels"),
                       geom="polygon", inherit.aes=F, contour_var="ndensity", bins=10) +
 
       scale_fill_manual(values=color_palette, breaks=highlight) +
@@ -118,7 +116,7 @@ plot_marginal = function(x,
     get_cov_dataframe() %>%
     dplyr::mutate(timepoints=factor(timepoints, levels=tp))
 
-  if (show_dens || single_plot) dens.df = get_dens_df(x, dd, highlight)
+  if (show_dens || single_plot) dens.df = get_dens_df(x, dd, highlight, tp)
 
   if (single_plot) return(plot_marginal_single_plot(dd, dens.df, highlight))
 
@@ -194,7 +192,7 @@ plot_marginal = function(x,
 }
 
 
-get_dens_params = function(x) {
+get_dens_params = function(x, tp) {
   means = x %>%
     get_mean_long() %>%
     dplyr::mutate(timepoints=factor(timepoints, levels=tp))
@@ -215,8 +213,8 @@ get_dens_params = function(x) {
 }
 
 
-get_dens_df = function(x, dd, highlight) {
-  params = get_dens_params(x)
+get_dens_df = function(x, dd, highlight, tp) {
+  params = get_dens_params(x, tp)
 
   return(
     params %>%
