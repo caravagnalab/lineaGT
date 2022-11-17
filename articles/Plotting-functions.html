@@ -126,11 +126,7 @@
 </h2>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plots</span> <span class="op">=</span> <span class="fu"><a href="../reference/plot_scatter_density.html">plot_scatter_density</a></span><span class="op">(</span><span class="va">x.example</span><span class="op">)</span></span>
-<span><span class="va">plots</span><span class="op">$</span><span class="va">`cov.t1.l1:cov.t2.l2`</span> <span class="co"># to visualize a single plot</span></span>
-<span><span class="co">#&gt; Warning: The dot-dot notation (`..level..`) was deprecated in ggplot2 3.4.0.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `after_stat(level)` instead.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The deprecated feature was likely used in the <span style="color: #0000BB;">lineaGT</span> package.</span></span>
-<span><span class="co">#&gt;   Please report the issue to the authors.</span></span></code></pre></div>
+<span><span class="va">plots</span><span class="op">$</span><span class="va">`cov.t2.l1:cov.t1.l2`</span> <span class="co"># to visualize a single plot</span></span></code></pre></div>
 <p><img src="Plotting-functions_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
 </div>
 <div class="section level2">
@@ -144,38 +140,38 @@
 <h2 id="mullerplot">Mullerplot<a class="anchor" aria-label="anchor" href="#mullerplot"></a>
 </h2>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_mullerplot.html">plot_mullerplot</a></span><span class="op">(</span><span class="va">x.example</span>, which<span class="op">=</span><span class="st">"frac"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">mp1</span> <span class="op">=</span> <span class="fu"><a href="../reference/plot_mullerplot.html">plot_mullerplot</a></span><span class="op">(</span><span class="va">x.example</span>, which<span class="op">=</span><span class="st">"frac"</span><span class="op">)</span></span>
+<span><span class="va">mp2</span> <span class="op">=</span> <span class="fu"><a href="../reference/plot_mullerplot.html">plot_mullerplot</a></span><span class="op">(</span><span class="va">x.example</span>, which<span class="op">=</span><span class="st">"pop"</span><span class="op">)</span></span>
+<span><span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span><span class="va">mp1</span>, <span class="va">mp2</span>, ncol<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Plotting-functions_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_mullerplot.html">plot_mullerplot</a></span><span class="op">(</span><span class="va">x.example</span>, which<span class="op">=</span><span class="st">"pop"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
 </div>
 <div class="section level2">
 <h2 id="vaf">VAF<a class="anchor" aria-label="anchor" href="#vaf"></a>
 </h2>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># plot_vaf(x.example, wrap=T)</span></span></code></pre></div>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_vaf.html">plot_vaf</a></span><span class="op">(</span><span class="va">x.example</span>, wrap<span class="op">=</span><span class="cn">T</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_vaf_time.html">plot_vaf_time</a></span><span class="op">(</span><span class="va">x.example</span>, highlight<span class="op">=</span><span class="st">"C4"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
 </div>
 <div class="section level2">
 <h2 id="mullerplot-with-mutations">Mullerplot with mutations<a class="anchor" aria-label="anchor" href="#mullerplot-with-mutations"></a>
 </h2>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mp1</span> <span class="op">=</span> <span class="fu"><a href="../reference/plot_mullerplot.html">plot_mullerplot</a></span><span class="op">(</span><span class="va">x.example</span>, which<span class="op">=</span><span class="st">"frac"</span>, mutations<span class="op">=</span><span class="cn">T</span>, estimate_npops<span class="op">=</span><span class="cn">T</span><span class="op">)</span></span>
 <span><span class="va">mp2</span> <span class="op">=</span> <span class="fu"><a href="../reference/plot_mullerplot.html">plot_mullerplot</a></span><span class="op">(</span><span class="va">x.example</span>, which<span class="op">=</span><span class="st">"frac"</span>, mutations<span class="op">=</span><span class="cn">T</span>, estimate_npops<span class="op">=</span><span class="cn">F</span><span class="op">)</span></span>
 <span><span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span><span class="va">mp1</span>, <span class="va">mp2</span>, ncol<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">mp1</span> <span class="op">=</span> <span class="fu"><a href="../reference/plot_mullerplot.html">plot_mullerplot</a></span><span class="op">(</span><span class="va">x.example</span>, which<span class="op">=</span><span class="st">"pop"</span>, mutations<span class="op">=</span><span class="cn">T</span>, estimate_npops<span class="op">=</span><span class="cn">T</span><span class="op">)</span></span>
+<span><span class="va">mp2</span> <span class="op">=</span> <span class="fu"><a href="../reference/plot_mullerplot.html">plot_mullerplot</a></span><span class="op">(</span><span class="va">x.example</span>, which<span class="op">=</span><span class="st">"pop"</span>, mutations<span class="op">=</span><span class="cn">T</span>, estimate_npops<span class="op">=</span><span class="cn">F</span><span class="op">)</span></span>
+<span><span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span><span class="va">mp1</span>, <span class="va">mp2</span>, ncol<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Plotting-functions_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_mullerplot.html">plot_mullerplot</a></span><span class="op">(</span><span class="va">x.example</span>, which<span class="op">=</span><span class="st">"pop"</span>, mutations<span class="op">=</span><span class="cn">T</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
 </div>
 <div class="section level2">
 <h2 id="phylogenetic-evolution">Phylogenetic evolution<a class="anchor" aria-label="anchor" href="#phylogenetic-evolution"></a>
 </h2>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_phylogeny.html">plot_phylogeny</a></span><span class="op">(</span><span class="va">x.example</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Duplicated aesthetics after name standardisation: <span style="color: #00BB00;">na.rm</span></span></span>
 <span><span class="co">#&gt; Duplicated aesthetics after name standardisation: <span style="color: #00BB00;">na.rm</span></span></span>
@@ -183,36 +179,36 @@
 <span><span class="co">#&gt; Duplicated aesthetics after name standardisation: <span style="color: #00BB00;">na.rm</span></span></span>
 <span><span class="co">#&gt; $C0</span></span>
 <span><span class="co">#&gt; Warning: Removed 1 rows containing missing values (`geom_point()`).</span></span></code></pre></div>
-<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $C1</span></span>
 <span><span class="co">#&gt; Warning: Removed 1 rows containing missing values (`geom_point()`).</span></span></code></pre>
-<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-11-2.png" width="700"></p>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-10-2.png" width="700"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $C4</span></span>
 <span><span class="co">#&gt; Warning: Removed 1 rows containing missing values (`geom_point()`).</span></span></code></pre>
-<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-11-3.png" width="700"></p>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-10-3.png" width="700"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $C7</span></span>
 <span><span class="co">#&gt; Warning: Removed 1 rows containing missing values (`geom_point()`).</span></span></code></pre>
-<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-11-4.png" width="700"></p>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-10-4.png" width="700"></p>
 </div>
 <div class="section level2">
 <h2 id="clonal-growth">Clonal Growth<a class="anchor" aria-label="anchor" href="#clonal-growth"></a>
 </h2>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_growth_regression.html">plot_growth_regression</a></span><span class="op">(</span><span class="va">x.example</span><span class="op">)</span></span></code></pre></div>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_growth_regression.html">plot_growth_regression</a></span><span class="op">(</span><span class="va">x.example</span>, highlight<span class="op">=</span><span class="st">"C4"</span>, mutations<span class="op">=</span><span class="cn">T</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Plotting-functions_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_growth_regression.html">plot_growth_regression</a></span><span class="op">(</span><span class="va">x.example</span>, highlight<span class="op">=</span><span class="st">"C5"</span>, mutations<span class="op">=</span><span class="cn">T</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_growth_rates.html">plot_growth_rates</a></span><span class="op">(</span><span class="va">x.example</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Plotting-functions_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_growth_rates.html">plot_growth_rates</a></span><span class="op">(</span><span class="va">x.example</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-14-1.png" width="700"></p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_growth_rates.html">plot_growth_rates</a></span><span class="op">(</span><span class="va">x.example</span>, highlight<span class="op">=</span><span class="st">"C5"</span>, mutations<span class="op">=</span><span class="cn">T</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_growth_rates.html">plot_growth_rates</a></span><span class="op">(</span><span class="va">x.example</span>, highlight<span class="op">=</span><span class="st">"C4"</span>, mutations<span class="op">=</span><span class="cn">T</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in RColorBrewer::brewer.pal(get_lineages(x) %&gt;% length(), "Dark2"): minimal value for n is 3, returning requested palette with 3 different levels</span></span></code></pre></div>
-<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-15-1.png" width="700"></p>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-14-1.png" width="700"></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
