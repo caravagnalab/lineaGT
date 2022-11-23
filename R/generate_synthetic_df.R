@@ -1,18 +1,18 @@
 generate_synthetic_df = function(N_values,
                                  T_values,
                                  K_values,
+                                 path,
                                  n_datasets=30,
                                  var_loc=110,
                                  var_scale=195,
-                                 mean_loc=200,
-                                 max_value=3000,
+                                 mean_loc=500,
+                                 mean_scale=5000,
                                  steps=1000,
-                                 alpha=0.35,
+                                 alpha=0.2,
                                  lr=0.005,
-                                 path=".",
                                  filename="",
                                  check_present=T,
-                                 default_lm=T,
+                                 default_lm=FALSE,
                                  run=T) {
 
   if (!endsWith(path, "/"))
@@ -57,8 +57,8 @@ generate_synthetic_df = function(N_values,
                                 label=as.character(n_df),
                                 var_loc=as.integer(var_loc),
                                 var_scale=as.integer(var_scale),
-                                # mean_loc=as.integer(mean_loc),
-                                max_value=as.integer(max_value),
+                                mean_loc=as.integer(mean_loc),
+                                mean_scale=as.integer(mean_scale),
                                 alpha=as.numeric(alpha))
 
           sim$generate_dataset()
