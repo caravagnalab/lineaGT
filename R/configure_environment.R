@@ -30,9 +30,15 @@ check_conda = function(use_default=F) {
       answ = readline()
     }
 
-    if (answ == "yes") install_miniconda_lineagt()
+    if (answ == "yes") {
+      install_miniconda_lineagt()
+      create_conda_env()
+      load_conda_env()
+    }
     else { cli::cli_alert_info("Miniconda will not be installed."); return() }
   }
+
+  load_conda_env()
 }
 
 
