@@ -24,6 +24,9 @@ generate_synthetic_df = function(N_values,
   torch = reticulate::import("torch")
   py_pkg = reticulate::import("pylineaGT")
 
+  mean_scale_inp = mean_scale
+  alpha_inp = alpha
+
   seeds = sample(0:min(50,n_datasets), size=n_datasets, replace=FALSE)
 
   for (n_df in 1:n_datasets) {
@@ -35,6 +38,20 @@ generate_synthetic_df = function(N_values,
       for (tt in T_values) {
         for (kk in K_values) {
 
+          if (tt == 1 && kk > 6) {
+            mean_scale = max(10100, mean_scale_inp)
+            alpha = max(0.45, alpha_inp)
+          } else if ((tt == 2 && kk > 6) || (tt == 1 && kk == 6)) {
+            mean_scale = max(8000, mean_scale_inp)
+            alpha = max(0.35, alpha_inp)
+          } else {
+            mean_scale = mean_scale_inp
+            alpha = alpha_inp
+          }
+
+          cat(paste0("K=", kk, ", T=", tt, "\nmean_scale=", mean_scale, ", alpha=", alpha, "\n"))
+
+
           tmp_name = paste0("N", nn, ".T", tt, ".K", kk)
           subpath = paste0(path, "N", nn, "/", tmp_name, "/")
 
@@ -42,8 +59,6 @@ generate_synthetic_df = function(N_values,
             dir.create(subpath)
 
           files_list = list.files(path=subpath)
-
-          print(paste0(tmp_name, ".", n_df, ".data.Rds"))
 
           if ( check_present &
                (paste0(tmp_name, ".", n_df, ".data.Rds") %in% files_list)  &
@@ -66,7 +81,7 @@ generate_synthetic_df = function(N_values,
 
           x = get_simulation_object(sim)
 
-          print(paste0(subpath, filename, ".data.Rds"))
+          cat(paste0(subpath, filename, ".data.Rds\n"))
           saveRDS(x, paste0(subpath, filename, ".data.Rds"))
 
           if (!run) next
@@ -98,6 +113,9 @@ generate_synthetic_df = function(N_values,
           print(aricode::ARI(x_fit$cov.dataframe$labels, x_fit$cov.dataframe$labels_true))
 
           saveRDS(x_fit, paste0(subpath, filename, ".fit.Rds"))
+
+          rm(mean_scale)
+          rm(alpha)
         }
       }
     }
