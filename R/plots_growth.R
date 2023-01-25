@@ -22,7 +22,8 @@ plot_growth_regression = function(x,
                                   mutations=F,
                                   timepoints_to_int=list(),
                                   fit=F,
-                                  show_best=T) {
+                                  show_best=T,
+                                  ratio=NULL) {
 
   timepoints_to_int = map_timepoints_int(x, timepoints_to_int)
   highlight = get_highlight(x, min_frac, highlight, mutations=mutations)
@@ -53,14 +54,16 @@ plot_growth_regression = function(x,
     geom_line(data=filter(regr.df, type==best_model), aes(x=x, y=y, color=type), size=.7, alpha=.9) +
 
     geom_vline(data=filter(regr.df, type==best_model),
-               aes(xintercept=init_t, color=type), linetype="dashed", size=.3, alpha=.7) +
+               aes(xintercept=init_t, color=type), linetype="dashed", linewidth=.3, alpha=.7) +
 
     geom_errorbar(data=filter(regr.df, type==best_model), aes(x=x, y=y, ymin=y.min, ymax=y.max, color=type),
                   width=.5, position=position_dodge(width=0.5), alpha=.9, size=.6) +
-
     facet_grid(rows=vars(Identity), cols=vars(Lineage), scales="free_y") +
     scale_color_manual(values=color_palette, breaks=unique(filter(regr.df, type==best_model)$best_model)) +
     labs(color="") + my_ggplot_theme()
+
+  if (!is.null(ratio))
+    pl = pl + theme(aspect.ratio=ratio)
 
   if (!show_best)
     return(

@@ -308,25 +308,26 @@ plot_marginal_lineage = function(dd, dens.df, show_dens, highlight) {
 #' @export plot_mixture_weights
 
 plot_mixture_weights = function(x) {
-  weights = x %>%
+  weights.df = x %>%
     get_weights() %>%
     data.frame() %>%
     tibble::rownames_to_column() %>%
     setNames(c("labels","weights"))
 
-  ISs = x %>%
+  ISs.df = x %>%
     get_ISs() %>%
     data.frame() %>%
     tibble::rownames_to_column() %>%
     setNames(c("labels","ISs"))
 
   return(
-    dplyr::inner_join(weights, ISs, by="labels") %>%
+    dplyr::inner_join(weights.df, ISs.df, by="labels") %>%
+      # dplyr::rename(mixt_w=weights) %>%
       ggplot() +
-      geom_bar(aes(x=labels, y=weights, fill=labels), stat="identity") +
-      geom_bar(aes(x=labels, y=ISs, fill=labels), stat="identity") +
+      geom_bar(aes(x=labels, y=weights/10, fill=labels), stat="identity") +
+      geom_bar(aes(x=labels, y=ISs/10, fill=labels), stat="identity") +
       scale_y_continuous(name="Mixture weights",
-                         sec.axis=sec_axis(~./ISs*weights, name="Number of ISs")) +
+                         sec.axis=sec_axis(~.*10, name="Number of ISs")) +
       scale_fill_manual(values=x %>% get_color_palette()) +
       guides(fill="none") +
       xlab("Clusters") + my_ggplot_theme() +
