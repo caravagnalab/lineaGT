@@ -116,5 +116,7 @@ install_miniconda_lineagt = function() {
 
 
 install_python_deps = function(envname="lineagt-env") {
-  reticulate::conda_install(envname=envname, packages=c("pylineaGT"), pip=TRUE)
+  reticulate::conda_install(envname=envname, packages=c("pylineaGT"),
+                            pip=TRUE,
+                            pip_options=c("--timeout 200"))
 }

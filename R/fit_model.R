@@ -199,10 +199,13 @@ check_cov_dimensions = function(cov.df) {
   if (nrow(missing.vals) == 0)
     return(cov.df %>% dplyr::ungroup())
 
-  try(expr = {
+  tryCatch(expr = {
     missing.vals = missing.vals %>%
       dplyr::mutate(timepoints=as.integer(timepoints))
-  }, silent=T)
+  },
+  warning=function(w) missing.vals = missing.vals,
+  error=function(e) missing.vals = missing.vals
+  )
 
   return(
     cov.df %>%
