@@ -11,7 +11,8 @@ plot_growth_regression(
   mutations = F,
   timepoints_to_int = list(),
   fit = F,
-  show_best = T
+  show_best = T,
+  ratio = NULL
 )
 }
 \arguments{

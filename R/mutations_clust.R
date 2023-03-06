@@ -42,6 +42,10 @@ fit_mutations = function(x,
     annotate_vaf_df(vaf.df=vaf.df, min_frac=min_frac) %>%  # add cluster to each mutation
     check_dp()  # check for too low values
 
+  if (nrow(get_vaf_dataframe(x))==0) {
+    return(x)
+  }
+
   input_viber = x %>% get_input_viber()  # get the input to run viber
 
   # vaf.df.fit -> long format dataframe with already `pi`, `labels`, `theta`
@@ -58,7 +62,6 @@ fit_mutations = function(x,
     vaf.df.fit = rbind(vaf.df.fit, x.muts.k$df)
 
     if (!purrr::is_empty(x.muts.k$fit)) x.muts[[cluster]] = x.muts.k$fit
-
 
     if (infer_phylo && !purrr::is_empty(x.muts.k$tree)) x.trees[[cluster]] = x.muts.k$tree
   }

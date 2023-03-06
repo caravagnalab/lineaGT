@@ -44,6 +44,11 @@ check_dp = function(x, thr=10) {
   vaf.df = x %>% get_vaf_dataframe()
   means = x %>% get_mean_long()
 
+  if (nrow(vaf.df)==0) {
+    cli::cli_alert_warning("The annotated mutation dataframe is empty!")
+    return(x)
+  }
+
   if (!"vaf" %in% colnames(vaf.df))
     vaf.df = vaf.df %>%
       dplyr::mutate(vaf=alt/dp)

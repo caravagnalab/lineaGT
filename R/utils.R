@@ -15,7 +15,7 @@ update_color_palette = function(x, clusters=c()) {
 
 
 get_highlight = function(x, min_frac=0, highlight=c(), mutations=F) {
-  if (mutations) {
+  if (mutations && have_muts_fit(x)) {
     if (purrr::is_empty(highlight)) highlight = select_relevant_clusters(x, min_frac)
     highlight_v = get_unique_muts_labels(x, highlight)
 
