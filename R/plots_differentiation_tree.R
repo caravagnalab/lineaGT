@@ -58,7 +58,7 @@ util_plot_diff = function(cls,
     }
   else mrca.df = mrca.list
 
-  if (is.null(mrca.df)) return(NULL)
+  if (is.null(mrca.df)) return(ggplot() + theme_minimal())
 
   mrca.df = mrca.df %>% dplyr::mutate(Identity=mrca.to)
 

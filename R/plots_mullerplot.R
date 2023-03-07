@@ -39,7 +39,7 @@ plot_mullerplot = function(x,
   timepoints_to_int = map_timepoints_int(x, timepoints_to_int)
 
   highlight.cov = get_highlight(x, min_frac=min_frac, highlight=highlight)
-  highlight = get_highlight(x, min_frac, highlight.cov, mutations=mutations)
+  # highlight = get_highlight(x, min_frac, highlight.cov, mutations=mutations)
 
   if (rm_mixt) {
     n_pops = estimate_n_pops(x, highlight=highlight.cov)

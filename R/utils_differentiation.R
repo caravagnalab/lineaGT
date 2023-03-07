@@ -1,21 +1,32 @@
-get_mrca_df = function(x, highlight, edges, tps=c()) {
+get_mrca_df = function(x, highlight, edges, tps=c(), clonal=F) {
 
   if (purrr::is_empty(tps)) tps = x %>% get_timepoints()
 
-  # edges.diff = differentiation_tree(return.numeric=T)
-  fracs = x %>%
-    get_vaf_dataframe() %>%
-    dplyr::filter(labels %in% highlight) %>%
-    dplyr::filter(timepoints %in% tps) %>%
-    dplyr::select(labels_mut, theta_binom, lineage, timepoints) %>%
-    dplyr::rename(cluster=labels_mut) %>%
+  if (clonal)
+    fracs = x %>%
+      get_mean_long() %>%
+      dplyr::filter(labels %in% highlight) %>%
+      dplyr::filter(timepoints %in% tps) %>%
+      dplyr::rename(cluster=labels) %>%
+      dplyr::group_by(cluster, lineage) %>%
+      dplyr::summarise(is.present=any(mean_cov > 0), .groups="keep") %>%
+      dplyr::ungroup() %>%
+      dplyr::rename(Identity=lineage) %>%
+      dplyr::inner_join(edges, by="Identity") else if (have_muts_fit(x))
+    fracs = x %>%
+      get_vaf_dataframe() %>%
+      dplyr::filter(labels %in% highlight) %>%
+      dplyr::filter(timepoints %in% tps) %>%
+      dplyr::select(labels_mut, theta_binom, lineage, timepoints) %>%
+      dplyr::rename(cluster=labels_mut) %>%
 
-    # is.present stores whether the cluster has been observed in the cluster
-    dplyr::group_by(cluster, lineage) %>%
-    dplyr::summarise(is.present=any(theta_binom > 0), .groups="keep") %>%
-    dplyr::ungroup() %>%
-    dplyr::rename(Identity=lineage) %>%
-    dplyr::inner_join(edges, by="Identity")
+      # is.present stores whether the cluster has been observed in the cluster
+      dplyr::group_by(cluster, lineage) %>%
+      dplyr::summarise(is.present=any(theta_binom > 0), .groups="keep") %>%
+      dplyr::ungroup() %>%
+      dplyr::rename(Identity=lineage) %>%
+      dplyr::inner_join(edges, by="Identity") else
+    fracs = data.frame()
 
   if (nrow(fracs) == 0)
     return(NULL)
