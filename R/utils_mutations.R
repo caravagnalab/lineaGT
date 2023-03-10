@@ -44,10 +44,7 @@ check_dp = function(x, thr=10) {
   vaf.df = x %>% get_vaf_dataframe()
   means = x %>% get_mean_long()
 
-  if (nrow(vaf.df)==0) {
-    cli::cli_alert_warning("The annotated mutation dataframe is empty!")
-    return(x)
-  }
+  if (is_empty_vaf(vaf.df)) return(x)
 
   if (!"vaf" %in% colnames(vaf.df))
     vaf.df = vaf.df %>%
@@ -104,6 +101,8 @@ check_dp = function(x, thr=10) {
 # Function to check if dimensions found in the coverage dataset (as combinations
 # of lineages and timepoints) are missing in the mutation data
 check_vaf_dimensions = function(vaf.df, x) {
+  if (is_empty_vaf(vaf.df)) return(x)
+
   vaf.df = vaf.df %>%
     dplyr::ungroup() %>%
     long_to_wide_muts() %>%
@@ -143,9 +142,20 @@ check_vaf_dimensions = function(vaf.df, x) {
     )
 }
 
+is_empty_vaf = function(vaf.df, verbose=F) {
+  if (nrow(vaf.df)==0) {
+    if (verbose)
+      cli::cli_alert_warning("The annotated mutation dataframe is empty!")
+    return(TRUE)
+  }
+  return(FALSE)
+}
+
 
 # returns the object x with the annotated vaf dataframe
 annotate_vaf_df = function(x, vaf.df, min_frac=0) {
+  if (is_empty_vaf(vaf.df)) return(x)
+
   highlight = get_highlight(x, min_frac=min_frac)
 
   vaf.df = vaf.df %>% check_vaf_dimensions(x=x)
@@ -191,16 +201,6 @@ get_input_viber = function(x) {
     rename_with(.fn = ~str_replace_all(.x, "alt.", ""))
 
   return(list("successes"=successes, "trials"=trials, "vaf.df"=vaf.df_wide))
-
-  # alpha_0 = x %>%
-  #   get_vaf_dataframe() %>%
-  #   group_by(labels, lineage, timepoints) %>%
-  #   dplyr::summarise(mean_vaf=mean(vaf)) %>%
-  #   dplyr::mutate(alpha_0=ifelse(mean_vaf==0, 0.01,1)) %>%
-  #   dplyr::select(-mean_vaf) %>%
-  #   tidyr::pivot_wider(names_from=c("timepoints","lineage"), values_from="alpha_0", names_sep=".")
-
-  # return(list("successes"=successes, "trials"=trials, "vaf.df"=vaf.df_wide, "alpha_0"=alpha_0))
 }
 
 

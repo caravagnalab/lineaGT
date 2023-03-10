@@ -36,6 +36,8 @@ fit_mutations = function(x,
     vaf.df = x %>% get_vaf_dataframe() %>%
       dplyr::select(-dplyr::contains("labels"), -dplyr::contains("binom"))
 
+  if (is_empty_vaf(vaf.df, verbose=T)) return(x)
+
   clusters_joined = get_highlight(x, min_frac, highlight)
 
   x = x %>%
