@@ -61,6 +61,7 @@ plot_mullerplot = function(x,
                           mutations=mutations,
                           timepoints_to_int=timepoints_to_int,
                           highlight=highlight.cov,
+                          single_clone=single_clone,
                           estimate_npops=estimate_npops) %>%
     dplyr::select(-Population, -Frequency, -Parent, -theta_binom, -dplyr::contains("Pop.subcl")) %>%
     dplyr::rename(Population=Pop.plot) %>%

@@ -66,17 +66,18 @@ get_muller_pop = function(x,
                           timepoints_to_int=c(),
                           highlight=c(),
                           add_t0=T,
+                          single_clone=T,
                           tree_score=1,
                           estimate_npops=FALSE,
                           edges=NULL) {
 
-  if (purrr::is_empty(highlight) && mutations && have_pop_df_muts(x) && have_corrected_pops(x, estimate_npops))
+  if ((purrr::is_empty(highlight) | !single_clone) && mutations && have_pop_df_muts(x) && have_corrected_pops(x, estimate_npops))
     return(
       get_pop_df(x) %>%
         dplyr::filter(Identity %in% c("P", get_highlight(x, mutations=mutations, highlight=c())))
       )
 
-  if (purrr::is_empty(highlight) && !mutations && have_pop_df(x) && have_corrected_pops(x, estimate_npops))
+  if ((purrr::is_empty(highlight) | !single_clone) && !mutations && have_pop_df(x) && have_corrected_pops(x, estimate_npops))
     return(
       get_pop_df(x) %>%
         dplyr::filter(Identity %in% c("P", get_highlight(x, mutations=mutations, highlight=c())))
