@@ -87,6 +87,13 @@ fit = function(cov.df,
                seed_init=reticulate::py_none(),
                sample_id="") {
 
+  cli::cli_process_start("\nStarting lineaGT model selection to retrieve the optimal number of clones\n")
+
+  if (nrow(cov.df)==0) {
+    cli::cli_process_failed(msg_failed="The input dataset contains 0 ISs.")
+    return()
+  }
+
   py_pkg = reticulate::import("pylineaGT")
 
   cov.df = cov.df %>% check_cov_dimensions()
@@ -94,7 +101,6 @@ fit = function(cov.df,
   max_k = cov.df %>% check_max_k()
   k_interval = check_k_interval(k_interval, max_k)
 
-  cli::cli_process_start("\nStarting lineaGT model selection to retrieve the optimal number of clones\n")
   out = py_pkg$run$run_inference(cov_df=cov.df %>% long_to_wide_cov(),
                                  lineages=cov.df$lineage %>% unique(),
                                  k_interval=list(as.integer(k_interval[1]), as.integer(k_interval[2])),

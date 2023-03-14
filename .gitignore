@@ -2,4 +2,5 @@ plots
 .Rproj.user
 .Rhistory
 inst/doc
-
+**._*
+**.RData

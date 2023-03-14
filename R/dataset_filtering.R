@@ -24,6 +24,8 @@ filter_dataset = function(cov.df,
                           metric="calinski_harabasz_score",
                           seed=5) {
 
+  cli::cli_process_start(paste0("Filtering the input dataset with minimum coverage ", min_cov, " and minimum clusters fraction ", min_frac,"."))
+
   # if (!is.factor(cov.df$timepoints))
   #   cov.df = cov.df %>%
   #     dplyr::mutate(timepoints=as.character(timepoints))
@@ -34,7 +36,15 @@ filter_dataset = function(cov.df,
     dplyr::filter(any(coverage>=min_cov)) %>%
     dplyr::ungroup()
 
-  if (min_frac == 0) return(cov.df)
+  if(nrow(cov.df)==0) {
+    cli::cli_process_failed(msg_failed="The filtered dataset contains 0 ISs.")
+    return(cov.df)
+  }
+
+  if (min_frac == 0) {
+    cli::cli_process_done()
+    return(cov.df)
+  }
 
   max_k = cov.df %>% check_max_k()
   k_interval = check_k_interval(k_interval, max_k)
@@ -49,6 +59,7 @@ filter_dataset = function(cov.df,
                           k_interval=as.integer(k_interval),
                           seed=as.integer(seed))
 
+  cli::cli_process_done()
   return(
       get_python_dataframe(py_model)
     )
