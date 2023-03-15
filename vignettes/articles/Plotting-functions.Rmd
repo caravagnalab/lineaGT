@@ -20,78 +20,99 @@ data(x.example)
 x.example
 ```
 
-
 # Scatterplot
+
+The function `plot_scatter_density()` returns a list of 2D multivariate densities estimated by the model. The argument `highlight` can be used to show only a subset of clusters and the argument `min_frac` to show the clusters with the specified frequency in at least one dimension.
+
+Note that the observed coverage values across lineages and over time are modeled as independent, therefore each dimension corresponds to a combination of time-point and lineage.
+
 ```{r}
 plots = plot_scatter_density(x.example)
 plots$`cov.t2.l1:cov.t1.l2` # to visualize a single plot
 ```
 
-
 # Marginal distributions
+
+The function `plot_marginal()` returns a plot with the marginal estimated densities for each cluster, time-point and lineage.
+
+The option `single_plot` returns the density of the whole mixture grouped by lineage and time-point.
+
 ```{r}
-plot_marginal(x.example)
+marginals = plot_marginal(x.example)
+marginals_mixture = plot_marginal(x.example, single_plot=T)
+patchwork::wrap_plots(marginals / marginals_mixture)
 ```
 
-
 # Mullerplot
+
+The function `plot_mullerplot()` shows the expansion of the identified populations over time. It supports the options `which=c("frac","pop")` corresponding to the absolule population abundance and the relative fraction, respectively.
+
 ```{r warning=FALSE}
 mp1 = plot_mullerplot(x.example, which="frac")
 mp2 = plot_mullerplot(x.example, which="pop")
 patchwork::wrap_plots(mp1, mp2, ncol=1)
 ```
 
+If the option `mutations` is set to `TRUE`, then the subclones originated within each population will be reported as well in the mullerplot.
 
+```{r}
+mp1 = plot_mullerplot(x.example, which="frac", mutations=T)
+mp2 = plot_mullerplot(x.example, which="pop", mutations=T)
+patchwork::wrap_plots(mp1, mp2, ncol=1)
+```
+
+The function supports also the visualization of a single clone to monitor the growth of subpopulations, through the argument `single_clone`.
+
+```{r}
+plot_mullerplot(x.example, highlight="C4", mutations=T, single_clone=T)
+```
+
+Moreover, some of the identified clusters (showing low coverage in all dimensions) represents poly-clonal populations, since they cannot be uniquely identified by the mixture model. Therefore, the estimated abundance values might be readjusted according to the estimated number of populations in each clusters.
+
+```{r}
+estimate_n_pops(x.example)
+```
+
+```{r}
+plot_mullerplot(x.example, which="frac", mutations=T, estimate_npops=T)
+```
 
 # VAF
-```{r}
-# plot_vaf(x.example, wrap=T)
-```
 
+The function `plot_vaf_time()` can be used to visualize the behaviour of mutations variant allele frequencies over time for each subclone.
 
 ```{r}
-plot_vaf_time(x.example, highlight="C4")
+plot_vaf_time(x.example)
 ```
-
-
-# Mullerplot with mutations
-
-```{r warning=FALSE}
-mp1 = plot_mullerplot(x.example, which="frac", mutations=T, estimate_npops=T)
-mp2 = plot_mullerplot(x.example, which="frac", mutations=T, estimate_npops=F)
-patchwork::wrap_plots(mp1, mp2, ncol=1)
-```
-
-```{r warning=FALSE}
-mp1 = plot_mullerplot(x.example, which="pop", mutations=T, estimate_npops=T)
-mp2 = plot_mullerplot(x.example, which="pop", mutations=T, estimate_npops=F)
-patchwork::wrap_plots(mp1, mp2, ncol=1)
-```
-
 
 # Phylogenetic evolution
+
+For each cluster of ISs, the function `plot_phylogeny()` reports the estimated phylogenetic tree.
 
 ```{r}
 plot_phylogeny(x.example)
 ```
 
-
-
 # Clonal Growth
+
+The fitted exponential and logistic growth regressions are shown with the `plot_growth_regression()` , reporting by default the fit of the best model, selected as the one with the highest likelihood.
+
+Both regressions can be inspected setting `show_best=F` .
+
 ```{r warning=FALSE}
-plot_growth_regression(x.example)
+plot_growth_regression(x.example, show_best=F)
 ```
+
+The same function can be used to show the growth regressions for the subclones identified by somatic mutations.
 
 ```{r warning=FALSE}
 plot_growth_regression(x.example, highlight="C4", mutations=T)
 ```
 
+An alternative way of visualising differences in growth rates is through `plot_growth_rates()` function, reporting the values of estimated growth rates for each (sub)population.
+
+Disabling the `show_best` option, the model with lowest likelihood is shown as a dashed line.
 
 ```{r warning=FALSE}
-plot_growth_rates(x.example)
+plot_growth_rates(x.example, show_best=F)
 ```
-
-```{r}
-plot_growth_rates(x.example, highlight="C4", mutations=T)
-```
-

@@ -118,11 +118,11 @@ plot_marginal = function(x,
 
   if (show_dens || single_plot) dens.df = get_dens_df(x, dd, highlight, tp)
 
-  if (single_plot) return(plot_marginal_single_plot(dd, dens.df, highlight))
+  if (single_plot) return(plot_marginal_single_plot(dd, dens.df, highlight, binwidth))
 
   dd = dd %>% dplyr::filter(labels %in% highlight)
 
-  if (facet_lin) return(plot_marginal_lineage(dd, dens.df, show_dens, highlight))
+  if (facet_lin) return(plot_marginal_lineage(dd, dens.df, show_dens, highlight, binwidth))
 
 
   p = dd %>%
@@ -135,7 +135,7 @@ plot_marginal = function(x,
     scale_fill_manual(values=color_palette, breaks=highlight) +
     ggh4x::facet_nested(lineage + timepoints ~ labels) +
     ylab("Counts") + xlab("Coverage") +
-    labs(fill="Clusters") +
+    labs(fill="Clusters") + guides(color="none") +
     my_ggplot_theme()
 
   if (show_dens)
@@ -147,48 +147,6 @@ plot_marginal = function(x,
       ylab("Density") + guides(color="none")
 
   return(p)
-
-  # lineages = x %>% get_lineages()
-  # for (ll in lineages) {
-  #
-  #   p[[ll]] = dd %>%
-  #     dplyr::filter(labels %in% highlight) %>%
-  #     dplyr::filter(lineage==ll) %>%
-  #     ggplot() +
-  #     geom_histogram(aes(x=coverage,
-  #                        y=after_stat(count)/sum(after_stat(count))/binwidth,
-  #                        fill=labels),
-  #                    position="identity", alpha=1, binwidth=binwidth, color="#FFFFFF00") +
-  #     scale_fill_manual(values=color_palette, breaks=highlight) +
-  #     facet_grid(timepoints ~ labels) +
-  #     ylab("Counts") + xlab("Coverage") +
-  #     labs(fill="Clusters", subtitle=ll) +
-  #     my_ggplot_theme()
-  #
-  #
-  #   if (show_dens) {
-  #     dens.df = params %>%
-  #       dplyr::filter(lineage==ll) %>%
-  #       dplyr::filter(labels %in% highlight) %>%
-  #       dplyr::group_by(timepoints, labels) %>%
-  #       # dplyr::mutate(dens=list(rnorm(1000, mean=mean_cov, sd=sigma))) %>%
-  #       dplyr::mutate(dens=list(dnorm(1:max(dd$coverage), mean=mean_cov, sd=sigma)),
-  #                     coverage=list(1:max(dd$coverage))) %>%
-  #       tidyr::unnest(c(coverage, dens)) %>%
-  #       # dplyr::filter(dens>=0) %>%
-  #       dplyr::ungroup()
-  #
-  #     p[[ll]] = p[[ll]] +
-  #       geom_density(data=dens.df,
-  #                    aes(x=coverage, y=dens, fill=labels),
-  #                    stat="identity",
-  #                    position="identity", color="#FFFFFF00", inherit.aes=F, alpha=.3) +
-  #       ylab("Density") + guides(color="none")
-  #   }
-  #
-  # }
-  #
-  # return(p)
 }
 
 
@@ -229,7 +187,7 @@ get_dens_df = function(x, dd, highlight, tp) {
 
 
 
-plot_marginal_single_plot = function(dd, dens.df, highlight) {
+plot_marginal_single_plot = function(dd, dens.df, highlight, binwidth) {
   max_val = max(dd$coverage)
 
   dens.all = dens.df %>%
@@ -249,20 +207,20 @@ plot_marginal_single_plot = function(dd, dens.df, highlight) {
     scale_fill_manual(values=color_palette, breaks=highlight) +
     scale_color_manual(values=color_palette, breaks=highlight) +
     ylab("Counts") + xlab("Coverage") +
-    labs(fill="Clone") +
+    labs(fill="Clusters") +
     my_ggplot_theme() +
     ylab("Density") + guides(color="none") +
     guides(fill=guide_legend(override.aes=list(alpha=1)))
 
   if ((dd$lineage %>% unique() %>% length()) >= 1)
-    p = p + facet_grid(timepoints ~ lineage, scale="free_y") else
-      p = p + facet_grid(timepoints ~ ., scale="free_y")
+    p = p + facet_grid(timepoints ~ lineage, scale="free") else
+      p = p + facet_grid(timepoints ~ ., scale="free")
 
   return(p + xlim(0, max(x$cov.dataframe$coverage)))
 }
 
 
-plot_marginal_lineage = function(dd, dens.df, show_dens, highlight) {
+plot_marginal_lineage = function(dd, dens.df, show_dens, highlight, binwidth) {
   p = dd %>%
     # dplyr::filter(labels %in% highlight) %>%
     ggplot() +
@@ -320,17 +278,20 @@ plot_mixture_weights = function(x) {
     tibble::rownames_to_column() %>%
     setNames(c("labels","ISs"))
 
+  ISs_tot = sum(ISs.df$ISs)
+
   return(
     dplyr::inner_join(weights.df, ISs.df, by="labels") %>%
       # dplyr::rename(mixt_w=weights) %>%
       ggplot() +
-      geom_bar(aes(x=labels, y=weights/10, fill=labels), stat="identity") +
-      geom_bar(aes(x=labels, y=ISs/10, fill=labels), stat="identity") +
+      geom_bar(aes(x=labels, y=weights, fill=labels), stat="identity") +
+      # geom_bar(aes(x=labels, y=ISs, fill=labels), stat="identity") +
       scale_y_continuous(name="Mixture weights",
-                         sec.axis=sec_axis(~.*10, name="Number of ISs")) +
+                         sec.axis=sec_axis(~.*ISs_tot, name="Number of ISs")) +
       scale_fill_manual(values=x %>% get_color_palette()) +
       guides(fill="none") +
       xlab("Clusters") + my_ggplot_theme() +
       theme(axis.title.y.right=element_text(angle=90))
   )
 }
+

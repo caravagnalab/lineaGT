@@ -10,10 +10,12 @@
 #'
 #' @export get_cov_dataframe
 
-get_cov_dataframe = function(x) {
+get_cov_dataframe = function(x, verbose=T) {
   try(expr = {
       dataframe = x$cov.dataframe
-      if (!purrr::is_empty(dataframe)) return(dataframe) else return(cli::cli_alert_warning("No coverage dataframe loaded."))
+      if (!purrr::is_empty(dataframe)) return(dataframe) else if (verbose)
+        return(cli::cli_alert_warning("No coverage dataframe loaded.")) else
+        return(NULL)
     }, silent = T)
 
   py_model = get_model(x)
@@ -34,10 +36,10 @@ get_cov_dataframe = function(x) {
 #' @export get_vaf_dataframe
 #'
 
-get_vaf_dataframe = function(x) {
+get_vaf_dataframe = function(x, verbose=T) {
   if ("vaf.dataframe" %in% names(x)) return(x$vaf.dataframe)
 
-  cli::cli_alert_warning("No VAF dataframe loaded.")
+  if (verbose) cli::cli_alert_warning("No VAF dataframe loaded.")
   return(list())
 }
 
@@ -54,10 +56,10 @@ get_vaf_dataframe = function(x) {
 #'
 #' @export get_dimensions
 
-get_dimensions = function(x) {
+get_dimensions = function(x, verbose=T) {
   if ("dimensions" %in% names(x)) return(x$dimensions)
 
-  cli::cli_alert_warning("No dimensions values.")
+  if (verbose) cli::cli_alert_warning("No dimensions values.")
   return(list())
 }
 
@@ -74,10 +76,10 @@ get_dimensions = function(x) {
 #'
 #' @export get_lineages
 
-get_lineages = function(x) {
+get_lineages = function(x, verbose=T) {
   if ("lineages" %in% names(x)) return(x$lineages)
 
-  cli::cli_alert_warning("No lineages values.")
+  if (verbose) cli::cli_alert_warning("No lineages values.")
   return(list())
 }
 
@@ -102,18 +104,18 @@ get_timepoints = function(x) {
 }
 
 
-get_tp_to_int = function(x) {
+get_tp_to_int = function(x, verbose=T) {
   if ("tp.to.int" %in% names(x)) return(x$tp.to.int)
 
-  cli::cli_alert_warning("Timepoints not mapped to integer values.")
+  if (verbose) cli::cli_alert_warning("Timepoints not mapped to integer values.")
   return(list())
 }
 
 
-get_muts_fit = function(x) {
+get_muts_fit = function(x, verbose=T) {
   if ("x.muts" %in% names(x)) return(x$x.muts)
 
-  cli::cli_alert_warning("No fitted binomial clusters object.")
+  if (verbose) cli::cli_alert_warning("No fitted binomial clusters object.")
   return(list())
 }
 
@@ -124,18 +126,18 @@ get_model = function(x) {
 }
 
 
-get_color_palette = function(x) {
+get_color_palette = function(x, verbose=T) {
   if ("color.palette" %in% names(x)) return(x$color.palette)
 
-  cli::cli_alert_warning("No color palette.")
+  if (verbose) cli::cli_alert_warning("No color palette.")
   return(list())
 }
 
 
-get_trees = function(x) {
+get_trees = function(x, verbose=T) {
   if ("x.trees" %in% names(x)) return(x$x.trees)
 
-  cli::cli_alert_warning("No fitted phylogenies object.")
+  if (verbose) cli::cli_alert_warning("No fitted phylogenies object.")
   return(list())
 }
 
@@ -147,9 +149,10 @@ get_adj = function(tree.k) {
 }
 
 
-get_pop_df = function(x) {
+get_pop_df = function(x, verbose=T) {
   if (have_pop_df(x))
     return(x$population.df)
-  cli::cli_alert_warning("No stored population dataframe!")
+
+  if (verbose) cli::cli_alert_warning("No stored population dataframe!")
   return(NULL)
 }

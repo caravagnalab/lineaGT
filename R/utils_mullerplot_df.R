@@ -27,7 +27,7 @@ get_edges_muts = function(x, highlight=c(), tree_score=1) {
     tibble::as_tibble() %>%
     mutate(Parent=as.character(Parent), Identity=as.character(Identity))
 
-  trees = get_trees(x)
+  trees = get_trees(x, verbose=F)
   for (cluster in highlight) {
     tree = trees[[cluster]]
     muts = x %>% get_unique_muts_labels(cluster=cluster)
