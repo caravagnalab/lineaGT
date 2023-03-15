@@ -12,16 +12,22 @@ knitr::opts_chunk$set(
 ```
 
 <!-- badges: start -->
-  [![R-CMD-check](https://github.com/caravagnalab/LineaGT/workflows/R-CMD-check/badge.svg)](https://github.com/caravagnalab/LineaGT/actions)
+
+[![R-CMD-check](https://github.com/caravagnalab/LineaGT/workflows/R-CMD-check/badge.svg)](https://github.com/caravagnalab/LineaGT/actions)
+
 <!-- badges: end -->
 
-# lineaGT <a href="caravagnalab.github.io/lineaGT"><img src="man/figures/logo.png" align="right" height="139" /></a>
+# lineaGT <a href="caravagnalab.github.io/lineaGT"><img src="man/figures/logo.png" align="right" height="139"/></a>
 
+This package implements algorithm to determine lineage inference for gene therapy assays based on insertion sites, accounting also for somatic mutations accumulation. More specifically, starting from coverage values of ISs identified in a gene therapy assays and associated somatic mutations, `lineaGT` can:
 
-This package implements algorithm to determine lineage inference for gene therapy assays based on insertion sites, accounting also for somatic mutations accumulation. The  assays supported by the `lineaGT` package are ....... 
+-   cluster ISs from the observed multi-lineage longitudinal coverage to identify populations of cells originated from the same Haematopoietic Stem Cell and estimate their abundances in the sample;
+
+-   cluster somatic mutations from the observed multi-lineage longitudinal variant allele frequency within each clone, to identify subpopulations;
+
+-   infer population genetics parameters, i.e., growth rates, for each population supporting the exponential and logistic growth models and selecting the optimal one.
 
 This R package provides an R interface for the Python algorithms developed in the [pyLineaGT](https://github.com/caravagnalab/pyLineaGT) package, which uses the Pyro probabilistic programming language to infer lineage histories.
-
 
 #### Citation
 
@@ -29,7 +35,7 @@ This R package provides an R interface for the Python algorithms developed in th
 
 If you use `lineaGT`, please cite:
 
--  ......
+-   E. Buscaroli, S. Milite, R. Bergamin, N. Calonaci, F. Gazzo, A. Calabria, G. Caravagna. Bayesian multi-lineage tracing in gene therapy assays. *In preparation.*
 
 #### Help and support
 
@@ -37,19 +43,17 @@ If you use `lineaGT`, please cite:
 
 ### Installation
 
-You can install the released version of `lineaGT` from
-[GitHub](https://github.com/) with:
+You can install the released version of `lineaGT` from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
 devtools::install_github("caravagnalab/lineaGT")
 ```
 
------
+------------------------------------------------------------------------
 
 #### Copyright and contacts
 
 Elena Buscaroli, Giulio Caravagna. Cancer Data Science (CDS) Laboratory, University of Trieste, Italy.
 
-[![](https://img.shields.io/badge/CDS%20Lab%20Github-caravagnalab-seagreen.svg)](https://github.com/caravagnalab)
-[![](https://img.shields.io/badge/CDS%20Lab%20webpage-https://www.caravagnalab.org/-red.svg)](https://www.caravagnalab.org/)
+[![](https://img.shields.io/badge/CDS%20Lab%20Github-caravagnalab-seagreen.svg)](https://github.com/caravagnalab) [![](https://img.shields.io/badge/CDS%20Lab%20webpage-https://www.caravagnalab.org/-red.svg)](https://www.caravagnalab.org/)

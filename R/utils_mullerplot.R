@@ -167,6 +167,15 @@ estimate_mean_ISs = function(x) {
 }
 
 
+
+#' Function implemented to estimate the real number of clones in each cluster.
+#'
+#' @param x mvnmm object
+#' @param highlight clusters to show
+#'
+#' @return named array reporting for each cluster the estimated true number of populations.
+#' @export estimate_n_pops
+
 estimate_n_pops = function(x, highlight=c()) {
   n_ISs = get_ISs(x)
   mean_ISs = estimate_mean_ISs(x)

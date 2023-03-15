@@ -4,7 +4,7 @@
 \alias{get_cov_dataframe}
 \title{Retrieve the coverage dataframe.}
 \usage{
-get_cov_dataframe(x)
+get_cov_dataframe(x, verbose = T)
 }
 \arguments{
 \item{x}{a mvnmm object.}

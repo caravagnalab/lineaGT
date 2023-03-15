@@ -4,7 +4,7 @@
 \alias{get_lineages}
 \title{Extract the data lineages.}
 \usage{
-get_lineages(x)
+get_lineages(x, verbose = T)
 }
 \arguments{
 \item{x}{a mvnmm object.}

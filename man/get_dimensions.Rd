@@ -4,7 +4,7 @@
 \alias{get_dimensions}
 \title{Extract the model dimensions.}
 \usage{
-get_dimensions(x)
+get_dimensions(x, verbose = T)
 }
 \arguments{
 \item{x}{a mvnmm object.}

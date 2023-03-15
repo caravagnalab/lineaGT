@@ -40,6 +40,7 @@ reference:
   - get_weights
   - get_z_probs
   - get_ISs
+  - estimate_n_pops
 
 - title: Visualization functions
   desc: Functions to visualize the fit results.

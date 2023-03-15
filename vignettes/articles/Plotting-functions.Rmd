@@ -20,6 +20,14 @@ data(x.example)
 x.example
 ```
 
+# Mixture weights
+
+The mixture weights and number of ISs per cluster can be visualized with the function `plot_mixture_weights()` .
+
+```{r}
+plot_mixture_weights(x.example)
+```
+
 # Scatterplot
 
 The function `plot_scatter_density()` returns a list of 2D multivariate densities estimated by the model. The argument `highlight` can be used to show only a subset of clusters and the argument `min_frac` to show the clusters with the specified frequency in at least one dimension.

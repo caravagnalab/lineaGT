@@ -118,11 +118,11 @@ plot_marginal = function(x,
 
   if (show_dens || single_plot) dens.df = get_dens_df(x, dd, highlight, tp)
 
-  if (single_plot) return(plot_marginal_single_plot(dd, dens.df, highlight, binwidth))
+  if (single_plot) return(plot_marginal_single_plot(x, dd, dens.df, highlight, binwidth, color_palette))
 
   dd = dd %>% dplyr::filter(labels %in% highlight)
 
-  if (facet_lin) return(plot_marginal_lineage(dd, dens.df, show_dens, highlight, binwidth))
+  if (facet_lin) return(plot_marginal_lineage(x, dd, dens.df, show_dens, highlight, binwidth, color_palette))
 
 
   p = dd %>%
@@ -187,7 +187,7 @@ get_dens_df = function(x, dd, highlight, tp) {
 
 
 
-plot_marginal_single_plot = function(dd, dens.df, highlight, binwidth) {
+plot_marginal_single_plot = function(x, dd, dens.df, highlight, binwidth, color_palette) {
   max_val = max(dd$coverage)
 
   dens.all = dens.df %>%
@@ -220,7 +220,7 @@ plot_marginal_single_plot = function(dd, dens.df, highlight, binwidth) {
 }
 
 
-plot_marginal_lineage = function(dd, dens.df, show_dens, highlight, binwidth) {
+plot_marginal_lineage = function(x, dd, dens.df, show_dens, highlight, binwidth, color_palette) {
   p = dd %>%
     # dplyr::filter(labels %in% highlight) %>%
     ggplot() +
