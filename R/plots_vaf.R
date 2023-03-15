@@ -111,6 +111,7 @@ plot_vaf_time = function(x,
                          min_frac=0,
                          highlight=c(),
                          timepoints_to_int=list()) {
+  if (!have_vaf_df(x) || !have_muts_fit(x)) return(NULL)
 
   timepoints_to_int = x %>% map_timepoints_int()
 

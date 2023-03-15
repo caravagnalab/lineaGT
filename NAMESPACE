@@ -3,6 +3,7 @@
 S3method(plot,mvnmm)
 S3method(print,mvnmm)
 export(configure_environment)
+export(estimate_n_pops)
 export(filter_dataset)
 export(fit)
 export(fit_growth_rates)
