@@ -85,13 +85,19 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9">
+<!-- badges: end -->
 <div class="section level1">
 <div class="page-header">
 <img src="logo.png" class="logo" alt=""><h1 id="lineagt-">lineaGT 
 <a class="anchor" aria-label="anchor" href="#lineagt-"></a>
 </h1>
 </div>
-<p>This package implements algorithm to determine lineage inference for gene therapy assays based on insertion sites, accounting also for somatic mutations accumulation. The assays supported by the <code>lineaGT</code> package are …….</p>
+<p>This package implements algorithm to determine lineage inference for gene therapy assays based on insertion sites, accounting also for somatic mutations accumulation. More specifically, starting from coverage values of ISs identified in a gene therapy assays and associated somatic mutations, <code>lineaGT</code> can:</p>
+<ul>
+<li><p>cluster ISs from the observed multi-lineage longitudinal coverage to identify populations of cells originated from the same Haematopoietic Stem Cell and estimate their abundances in the sample;</p></li>
+<li><p>cluster somatic mutations from the observed multi-lineage longitudinal variant allele frequency within each clone, to identify subpopulations;</p></li>
+<li><p>infer population genetics parameters, i.e., growth rates, for each population supporting the exponential and logistic growth models and selecting the optimal one.</p></li>
+</ul>
 <p>This R package provides an R interface for the Python algorithms developed in the <a href="https://github.com/caravagnalab/pyLineaGT" class="external-link">pyLineaGT</a> package, which uses the Pyro probabilistic programming language to infer lineage histories.</p>
 <div class="section level4">
 <h4 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
@@ -99,7 +105,8 @@
 <p><a href="https://doi.org/...." class="external-link"><img src="https://img.shields.io/badge/doi-.....-red.svg"></a></p>
 <p>If you use <code>lineaGT</code>, please cite:</p>
 <ul>
-<li>……</li>
+<li>E. Buscaroli, S. Milite, R. Bergamin, N. Calonaci, F. Gazzo, A. Calabria, G. Caravagna. Bayesian multi-lineage tracing in gene therapy assays. <em>In preparation.</em>
+</li>
 </ul>
 </div>
 <div class="section level4">
