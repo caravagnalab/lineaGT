@@ -1,4 +1,5 @@
-get_mrca_df = function(x, highlight, edges, tps=c(), clonal=F) {
+get_mrca_df = function(x, highlight, edges, tps=c(), time_spec=F, clonal=F, thr=1) {
+  if (length(tps)>0) time_spec = T
 
   if (purrr::is_empty(tps)) tps = x %>% get_timepoints()
 
@@ -8,23 +9,32 @@ get_mrca_df = function(x, highlight, edges, tps=c(), clonal=F) {
       dplyr::filter(labels %in% highlight) %>%
       dplyr::filter(timepoints %in% tps) %>%
       dplyr::rename(cluster=labels) %>%
-      dplyr::group_by(cluster, lineage) %>%
-      dplyr::summarise(is.present=any(mean_cov > 0), .groups="keep") %>%
-      dplyr::ungroup() %>%
-      dplyr::rename(Identity=lineage) %>%
-      dplyr::inner_join(edges, by="Identity") else if (have_muts_fit(x))
-    fracs = x %>%
-      get_vaf_dataframe() %>%
-      dplyr::filter(labels %in% highlight) %>%
-      dplyr::filter(timepoints %in% tps) %>%
-      dplyr::select(labels_mut, theta_binom, lineage, timepoints) %>%
-      dplyr::rename(cluster=labels_mut) %>%
+      dplyr::mutate(cluster=as.character(cluster)) %>%
 
-      # is.present stores whether the cluster has been observed in the cluster
       dplyr::group_by(cluster, lineage) %>%
-      dplyr::summarise(is.present=any(theta_binom > 0), .groups="keep") %>%
+      dplyr::mutate(is.present=any(mean_cov > thr)) %>%
       dplyr::ungroup() %>%
-      dplyr::rename(Identity=lineage) %>%
+
+      dplyr::rename(Identity=lineage, Generation=timepoints, Population=mean_cov) %>%
+
+      convert_tp(get_tp_to_int(x)) %>%
+
+      dplyr::inner_join(edges, by="Identity") else if (have_muts_fit(x))
+
+    fracs = x %>%
+      get_pop_df() %>%
+      dplyr::filter(Parent %in% highlight) %>%
+      dplyr::filter(Generation %in% get_tp_to_int(x)[tps]) %>%
+      # convert_tp(setNames(names(get_tp_to_int(x)), get_tp_to_int(x))) %>%
+      dplyr::select(Identity, Population, Lineage, Generation) %>%
+      dplyr::rename(cluster=Identity) %>%
+
+      # is.present stores whether the cluster has been observed in the cluster in at least one tp
+      dplyr::group_by(cluster, Lineage) %>%
+      dplyr::mutate(is.present=any(Population > thr)) %>%
+      dplyr::ungroup() %>%
+
+      dplyr::rename(Identity=Lineage) %>%
       dplyr::inner_join(edges, by="Identity") else
     fracs = data.frame()
 
@@ -32,25 +42,72 @@ get_mrca_df = function(x, highlight, edges, tps=c(), clonal=F) {
     return(NULL)
 
   orig = fracs %>%
+
+    # check for each cluster if is present in all descendants of the parent
+    # if so,
     dplyr::rowwise() %>%
-    dplyr::mutate(is.present.parent=is_present_desc(cluster, Parent, edges, fracs) ) %>%  # if is present in all descendants of the parent
+    dplyr::mutate(is.present.parent=is_present_desc(cluster, Generation, Parent, edges, fracs)) %>%
     dplyr::ungroup() %>%
+
+    # !! cannot filter now otherwise retrieving the mrca won't work
+    # dplyr::filter(is.present, Population > thr) %>%
 
     # orig stores the node of differentiation tree where the cluster has originated
     # it will stay NA if the it's never observed in the lineage
-    dplyr::mutate(orig=ifelse( (is.present & !is.present.parent), Identity, NA)) %>%
-    dplyr::mutate(orig=ifelse( (is.na(orig) & (is.present & is.present.parent)), Parent, orig ))
+    dplyr::group_by(Generation) %>%
+    dplyr::mutate(orig.node=ifelse( (is.present & !is.present.parent), Identity, NA)) %>%
+    dplyr::mutate(orig.node=ifelse( (is.na(orig.node) & (is.present & is.present.parent)), Parent, orig.node )) %>%
+    dplyr::ungroup() %>%
 
-  mrca.list = lapply(unique(orig$cluster), get_mrca_list, edges=edges, orig=orig) %>%
-    setNames(nm=unique(orig$cluster))
+    dplyr::select(-dplyr::contains("is.present")) %>%
 
-  if (all(mrca.list %>% unlist() %>% unique() %>% is.na()))
+    dplyr::group_by(Generation, cluster) %>%
+    dplyr::mutate(orig.node=ifelse(Generation==Generation & cluster==cluster,
+                              get_mrca_list(unique(cluster), edges,
+                                            dplyr::filter(., cluster==unique(cluster),Generation==unique(Generation))),
+                              orig.node)) %>%
+    dplyr::ungroup() %>%
+
+    dplyr::select(-Identity, -Parent) %>%
+    dplyr::rename(Identity=orig.node)
+
+  # mrca.list = lapply(unique(orig$Generation), function(gen)
+  #   lapply(unique(orig$cluster),
+  #          function(cls) {
+  #            mrca = get_mrca_list(cls, edges, orig %>% dplyr::filter(Generation==gen))
+  #            orig %>% dplyr::mutate(orig=ifelse(Generation==gen & cluster==cls, mrca, orig))
+  #          } ) ) %>%
+  #     # setNames(nm=unique(orig$cluster)) %>% unlist() ) %>%
+  #   data.frame() %>% tibble::rownames_to_column() %>%
+  #   setNames(c("cluster",unique(orig$Generation))) %>%
+  #   reshape2::melt(id="cluster", value.name="Identity", variable.name="Generation") %>%
+  #   dplyr::filter(!is.na(Identity)) %>%
+  #   dplyr::inner_join(orig %>% dplyr::select(cluster,Generation,Population) %>% unique())
+
+  # if (all(mrca.list %>% unlist() %>% unique() %>% is.na()))
+  if (nrow(orig)==0)
     return(NULL)
 
+  if (time_spec)
+    return(
+      orig %>%
+        dplyr::filter(Population>=thr) %>%
+        dplyr::select(-Population) %>% unique() %>%
+
+        dplyr::inner_join(edges, by="Identity") %>%
+        dplyr::rename(mrca.from=Parent, mrca.to=Identity) %>%
+
+        dplyr::group_by(mrca.to, Generation) %>%
+        dplyr::mutate(n_clones=length(cluster), cluster=paste(cluster, collapse=", ")) %>%
+        dplyr::ungroup() %>%
+
+        unique()
+    )
+
   return(
-    mrca.list %>%
-      data.frame() %>% t() %>% as.data.frame() %>%
-      tibble::rownames_to_column() %>% setNames(c("cluster","Identity")) %>%
+    orig %>%
+      dplyr::filter(Population>=thr) %>%
+      dplyr::select(-Generation, -Population) %>% unique() %>%
       dplyr::inner_join(edges, by="Identity") %>%
       dplyr::rename(mrca.from=Parent, mrca.to=Identity) %>%
 
@@ -69,7 +126,7 @@ get_mrca_list = function(cls, edges, orig) {
   # orig is a dataframe reporting where each cluster has been observed
 
   # the function's purpose is to return the MRCA of "cls"
-  nodes = orig %>% filter(cluster==cls) %>% filter(!is.na(orig)) %>% dplyr::pull(orig)
+  nodes = orig %>% filter(cluster==cls) %>% filter(!is.na(orig.node)) %>% dplyr::pull(orig.node) %>% unique()
   root = get_root(edges)
 
   if (length(unique(nodes)) == 1) return(nodes %>% unique())
@@ -104,14 +161,15 @@ get_mrca = function(edges, n1, n2) {
 }
 
 
-is_present_desc = function(node, parent, edges, fracs) {
+is_present_desc = function(cls, tp, parent, edges, fracs) {
+
   desc = get_desc_list(edges)[[parent]]
 
-  # check for each descendant whether cluster "node" is observed in lineage "dd"
+  # check for each descendant whether cluster "cluster" is observed in lineage "dd" -> Identity contains the "mrca.to"
   for (dd in desc) {
     if ( dd %in% fracs$Identity &&
-         !(fracs %>% dplyr::filter(cluster==node, Identity==dd) %>% dplyr::pull(is.present)) )
-      return(FALSE)
+         !(fracs %>% dplyr::filter(cluster==cls, Generation==tp, Identity==dd) %>% dplyr::pull(is.present)) )
+    return(FALSE)
   }
   return(TRUE)
 }

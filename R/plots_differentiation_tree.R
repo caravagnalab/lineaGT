@@ -26,9 +26,10 @@ plot_differentiation_tree = function(x,
 
   if (single_tree || length(highlight)==1)
     return(
-      util_plot_diff(mrca.list=get_mrca_df(x, highlight=highlight, edges=edges, tps=timepoints),
+      util_plot_diff(mrca.list=get_mrca_df(x, highlight=highlight, edges=edges,
+                                           tps=timepoints, time_spec=!single_tree),
                      edges=edges,
-                     timepoints=timepoints,
+                     # timepoints=timepoints,
                      cls=cls)
     )
 
@@ -48,7 +49,7 @@ plot_differentiation_tree = function(x,
 util_plot_diff = function(cls,
                           mrca.list,
                           edges,
-                          timepoints,
+                          # timepoints,
                           cex=1,
                           node_palette=colorRampPalette(RColorBrewer::brewer.pal(n=9, "Set1"))) {
   if (cls != "") {
@@ -108,8 +109,13 @@ util_plot_diff = function(cls,
     theme_void(base_size=9*cex) +
     theme(legend.position="right", text=element_text(size=9)) +
     guides(color="none") +
-    labs(title=paste0(cls, "Timepoints ", paste0(timepoints, collapse=","))) +
+    # labs(title=paste0(cls, "Timepoints ", paste0(timepoints, collapse=","))) +
     coord_fixed(0.4) + theme(plot.margin=margin())
+
+  if ("Generation" %in% colnames(df))
+    pp = pp + ggraph::facet_edges(Generation ~ vec_gt, as.table=T, ncol=4)
+  else
+    pp = pp + ggraph::facet_edges( ~ vec_gt, as.table=T, ncol=4)
 
   return(pp)
 }
