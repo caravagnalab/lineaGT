@@ -77,38 +77,19 @@ get_mrca_df = function(x, highlight, edges, tps=c(), time_spec=F, clonal=F, thr=
     dplyr::mutate(orig.node=ifelse( (is.present & !is.present.parent), Identity, NA)) %>%
     dplyr::mutate(orig.node=ifelse( (is.na(orig.node) & (is.present & is.present.parent)), Parent, orig.node )) %>%
     dplyr::ungroup() %>%
+    dplyr::filter(!(!is.present & !is.present.parent)) %>%
 
-    dplyr::select(-dplyr::contains("is.present"))
+    dplyr::select(-dplyr::contains("is.present")) %>%
 
-  if (time_dep)
-    orig = orig %>%
-      dplyr::group_by(Generation, cluster) %>%
-      dplyr::mutate(orig.node=ifelse(Generation==Generation & cluster==cluster,
-                                get_mrca_list(unique(cluster), edges,
-                                              dplyr::filter(., cluster==unique(cluster),Generation==unique(Generation))),
-                                orig.node)) %>%
-      dplyr::ungroup() %>%
+    dplyr::group_by(Generation, cluster) %>%
+    dplyr::mutate(orig.node=ifelse(Generation==Generation & cluster==cluster,
+                              get_mrca_list(unique(cluster), edges,
+                                            dplyr::filter(., cluster==unique(cluster),Generation==unique(Generation))),
+                              orig.node)) %>%
+    dplyr::ungroup() %>%
 
-      dplyr::select(-Identity, -Parent) %>%
-      dplyr::rename(Identity=orig.node)
-  else
-    orig = orig %>%
-      dplyr::filter(!is.na(orig.node)) %>%
-      dplyr::select(-Identity, -Parent) %>%
-      dplyr::rename(Identity=orig.node)
-
-  # mrca.list = lapply(unique(orig$Generation), function(gen)
-  #   lapply(unique(orig$cluster),
-  #          function(cls) {
-  #            mrca = get_mrca_list(cls, edges, orig %>% dplyr::filter(Generation==gen))
-  #            orig %>% dplyr::mutate(orig=ifelse(Generation==gen & cluster==cls, mrca, orig))
-  #          } ) ) %>%
-  #     # setNames(nm=unique(orig$cluster)) %>% unlist() ) %>%
-  #   data.frame() %>% tibble::rownames_to_column() %>%
-  #   setNames(c("cluster",unique(orig$Generation))) %>%
-  #   reshape2::melt(id="cluster", value.name="Identity", variable.name="Generation") %>%
-  #   dplyr::filter(!is.na(Identity)) %>%
-  #   dplyr::inner_join(orig %>% dplyr::select(cluster,Generation,Population) %>% unique())
+    dplyr::select(-Identity, -Parent) %>%
+    dplyr::rename(Identity=orig.node)
 
   # if (all(mrca.list %>% unlist() %>% unique() %>% is.na()))
   if (nrow(orig)==0)
