@@ -4,6 +4,8 @@ get_mrca_df = function(x, highlight, edges, tps=c(), time_spec=F, clonal=F, thr=
 
   if (length(tps)>0) time_spec = T
 
+  if (!time_spec) time_dep = F
+
   if (purrr::is_empty(tps)) tps = x %>% get_timepoints()
 
   if (clonal) {
@@ -79,15 +81,29 @@ get_mrca_df = function(x, highlight, edges, tps=c(), time_spec=F, clonal=F, thr=
     dplyr::ungroup() %>%
     dplyr::filter(!(!is.present & !is.present.parent)) %>%
 
-    dplyr::select(-dplyr::contains("is.present")) %>%
+    dplyr::select(-dplyr::contains("is.present"))
 
-    dplyr::group_by(Generation, cluster) %>%
-    dplyr::mutate(orig.node=ifelse(Generation==Generation & cluster==cluster,
-                              get_mrca_list(unique(cluster), edges,
-                                            dplyr::filter(., cluster==unique(cluster),Generation==unique(Generation))),
-                              orig.node)) %>%
-    dplyr::ungroup() %>%
 
+  if (time_spec)
+    orig = orig %>%
+      dplyr::group_by(Generation, cluster) %>%
+      dplyr::mutate(orig.node=ifelse(Generation==Generation & cluster==cluster,
+                                     get_mrca_list(unique(cluster), edges,
+                                                   dplyr::filter(., cluster==unique(cluster),Generation==unique(Generation))),
+                                     orig.node)) %>%
+    dplyr::ungroup()
+  else
+    orig = orig %>%
+      dplyr::select(-Generation) %>% unique() %>%
+      dplyr::group_by(cluster) %>%
+      dplyr::mutate(orig.node=ifelse(cluster==cluster,
+                                     get_mrca_list(unique(cluster), edges,
+                                                   dplyr::filter(., cluster==unique(cluster))),
+                                     orig.node)) %>%
+      dplyr::ungroup()
+
+
+  orig = orig %>%
     dplyr::select(-Identity, -Parent) %>%
     dplyr::rename(Identity=orig.node)
 
@@ -114,7 +130,7 @@ get_mrca_df = function(x, highlight, edges, tps=c(), time_spec=F, clonal=F, thr=
   return(
     orig %>%
       dplyr::filter(Population>=thr) %>%
-      dplyr::select(-Generation, -Population) %>% unique() %>%
+      dplyr::select(-Population) %>% unique() %>%
       dplyr::inner_join(edges, by="Identity") %>%
       dplyr::rename(mrca.from=Parent, mrca.to=Identity) %>%
 
