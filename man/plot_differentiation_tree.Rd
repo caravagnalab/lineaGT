@@ -9,6 +9,7 @@ plot_differentiation_tree(
   edges = differentiation_tree(),
   highlight = c(),
   single_tree = T,
+  clonal = T,
   wrap = T,
   timepoints = c()
 )
