@@ -213,7 +213,6 @@ get_root = function(edges) {
 
 lowest_common_acestor = function(nodes, edges) {
   nodes = nodes[!is.na(nodes)]
-  print(nodes)
 
   # nodes is a list of nodes for which we want to find the mrca
   desc_list = get_desc_list(edges, leaves=T)
