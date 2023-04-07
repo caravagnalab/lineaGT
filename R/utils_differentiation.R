@@ -21,7 +21,7 @@ get_mrca_df = function(x, edges, highlight=c(), tps=c(), time_spec=F, thr=1) {
     dplyr::filter(Population>thr)
 
   if (time_spec)
-    fracs = get_time_spec_mrca(fracs, tps)
+    fracs = get_time_spec_mrca(fracs, tps, edges)
   else
     fracs = fracs %>%
       dplyr::group_by(Identity) %>%
@@ -56,7 +56,7 @@ get_mrca_df = function(x, edges, highlight=c(), tps=c(), time_spec=F, thr=1) {
 }
 
 
-get_time_spec_mrca = function(fracs, tps) {
+get_time_spec_mrca = function(fracs, tps, edges) {
   sorted_gens = sort(as.array(tps), decreasing=T)
 
   for (gg in 1:length(sorted_gens)) {
@@ -69,7 +69,7 @@ get_time_spec_mrca = function(fracs, tps) {
       dplyr::ungroup() %>%
 
       # annotate the next analysed timepoint (i.e., previous time) with the current mrca
-      get_mrca_next_tp(tps, gg)
+      get_mrca_next_tp(sorted_gens, gg)
   }
 
   return(fracs %>% dplyr::select(-next.tp.mrca))
@@ -237,7 +237,12 @@ get_mrca_next_tp = function(fracs, tps, tp.idx) {
   fracs.curr = fracs %>%
     dplyr::select(Identity, Generation, mrca.to) %>% unique() %>%
     dplyr::filter(Generation==tps[tp.idx]) %>%
-    dplyr::mutate(Generation=tps[tp.idx+1]) %>%
+
+    dplyr::rowwise() %>%
+    dplyr::mutate(Generation=get_next_tp(fracs, tps[tp.idx], Identity)) %>%
+    dplyr::ungroup() %>%
+
+    # dplyr::mutate(Generation=tps[tp.idx+1]) %>%
     dplyr::rename(next.tp.mrca2=mrca.to)
 
   return(
@@ -247,6 +252,39 @@ get_mrca_next_tp = function(fracs, tps, tp.idx) {
       dplyr::mutate(next.tp.mrca=ifelse(is.na(next.tp.mrca), next.tp.mrca2, next.tp.mrca)) %>%
       dplyr::select(-next.tp.mrca2)
   )
+}
+
+get_next_tp = function(fracs, gen, idd) {
+  # print(c(idd, gen))
+  # print(fracs %>%
+  #         dplyr::filter(Identity==idd) %>%
+  #         dplyr::filter(Generation < gen))
+
+  next.gens = fracs %>%
+    dplyr::filter(Identity==idd) %>%
+    dplyr::filter(Generation < gen) %>%
+    dplyr::pull(Generation)
+
+  if (length(next.gens) == 0)
+    return(NA)
+
+  return(next.gens %>% max())
+}
+
+fix_missing_tps = function(fracs, tps, tp.idx) {
+  tmp = fracs %>%
+    dplyr::rowwise() %>%
+    dplyr::mutate(is.missing=is.na(next.tp.mrca) && Generation==tps[tp.idx+1]) %>%
+    dplyr::group_by(Identity) %>%
+    dplyr::filter(any(is.missing)) %>%
+    dplyr::ungroup()
+
+  tmp %>%
+    dplyr::group_by(Identity) %>%
+    dplyr::mutate(next.tp=ifelse(Generation==tps[tp.idx+1],
+                                 get_next_tp(Generation),
+                                 ))
+
 }
 
 
