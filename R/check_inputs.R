@@ -8,7 +8,7 @@ have_muts_fit = function(x) {
 
 have_vaf_df = function(x) {
   vaf.df = suppressMessages(x %>% get_vaf_dataframe())
-  if (purrr::is_empty(vaf.df))
+  if (purrr::is_empty(vaf.df) || nrow(vaf.df)==0)
     return(FALSE)
   return(TRUE)
 }

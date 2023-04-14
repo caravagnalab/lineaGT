@@ -104,6 +104,28 @@ get_timepoints = function(x) {
 }
 
 
+get_ISs_list = function(x, cls=c(), mutations=F) {
+  if (length(cls)==0) cls = x %>% get_highlight(mutations=mutations)
+  cls.tmp = list("clonal"=get_highlight(x, mutations = F), "subcl"=get_all_unique_muts_labels(x))
+
+  clonal = lapply(cls.tmp$clonal, function(cc)
+    x %>% get_cov_dataframe() %>%
+      dplyr::filter(labels==cc) %>%
+      dplyr::pull(IS) %>%
+      unique()) %>% setNames(cls.tmp$clonal)
+
+  subcl = lapply(cls.tmp$subcl, function(ss)
+    x %>% get_vaf_dataframe() %>%
+      dplyr::filter(labels_mut==ss) %>%
+      dplyr::pull(IS) %>%
+      unique()) %>% setNames(cls.tmp$subcl)
+
+  list_ISs = c(clonal, subcl)
+
+  return(list_ISs[cls])
+}
+
+
 get_tp_to_int = function(x, verbose=T) {
   if ("tp.to.int" %in% names(x)) return(x$tp.to.int)
 

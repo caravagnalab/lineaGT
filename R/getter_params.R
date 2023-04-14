@@ -349,6 +349,7 @@ get_unique_muts_labels = function(x, clusters=c(), verbose=F) {
 
 get_all_unique_muts_labels = function(x) {
   if (!have_vaf_df(x)) return(list())
+  if (nrow(get_vaf_dataframe(x))==0) return(list())
   return(
     x %>%
       get_vaf_dataframe() %>%
