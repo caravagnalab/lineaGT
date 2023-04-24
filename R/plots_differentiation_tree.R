@@ -50,7 +50,13 @@ util_plot_diff = function(mrca.df,
 
   mrca.df = mrca.df %>% dplyr::select(-dplyr::contains("branch")) %>%
     dplyr::mutate(cluster=Identity, Identity=mrca.to) %>%
-    dplyr::rename(from=mrca.from, to=mrca.to)
+    dplyr::rename(from=mrca.from, to=mrca.to) %>%
+    dplyr::full_join(edges %>%
+                       dplyr::rename(from=Parent, to=Identity),
+                     by=c("from","to")) %>%
+    dplyr::mutate(n_clones=replace(n_clones, is.na(n_clones), 0),
+                  Identity=to,
+                  cluster=replace(cluster, is.na(cluster), ""))
 
   gg = igraph::graph_from_data_frame(mrca.df)
   igraph::E(gg)$name = mrca.df$to
