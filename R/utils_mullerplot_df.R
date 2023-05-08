@@ -83,7 +83,10 @@ get_muller_pop = function(x,
         dplyr::filter(Identity %in% c("P", get_highlight(x, mutations=mutations, highlight=c())))
     )
 
-  highlight = get_highlight(x, mutations=mutations, highlight=highlight)
+  if (single_clone)
+    highlight = get_highlight(x, mutations=mutations, highlight=highlight)
+  else
+    highlight = get_highlight(x, mutations=mutations, highlight=c())
 
   # if highlight is specified -> we want to observe the frequencies of them related one to the other
   timepoints_to_int = map_timepoints_int(x, timepoints_to_int=timepoints_to_int)

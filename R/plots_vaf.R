@@ -73,7 +73,7 @@ plot_vaf_2D = function(dataframe,
                   labels, lineage, labels_mut, mutation, dplyr::starts_with("pi")) %>%
     ggplot() +
     geom_point(aes_string(x=dims.vaf[1], y=dims.vaf[2], color="labels_mut"), alpha=.5, size=.7) +
-    geom_point(aes_string(x=dims.theta[1], y=dims.theta[2], color="labels_mut"), shape=15, inherit.aes=F, size=1.5) +
+    geom_point(aes_string(x=dims.theta[1], y=dims.theta[2], color="labels_mut"), shape=15, inherit.aes=F, size=2) +
     facet_grid(lineage ~ labels) +
     scale_color_manual(values=color_palette) +
     xlab(stringr::str_replace_all(dims.vaf[[1]], pattern="vaf.", replacement="VAF ")) +

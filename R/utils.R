@@ -19,7 +19,7 @@ get_highlight = function(x, min_frac=0, highlight=c(), mutations=F) {
     if (purrr::is_empty(highlight)) highlight = select_relevant_clusters(x, min_frac)
     highlight_v = get_unique_muts_labels(x, highlight)
 
-    return( c(highlight, highlight_v) )
+    return( unique(c(highlight, highlight_v)) )
   }
 
   if (purrr::is_empty(highlight)) highlight = x %>% get_unique_labels()
