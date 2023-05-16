@@ -48,7 +48,8 @@ check_dp = function(x, thr=10) {
 
   if (!"vaf" %in% colnames(vaf.df))
     vaf.df = vaf.df %>%
-      dplyr::mutate(vaf=alt/dp)
+      dplyr::mutate(vaf=alt/dp) else if (any(vaf.df$vaf > 1))
+          vaf.df = vaf.df %>% dplyr::mutate(vaf=vaf/100)
 
   joined = dplyr::inner_join(vaf.df, means, by=c("labels", "timepoints", "lineage")) %>%
 

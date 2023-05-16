@@ -57,9 +57,10 @@
 # hyperparams A list of hyperparams to set. Available values are:
 # \code{mean_loc}, the center of the mean prior (default set to the sample mean),
 # \code{mean_scale}, the variance of the mean prior (default set to the sample variance),
-# \code{var_scale}, the variance of the variance prior (default set to \code{400}),
+# \code{var_loc}, the center of the variance prior (default set to \code{110}),
+# \code{var_scale}, the variance of the variance prior (default set to \code{195}),
 # \code{max_var}, the maximum value attributed to the variance (no default value),
-# \code{min_var} the minimum value attributed to the variance (no default limit).
+# \code{min_var} the minimum value attributed to the variance (default set to \code{5}).
 
 fit = function(cov.df,
                vaf.df=NULL,
