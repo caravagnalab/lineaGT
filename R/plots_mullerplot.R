@@ -12,6 +12,7 @@
 #' @param mutations Boolean. If set to \code{TRUE}, also the clusters of mutations will be visualized.
 #' @param single_clone Boolean. If \code{mutations} and \code{single_clone} are set to \code{TRUE}, only the clones
 #' reported in \code{highlight} and the respective subclones will be visualised.
+#' @param rm_mixt remove clusters estimated as polyclonal
 #' @param tree_score add
 #' @param legend.pos add
 #'
@@ -28,6 +29,7 @@ plot_mullerplot = function(x,
                            which="frac",
                            highlight=c(),
                            min_frac=0,
+                           min_abundance=0,
                            estimate_npops=FALSE,
                            rm_mixt=FALSE,
                            timepoints_to_int=c(),
@@ -39,7 +41,6 @@ plot_mullerplot = function(x,
   timepoints_to_int = map_timepoints_int(x, timepoints_to_int)
 
   highlight.cov = get_highlight(x, min_frac=min_frac, highlight=highlight)
-  # highlight = get_highlight(x, min_frac, highlight.cov, mutations=mutations)
 
   if (rm_mixt) {
     n_pops = estimate_n_pops(x, highlight=highlight.cov)

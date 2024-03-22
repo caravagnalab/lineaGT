@@ -14,20 +14,23 @@ update_color_palette = function(x, clusters=c()) {
 }
 
 
-get_highlight = function(x, min_frac=0, highlight=c(), mutations=F) {
+get_highlight = function(x, min_frac=0, min_abundance=0, highlight=c(), mutations=F) {
   if (mutations && have_vaf_df(x)) {
-    if (purrr::is_empty(highlight)) highlight = select_relevant_clusters(x, min_frac)
+    if (purrr::is_empty(highlight))
+      highlight = select_relevant_clusters(x, min_frac=min_frac, min_abundance=min_abundance)
     highlight_v = get_unique_muts_labels(x, highlight)
 
     return( unique(c(highlight, highlight_v)) )
   }
 
   if (purrr::is_empty(highlight)) highlight = x %>% get_unique_labels()
-  return( intersect(select_relevant_clusters(x, min_frac), highlight) )
+  return(
+    intersect(select_relevant_clusters(x, min_frac=min_frac, min_abundance=min_abundance), highlight)
+    )
 }
 
 
-select_relevant_clusters = function(x, min_frac) {
+select_relevant_clusters = function(x, min_frac, min_abundance) {
   return(
     x %>%
       get_mean_long() %>%
@@ -35,7 +38,9 @@ select_relevant_clusters = function(x, min_frac) {
       dplyr::mutate(frac=mean_cov/sum(mean_cov)) %>%
       dplyr::ungroup() %>%
       dplyr::group_by(labels) %>%
-      dplyr::filter(any(frac > min_frac), labels!="P") %>%
+      dplyr::filter(any(frac > min_frac),
+                    any(mean_cov > min_abundance),
+                    labels!="P") %>%
       dplyr::pull(labels) %>%
       unique() %>%
       as.character()

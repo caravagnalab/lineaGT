@@ -1,14 +1,15 @@
-get_mrca_df = function(x, edges, highlight=c(), tps=c(), time_spec=F, thr=1) {
+# Function to retrieve a dataframe with infos about each cluster on the differentation tree.
+#
+
+get_mrca_df = function(x, edges, highlight=c(), tps=c(), time_spec=F, thr=0) {
   # time_dep : if TRUE -> assume dependency among timepoints, so a cluster is assigned to a branch based on observations across ALL timepoints
-  #            if FALSE -> counts the number of clones in each branch at each timepoint, independently on the previous/next timepoits
+  #            if FALSE -> counts the number of clones in each branch at each timepoint, independently on the previous/next timepoints
 
   if (purrr::is_empty(highlight)) highlight = get_highlight(x, mutations=T)
-
-  # if (length(tps)>0) time_spec = T
-
   if (purrr::is_empty(tps)) tps = x %>% get_tp_to_int()
   if (is.character(tps)) tps = get_tp_to_int(x)[tps]  # take the integer values
 
+  # get population sizes and phylogenies (clone tree) for each generation
   fracs = x %>%
     get_pop_df() %>%
     dplyr::select(Identity, Generation, Lineage, Population, Parent) %>%
@@ -21,6 +22,7 @@ get_mrca_df = function(x, edges, highlight=c(), tps=c(), time_spec=F, thr=1) {
     dplyr::filter(Population>thr)
 
   if (time_spec)
+    # retrieves info about location of each clone on the differentiation tree
     fracs = get_time_spec_mrca(fracs, tps, edges)
   else
     fracs = fracs %>%
@@ -40,7 +42,9 @@ get_mrca_df = function(x, edges, highlight=c(), tps=c(), time_spec=F, thr=1) {
       fracs %>%
         dplyr::select(Identity, Generation, dplyr::contains(c("branch","mrca"))) %>% unique() %>%
         dplyr::group_by(Generation, branch) %>%
-        dplyr::reframe(n_clones=dplyr::n(), Identity=toString(unique(Identity)),
+        dplyr::reframe(n_clones=sum(!grepl(pattern="S", x=unique(Identity))),
+                       n_subclones=sum(grepl(pattern="S", x=unique(Identity))),
+                       Identity=toString(unique(Identity)),
                        mrca.from=mrca.from, mrca.to=mrca.to) %>% unique() %>%
         dplyr::select(dplyr::contains("from"), dplyr::contains("to"), dplyr::everything())
     )
@@ -49,7 +53,9 @@ get_mrca_df = function(x, edges, highlight=c(), tps=c(), time_spec=F, thr=1) {
     fracs %>%
       dplyr::select(Identity, dplyr::contains(c("branch","mrca"))) %>% unique() %>%
       dplyr::group_by(branch) %>%
-      dplyr::reframe(n_clones=dplyr::n(), Identity=toString(unique(Identity)),
+      dplyr::reframe(n_clones=sum(!grepl(pattern="S", x=unique(Identity))),
+                     n_subclones=sum(grepl(pattern="S", x=unique(Identity))),
+                     Identity=toString(unique(Identity)),
                      mrca.from=mrca.from, mrca.to=mrca.to) %>% unique() %>%
       dplyr::select(dplyr::contains("from"), dplyr::contains("to"), dplyr::everything())
   )
@@ -57,11 +63,13 @@ get_mrca_df = function(x, edges, highlight=c(), tps=c(), time_spec=F, thr=1) {
 
 
 get_time_spec_mrca = function(fracs, tps, edges) {
+  # start from the last generation
   sorted_gens = sort(as.array(tps), decreasing=T)
 
   for (gg in 1:length(sorted_gens)) {
     fracs = fracs %>%
 
+      # compute the "location" of each cluster in each timepoint based on population size
       dplyr::group_by(Identity, Generation) %>%
       dplyr::mutate(mrca.to=ifelse(Generation==sorted_gens[gg],
                                    lowest_common_acestor(c(Lineage, unique(next.tp.mrca)), edges),
@@ -212,14 +220,20 @@ get_root = function(edges) {
 
 
 lowest_common_acestor = function(nodes, edges) {
+  # nodes is a list of nodes for which we want to find the mrca
   nodes = nodes[!is.na(nodes)]
 
-  # nodes is a list of nodes for which we want to find the mrca
+  # get for each node in "edges", the list of descendants
   desc_list = get_desc_list(edges, leaves=T)
 
   return(
-    lapply(names(desc_list), function(x) if (all(nodes%in%c(x,desc_list[[x]]))) return(length(desc_list[[x]]))) %>%
-      setNames(names(desc_list)) %>% purrr::discard(is.null) %>% which.min() %>% names
+    lapply(names(desc_list), function(x) {
+      # if all nodes are descendants of "x", then returns the number of descendants, NULL otherwise
+      if (all(nodes %in% c(x, desc_list[[x]]))) return(length(desc_list[[x]]))
+      }) %>%
+      setNames(names(desc_list)) %>% purrr::discard(is.null) %>%
+      # keep the node with less descendants -> mrca
+      which.min() %>% names
   )
 }
 
@@ -242,7 +256,6 @@ get_mrca_next_tp = function(fracs, tps, tp.idx) {
     dplyr::mutate(Generation=get_next_tp(fracs, tps[tp.idx], Identity)) %>%
     dplyr::ungroup() %>%
 
-    # dplyr::mutate(Generation=tps[tp.idx+1]) %>%
     dplyr::rename(next.tp.mrca2=mrca.to)
 
   return(

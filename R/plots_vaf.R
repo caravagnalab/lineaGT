@@ -26,7 +26,8 @@ plot_vaf = function(x,
                     highlight=c(),
                     wrap=T) {
 
-  dataframe = x %>% get_vaf_dataframe()
+  dataframe = x %>% get_vaf_dataframe() %>%
+    dplyr::filter(labels %in% keep_clusters)
 
   dataframe = dataframe %>%
     dplyr::mutate(theta_binom=theta_binom) %>%
@@ -120,6 +121,7 @@ plot_vaf_time = function(x,
 
   vaf.df = x %>%
     get_vaf_dataframe() %>%
+    dplyr::filter(labels %in% keep_clusters) %>%
     dplyr::filter(labels %in% highlight.c) %>%
     mutate_tp(fn=as.character, colnm="timepoints") %>%
     dplyr::mutate(timepoints=as.character(timepoints_to_int[timepoints])) %>%

@@ -16,13 +16,15 @@ plot_differentiation_tree = function(x,
                                      single_tree=T,
                                      clonal=T,
                                      wrap=T,
-                                     timepoints=c()) {
+                                     timepoints=c(),
+                                     min_abundance=0) {
 
   highlight = get_highlight(x, highlight=highlight, mutations=clonal)
   if (purrr::is_empty(timepoints)) timepoints = x %>% get_tp_to_int() %>% names()
   if (length(intersect(timepoints, get_timepoints(x)))==0) return(NULL)
 
-  mrca.df = get_mrca_df(x, edges, highlight, timepoints, time_spec=!single_tree, thr=1)
+  mrca.df = get_mrca_df(x, edges, highlight, tps=timepoints,
+                        time_spec=!single_tree, thr=min_abundance)
 
   if (single_tree)
     plots = util_plot_diff(mrca.df, edges) else
