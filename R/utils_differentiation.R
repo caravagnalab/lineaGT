@@ -1,25 +1,44 @@
 # Function to retrieve a dataframe with infos about each cluster on the differentation tree.
 #
 
-get_mrca_df = function(x, edges, highlight=c(), tps=c(), time_spec=F, thr=0) {
+get_mrca_df = function(x, edges, highlight=c(), tps=c(), time_spec=F, thr=0,
+                       thr_freq=0, filter_polyclonal=FALSE, vcn=NULL) {
   # time_dep : if TRUE -> assume dependency among timepoints, so a cluster is assigned to a branch based on observations across ALL timepoints
   #            if FALSE -> counts the number of clones in each branch at each timepoint, independently on the previous/next timepoints
 
-  if (purrr::is_empty(highlight)) highlight = get_highlight(x, mutations=T)
+  monoclonal = c()
+  if (filter_polyclonal) {
+    monoclonal = estimate_n_pops(x, vcn=vcn) %>% purrr::keep(function(x) x==TRUE) %>% names()
+    if (purrr::is_empty(monoclonal)) highlight = c()
+    else highlight = get_highlight(x, highlight=monoclonal, mutations=T)
+  } else if (purrr::is_empty(highlight)) highlight = get_highlight(x, highlight=monoclonal, mutations=T)
   if (purrr::is_empty(tps)) tps = x %>% get_tp_to_int()
   if (is.character(tps)) tps = get_tp_to_int(x)[tps]  # take the integer values
 
   # get population sizes and phylogenies (clone tree) for each generation
   fracs = x %>%
     get_pop_df() %>%
-    dplyr::select(Identity, Generation, Lineage, Population, Parent) %>%
+    dplyr::select(Identity, Generation, Lineage, Population, Frequency, Parent) %>%
     dplyr::filter(Identity %in% highlight) %>%
     dplyr::filter(Generation %in% tps) %>%
     dplyr::mutate(Identity=as.character(Identity)) %>%
     dplyr::arrange(Identity, Lineage, Generation) %>%
 
     tibble::add_column(mrca.to=NA, next.tp.mrca=NA) %>%
-    dplyr::filter(Population>thr)
+    dplyr::filter(Population>thr) %>%
+
+    dplyr::group_by(Identity) %>%
+    dplyr::filter(any(Frequency > thr_freq)) %>%
+    dplyr::ungroup() %>% dplyr::select(-Frequency)
+
+  if (nrow(fracs)==0) {
+    empty_df = edges %>% dplyr::mutate(Generation=list(tps)) %>% tidyr::unnest(Generation) %>%
+      dplyr::rename(mrca.from=Parent, mrca.to=Identity) %>%
+      dplyr::mutate(branch=paste0(mrca.from,"->",mrca.to), n_clones=0, n_subclones=0, Identity="") %>%
+      tibble::as_tibble()
+    if (time_spec) return(empty_df)
+    return(empty_df %>% dplyr::select(-Generation) %>% unique())
+  }
 
   if (time_spec)
     # retrieves info about location of each clone on the differentiation tree
@@ -82,6 +101,7 @@ get_time_spec_mrca = function(fracs, tps, edges) {
 
   return(fracs %>% dplyr::select(-next.tp.mrca))
 }
+
 
 
 # get_mrca_list = function(cls, edges, orig) {

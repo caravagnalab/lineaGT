@@ -176,11 +176,11 @@ estimate_mean_ISs = function(x) {
 #' @return named array reporting for each cluster the estimated true number of populations.
 #' @export estimate_n_pops
 
-estimate_n_pops = function(x, highlight=c()) {
+estimate_n_pops = function(x, highlight=c(), vcn=NULL) {
   n_ISs = get_ISs(x)
-  mean_ISs = estimate_mean_ISs(x)
+  if (is.null(vcn)) vcn = estimate_mean_ISs(x)
 
-  n_pops = sapply(get_unique_labels(x), function(cls) return(max(1, round(n_ISs[[cls]] / mean_ISs))) )
+  n_pops = sapply(get_unique_labels(x), function(cls) return(max(1, round(n_ISs[[cls]] / vcn))) )
 
   return(n_pops)
 }
