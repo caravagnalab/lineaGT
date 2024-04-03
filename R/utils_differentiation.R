@@ -28,7 +28,7 @@ get_mrca_df = function(x, edges, highlight=c(), tps=c(), time_spec=F, thr=0,
     dplyr::filter(Population>thr) %>%
 
     dplyr::group_by(Identity) %>%
-    dplyr::filter(any(Frequency > thr_freq)) %>%
+    dplyr::filter(any(Frequency >= thr_freq)) %>%
     dplyr::ungroup() %>% dplyr::select(-Frequency)
 
   if (nrow(fracs)==0) {

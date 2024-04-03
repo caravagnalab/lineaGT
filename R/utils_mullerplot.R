@@ -180,7 +180,8 @@ estimate_n_pops = function(x, highlight=c(), vcn=NULL) {
   n_ISs = get_ISs(x)
   if (is.null(vcn)) vcn = estimate_mean_ISs(x)
 
-  n_pops = sapply(get_unique_labels(x), function(cls) return(max(1, round(n_ISs[[cls]] / vcn))) )
+  n_pops = sapply(get_unique_labels(x),
+                  function(cls) return(max(1, round(n_ISs[[cls]] / (vcn+0.1*vcn)))) )
 
   return(n_pops)
 }
