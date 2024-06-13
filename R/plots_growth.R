@@ -26,7 +26,7 @@ plot_growth_regression = function(x,
                                   ratio=NULL) {
 
   timepoints_to_int = map_timepoints_int(x, timepoints_to_int)
-  highlight = get_highlight(x, min_frac, highlight, mutations=mutations)
+  highlight = get_highlight(x, min_frac=min_frac, highlight=highlight, mutations=mutations)
   color_palette = highlight_palette(x, highlight)
 
   if (fit)
@@ -154,7 +154,7 @@ plot_growth_rates = function(x,
                          show_best=T) {
 
   if (purrr::is_empty(timepoints_to_int)) timepoints_to_int = map_timepoints_int(x, timepoints_to_int=timepoints_to_int)
-  highlight = get_highlight(x, min_frac, highlight, mutations=mutations)
+  highlight = get_highlight(x, min_frac=min_frac, highlight=highlight, mutations=mutations)
 
   if (fit)
     x = fit_growth_rates(x, highlight=highlight, timepoints_to_int=timepoints_to_int, force=F)

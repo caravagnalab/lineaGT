@@ -23,7 +23,7 @@ fit_phylogenies = function(x, vaf.df=NULL, min_frac=0, highlight=list(), fit_mut
   else if (is.null(vaf.df) && have_vaf_df(x))
     vaf.df = x %>% get_vaf_dataframe()
 
-  clusters_joined = get_highlight(x, min_frac, highlight)
+  clusters_joined = get_highlight(x, min_frac=min_frac, highlight=highlight)
   trees = list()
   if (!have_muts_fit(x) || fit_muts)
     return(

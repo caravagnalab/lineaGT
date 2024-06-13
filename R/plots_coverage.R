@@ -109,7 +109,7 @@ plot_marginal = function(x,
 
   tp = timepoints_to_int %>% unlist() %>% sort() %>% names()
 
-  highlight = get_highlight(x, min_frac, highlight)
+  highlight = get_highlight(x, min_frac=min_frac, highlight=highlight)
   color_palette = highlight_palette(x, highlight)
 
   dd = x %>%

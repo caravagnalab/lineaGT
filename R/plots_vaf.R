@@ -36,7 +36,7 @@ plot_vaf = function(x,
                        names_sep=".",
                        values_from=c("vaf","theta_binom"))
 
-  highlight = get_highlight(x, min_frac, highlight, mutations=T)
+  highlight = get_highlight(x, min_frac=min_frac, highlight=highlight, mutations=T)
   highlight_v = get_unique_muts_labels(x, highlight)
   color_palette = highlight_palette(x, highlight)
 
@@ -116,12 +116,12 @@ plot_vaf_time = function(x,
 
   timepoints_to_int = x %>% map_timepoints_int()
 
-  highlight.c = get_highlight(x, min_frac, highlight, mutations=F)
+  highlight.c = get_highlight(x, min_frac=min_frac, highlight=highlight, mutations=F)
   highlight.m = get_unique_muts_labels(x, clusters=highlight.c)
 
   vaf.df = x %>%
     get_vaf_dataframe() %>%
-    dplyr::filter(labels %in% keep_clusters) %>%
+    # dplyr::filter(labels %in% keep_clusters) %>%
     dplyr::filter(labels %in% highlight.c) %>%
     mutate_tp(fn=as.character, colnm="timepoints") %>%
     dplyr::mutate(timepoints=as.character(timepoints_to_int[timepoints])) %>%

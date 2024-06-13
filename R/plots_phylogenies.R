@@ -16,7 +16,7 @@
 
 plot_phylogeny = function(x, show_best=1, min_frac=0, highlight=c()) {
 
-  clusters_joined = get_highlight(x, min_frac, highlight)
+  clusters_joined = get_highlight(x, min_frac=min_frac, highlight=highlight)
   trees = get_trees(x, verbose=F); tree_plots = list()
 
   for (cluster in clusters_joined) {

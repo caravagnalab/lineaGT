@@ -13,7 +13,7 @@
 plot_differentiation_tree = function(x,
                                      edges=differentiation_tree(),
                                      highlight=c(),
-                                     single_tree=T,
+                                     by_timepoint=F,
                                      clonal=T,
                                      wrap=T,
                                      timepoints=c(),
@@ -24,12 +24,14 @@ plot_differentiation_tree = function(x,
   if (length(intersect(timepoints, get_timepoints(x)))==0) return(NULL)
 
   mrca.df = get_mrca_df(x, edges, highlight, tps=timepoints,
-                        time_spec=!single_tree, thr=min_abundance)
+                        time_spec=by_timepoint, thr=min_abundance)
 
-  if (single_tree)
+  if (!by_timepoint)
     plots = util_plot_diff(mrca.df, edges) else
     plots = lapply(mrca.df$Generation %>% unique(), function(gg)
-      util_plot_diff(mrca.df %>% dplyr::filter(Generation==gg), edges=edges)) %>%
+      util_plot_diff(mrca.df %>% dplyr::filter(Generation==gg), edges=edges) +
+        labs(title=paste0("Timepoint ", gg))
+      ) %>%
     setNames(mrca.df$Generation %>% unique())
 
 

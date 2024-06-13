@@ -20,7 +20,7 @@ get_muller_edges = function(x,
 
 get_edges_muts = function(x, highlight=c(), tree_score=1) {
 
-  highlight = get_highlight(x, highlight, min_frac=0, mutations=F)
+  highlight = get_highlight(x, highlight=highlight, min_frac=0, mutations=F)
 
   # create an empty dataset with colnames
   edges = setNames(data.frame(matrix(ncol=2, nrow=0)), c("Parent", "Identity")) %>%

@@ -38,7 +38,7 @@ fit_mutations = function(x,
 
   if (is_empty_vaf(vaf.df, verbose=T)) return(x)
 
-  clusters_joined = get_highlight(x, min_frac, highlight)
+  clusters_joined = get_highlight(x, min_frac=min_frac, highlight=highlight)
 
   x = x %>%
     annotate_vaf_df(vaf.df=vaf.df, min_frac=min_frac) %>%  # add cluster to each mutation

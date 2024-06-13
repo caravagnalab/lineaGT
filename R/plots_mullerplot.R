@@ -54,7 +54,7 @@ plot_mullerplot = function(x,
     highlight.cov = intersect(highlight.cov, names(n_pops[n_pops==1]))
   }
 
-  highlight = get_highlight(x, min_frac, highlight.cov, mutations=mutations)
+  highlight = get_highlight(x, min_frac=min_frac, min_abundance=min_abundance, highlight=highlight.cov, mutations=mutations)
   color_palette = highlight_palette(x, highlight)
   lvls = c("P", get_unique_muts_labels(x), get_unique_labels(x))
 
