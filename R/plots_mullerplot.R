@@ -31,6 +31,7 @@ plot_mullerplot = function(x,
                            min_frac=0,
                            min_abundance=0,
                            estimate_npops=FALSE,
+                           vcn=NULL,
                            rm_mixt=FALSE,
                            timepoints_to_int=c(),
                            mutations=F,
@@ -43,7 +44,7 @@ plot_mullerplot = function(x,
   highlight.cov = get_highlight(x, min_frac=min_frac, highlight=highlight)
 
   if (rm_mixt) {
-    n_pops = estimate_n_pops(x, highlight=highlight.cov)
+    n_pops = estimate_n_pops(x, highlight=highlight.cov, vcn=vcn)
 
     if (length(names(n_pops[n_pops==1])) == length(highlight.cov))
       cli::cli_alert_info("All the estimated clusters represent a single population. No clusters are removed.")
@@ -63,7 +64,8 @@ plot_mullerplot = function(x,
                           timepoints_to_int=timepoints_to_int,
                           highlight=highlight.cov,
                           single_clone=single_clone,
-                          estimate_npops=estimate_npops) %>%
+                          estimate_npops=estimate_npops,
+                          vcn=vcn) %>%
     dplyr::select(-Population, -Frequency, -Parent, -theta_binom, -dplyr::contains("Pop.subcl")) %>%
     dplyr::rename(Population=Pop.plot) %>%
     dplyr::arrange(Identity, Generation, Lineage)
@@ -107,12 +109,13 @@ plot_mullerplot = function(x,
                     highlight=highlight,
                     color_palette=color_palette,
                     legend.pos=legend.pos,
-                    estimate_npops=estimate_npops)
+                    estimate_npops=estimate_npops,
+                    vcn=vcn)
   )
 }
 
 
-mullerplot_util = function(x, mullerdf, which, color_palette, highlight, legend.pos="right", estimate_npops=F) {
+mullerplot_util = function(x, mullerdf, which, color_palette, highlight, legend.pos="right", estimate_npops=F, vcn=NULL) {
   if (!which %in% c("fitness", "frac", "pop")) {
     cli::format_warning('`which` must be one among "frac","pop","fitness". Using `which`="frac".')
     which = "frac"
@@ -151,7 +154,7 @@ mullerplot_util = function(x, mullerdf, which, color_palette, highlight, legend.
 
   fillname = "Clusters"
   if (estimate_npops) {
-    pp = x %>% estimate_n_pops()
+    pp = x %>% estimate_n_pops(vcn=vcn)
     names(color_palette) = sapply(names(color_palette),
                                   function(a) {
                                     if (a %in% names(pp)) return(paste0(a, " - ", pp[[a]]))

@@ -69,6 +69,7 @@ get_muller_pop = function(x,
                           single_clone=T,
                           tree_score=1,
                           estimate_npops=FALSE,
+                          vcn=NULL,
                           edges=NULL) {
 
   if ((purrr::is_empty(highlight) | !single_clone) && mutations && have_pop_df_muts(x) && have_corrected_pops(x, estimate_npops))
@@ -115,7 +116,7 @@ get_muller_pop = function(x,
     dplyr::mutate(theta_binom=1, theta.par=NA, Parent="P")
 
   if (estimate_npops) {
-    n_pops = data.frame(estimate_n_pops(x)) %>% setNames("n_pops") %>% tibble::rownames_to_column(var="Identity")
+    n_pops = data.frame(estimate_n_pops(x, vcn=vcn)) %>% setNames("n_pops") %>% tibble::rownames_to_column(var="Identity")
     means.clonal = dplyr::inner_join(means.clonal, n_pops, by="Identity") %>%
       dplyr::rename(Population.orig=Population) %>%
       dplyr::mutate(Population=Population.orig*n_pops)

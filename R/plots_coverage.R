@@ -265,7 +265,7 @@ plot_marginal_lineage = function(x, dd, dens.df, show_dens, highlight, binwidth,
 #'
 #' @export plot_mixture_weights
 
-plot_mixture_weights = function(x) {
+plot_mixture_weights = function(x, vcn=NULL) {
   weights.df = x %>%
     get_weights() %>%
     data.frame() %>%
@@ -282,10 +282,11 @@ plot_mixture_weights = function(x) {
 
   return(
     dplyr::inner_join(weights.df, ISs.df, by="labels") %>%
+      dplyr::mutate(labels=factor(labels, levels=stringr::str_sort(unique(labels), numeric=TRUE))) %>%
       # dplyr::rename(mixt_w=weights) %>%
       ggplot() +
       geom_bar(aes(x=labels, y=weights, fill=labels), stat="identity") +
-      # geom_bar(aes(x=labels, y=ISs, fill=labels), stat="identity") +
+      geom_hline(yintercept=vcn/ISs_tot, linetype="dashed", lwd=.5) +
       scale_y_continuous(name="Mixture weights",
                          sec.axis=sec_axis(~.*ISs_tot, name="Number of ISs")) +
       scale_fill_manual(values=x %>% get_color_palette()) +
