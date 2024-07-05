@@ -266,11 +266,16 @@ plot_marginal_lineage = function(x, dd, dens.df, show_dens, highlight, binwidth,
 #' @export plot_mixture_weights
 
 plot_mixture_weights = function(x, vcn=NULL) {
-  weights.df = x %>%
-    get_weights() %>%
-    data.frame() %>%
-    tibble::rownames_to_column() %>%
-    setNames(c("labels","weights"))
+  # weights.df = x %>%
+  #   get_weights() %>%
+  #   data.frame() %>%
+  #   tibble::rownames_to_column() %>%
+  #   setNames(c("labels","weights"))
+
+  weights.df = get_cov_dataframe(x) %>% dplyr::select(IS, labels) %>%
+    unique() %>% dplyr::group_by(labels) %>%
+    dplyr::summarise(weights=dplyr::n()) %>%
+    dplyr::ungroup() %>% dplyr::mutate(weights=weights/sum(weights))
 
   ISs.df = x %>%
     get_ISs() %>%
