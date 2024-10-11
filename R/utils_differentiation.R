@@ -25,7 +25,7 @@ get_mrca_df = function(x, edges, highlight=c(), tps=c(), time_spec=F, thr=0,
     dplyr::arrange(Identity, Lineage, Generation) %>%
 
     tibble::add_column(mrca.to=NA, next.tp.mrca=NA) %>%
-    dplyr::filter(Population>thr) %>%
+    dplyr::filter(Population>=thr) %>%
 
     dplyr::group_by(Identity) %>%
     dplyr::filter(any(Frequency >= thr_freq)) %>%
