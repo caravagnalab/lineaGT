@@ -177,9 +177,18 @@ run_py_growth = function(rates.df,
 
   input.clone = pop_df.cl %>%
     dplyr::filter(Identity == cluster) %>%
-    dplyr::select(-Frequency) %>%
-    dplyr::mutate(Population=ifelse((Generation == 0 & clonal), 1, Population)) %>%
-    tidyr::pivot_wider(id_cols="Generation", names_from="Lineage", values_from="Population") %>%
+
+    ## Run with population size
+    # dplyr::select(-Frequency) %>%
+    # dplyr::mutate(Population=ifelse((Generation == 0 & clonal), 1, Population)) %>%
+    # tidyr::pivot_wider(id_cols="Generation", names_from="Lineage", values_from="Population") %>%
+
+    ## Run with re-scaled population size
+    dplyr::mutate(Frequency=Frequency * 1000) %>%
+    dplyr::select(-Population) %>%
+    dplyr::mutate(Frequency=ifelse((Generation == 0 & clonal), 1, Frequency)) %>%
+    tidyr::pivot_wider(id_cols="Generation", names_from="Lineage", values_from="Frequency") %>%
+
     dplyr::arrange(Generation)
 
   times = input.clone$Generation
@@ -188,6 +197,10 @@ run_py_growth = function(rates.df,
 
   times = torch$tensor(times)$int()$unsqueeze(as.integer(1))
   y = torch$tensor(y %>% as.matrix())
+
+  # Remove ######
+  print(times)
+  print(y)
 
   p.rate.exp = p.rate.log = NULL
 
@@ -198,6 +211,9 @@ run_py_growth = function(rates.df,
     losses.exp = x.reg$train(regr="exp", p_rate=p.rate.exp, steps=as.integer(steps), random_state=as.integer(random_state))
     p.exp = x.reg$get_learned_params()
     ll.exp = x.reg$compute_log_likelihood() %>% setNames(nm=lineages)
+
+    # Remove ######
+    print(p.exp)
   }
 
   if (grepl("log", growth_model)) {   # log training
