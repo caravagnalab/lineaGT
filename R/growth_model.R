@@ -198,10 +198,6 @@ run_py_growth = function(rates.df,
   times = torch$tensor(times)$int()$unsqueeze(as.integer(1))
   y = torch$tensor(y %>% as.matrix())
 
-  # Remove ######
-  print(times)
-  print(y)
-
   p.rate.exp = p.rate.log = NULL
 
   x.reg = py_pkg$explogreg$Regression(times, y)
@@ -211,9 +207,6 @@ run_py_growth = function(rates.df,
     losses.exp = x.reg$train(regr="exp", p_rate=p.rate.exp, steps=as.integer(steps), random_state=as.integer(random_state))
     p.exp = x.reg$get_learned_params()
     ll.exp = x.reg$compute_log_likelihood() %>% setNames(nm=lineages)
-
-    # Remove ######
-    print(p.exp)
   }
 
   if (grepl("log", growth_model)) {   # log training
