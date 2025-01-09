@@ -67,7 +67,10 @@ generate_synthetic_df = function(N_values,
 
           if ( check_present &
                (paste0(tmp_name, ".", n_df, ".data.Rds") %in% files_list) ) {
-            x = readRDS(paste0(tmp_name, ".", n_df, ".data.Rds"))
+            filename = paste0(tmp_name, ".", n_df)
+            # filename = paste0(subpath, tmp_name, ".", n_df, ".data.Rds")
+            cat(paste0(filename, "\n"))
+            x = readRDS(paste0(subpath, filename, ".data.Rds"))
           } else {
             sim = py_pkg$Simulate(N=as.integer(nn),
                                   `T`=as.integer(tt),
@@ -125,8 +128,8 @@ generate_synthetic_df = function(N_values,
 
           saveRDS(x_fit, paste0(subpath, filename, ".fit.Rds"))
 
-          rm(mean_scale)
-          rm(alpha)
+          # rm(mean_scale)
+          # rm(alpha)
         }
       }
     }
