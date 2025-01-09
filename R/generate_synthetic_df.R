@@ -65,24 +65,29 @@ generate_synthetic_df = function(N_values,
                (paste0(tmp_name, ".", n_df, ".fit.Rds") %in% files_list) )
             next
 
-          sim = py_pkg$Simulate(N=as.integer(nn),
-                                `T`=as.integer(tt),
-                                K=as.integer(kk),
-                                seed=as.integer(seeds[n_df]),
-                                label=as.character(n_df),
-                                var_loc=as.integer(var_loc),
-                                var_scale=as.integer(var_scale),
-                                mean_loc=as.integer(mean_loc),
-                                mean_scale=as.integer(mean_scale),
-                                alpha=as.numeric(alpha))
+          if ( check_present &
+               (paste0(tmp_name, ".", n_df, ".data.Rds") %in% files_list) ) {
+            x = readRDS(paste0(tmp_name, ".", n_df, ".data.Rds"))
+          } else {
+            sim = py_pkg$Simulate(N=as.integer(nn),
+                                  `T`=as.integer(tt),
+                                  K=as.integer(kk),
+                                  seed=as.integer(seeds[n_df]),
+                                  label=as.character(n_df),
+                                  var_loc=as.integer(var_loc),
+                                  var_scale=as.integer(var_scale),
+                                  mean_loc=as.integer(mean_loc),
+                                  mean_scale=as.integer(mean_scale),
+                                  alpha=as.numeric(alpha))
 
-          sim$generate_dataset()
-          filename = sim$sim_id
+            sim$generate_dataset()
+            filename = sim$sim_id
 
-          x = get_simulation_object(sim)
+            x = get_simulation_object(sim)
 
-          cat(paste0(subpath, filename, ".data.Rds\n"))
-          saveRDS(x, paste0(subpath, filename, ".data.Rds"))
+            cat(paste0(subpath, filename, ".data.Rds\n"))
+            saveRDS(x, paste0(subpath, filename, ".data.Rds"))
+          }
 
           if (!run) next
 
