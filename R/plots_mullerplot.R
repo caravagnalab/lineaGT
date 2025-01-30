@@ -106,7 +106,7 @@ plot_mullerplot = function(x,
   return(
     mullerplot_util(x, mullerdf %>% filter(Generation %in% (timepoints_to_int %>% unlist())),
                     which=which,
-                    highlight=highlight,
+                    highlight=stringr::str_sort(highlight, numeric=TRUE),
                     color_palette=color_palette,
                     legend.pos=legend.pos,
                     estimate_npops=estimate_npops,
