@@ -59,10 +59,12 @@ get_growth_params = function(timepoints_to_int,
                              lineages,
                              cluster,
                              rates.exp=NULL,
-                             rates.log=NULL) {
+                             rates.log=NULL,
+                             posterior_samples.exp=NULL,
+                             posterior_samples.log=NULL) {
 
-  if (!is.null(rates.exp)) params.exp = get_growth_rates_exp(rates.exp, lineages, cluster, timepoints_to_int)
-  if (!is.null(rates.log)) params.log = get_growth_rates_log(rates.log, lineages, cluster, timepoints_to_int)
+  if (!is.null(rates.exp)) params.exp = get_growth_rates_exp(rates.exp, lineages, cluster, timepoints_to_int, posterior_samples.exp)
+  if (!is.null(rates.log)) params.log = get_growth_rates_log(rates.log, lineages, cluster, timepoints_to_int, posterior_samples.log)
 
   if (is.null(rates.exp)) return(params.log)
   if (is.null(rates.log)) return(params.exp)
@@ -72,22 +74,55 @@ get_growth_params = function(timepoints_to_int,
 }
 
 
-get_growth_rates_exp = function(rates.df, lineages, cluster, timepoints_to_int) {
-  pars = data.frame() %>%
+posterior_samples_to_df = function(numpy_array, lineages) {
+  # numpy array of dimension N_iters x L
+  # returns a dataframe with nrow = L and one column with a list of samples
 
-    # initialize the columns
-    tibble::add_column("Lineage"=as.character(NA),
-                       "fitness.exp"=NA,
-                       "init_t.exp"=NA,
-                       "p_rate.exp"=NA,
-                       "sigma.exp"=NA,
-                       "rate.exp"=as.numeric(NA)) %>%
+  if (is.null(numpy_array))
+    return(data.frame(Lineage=lineages) %>% dplyr::mutate(param_samples=NA))
 
-    # add the values
-    tibble::add_row(Lineage=lineages,
-                    p_rate.exp=rates.df$parent_rate,
-                    fitness.exp=rates.df$fitness %>% as.numeric(),
-                    init_t.exp=rates.df$init_time %>% as.integer())
+  numpy_array = numpy_array %>% as.matrix() %>% t() %>% as.data.frame()
+  rownames(numpy_array) = lineages
+  result = numpy_array %>% tibble::rownames_to_column(var="Lineage") %>%
+    tidyr::pivot_longer(cols=-"Lineage") %>%
+    dplyr::group_by(Lineage) %>%
+    dplyr::summarise(param_samples=list(value %>% setNames(name)))
+}
+
+
+get_growth_rates_exp = function(rates.df, lineages, cluster, timepoints_to_int,
+                                posterior_samples) {
+
+  posterior_df = data.frame()
+  if (!is.null(posterior_samples)) {
+    posterior_df = posterior_samples$fitness %>% posterior_samples_to_df(lineages) %>%
+      dplyr::rename(post_fitness=param_samples) %>%
+      dplyr::left_join(
+        posterior_samples$init_time %>% posterior_samples_to_df(lineages) %>%
+          dplyr::rename(post_init_time=param_samples),
+        by="Lineage") %>%
+      dplyr::group_by(Lineage) %>%
+      tidyr::nest(posterior_samples.exp=c(post_fitness, post_init_time))
+  }
+
+  sigma = rates.df$sigma %>% as.matrix() %>% t() %>% as.data.frame()
+  colnames(sigma) = c(0, timepoints_to_int)
+  rownames(sigma) = lineages
+
+  sigma = sigma %>% tibble::rownames_to_column(var="Lineage") %>%
+    tidyr::pivot_longer(cols=-"Lineage") %>%
+    dplyr::group_by(Lineage) %>%
+    dplyr::summarise(sigma.exp=list(value %>% setNames(name)))
+
+  pars = data.frame(
+    Lineage=lineages,
+    # p_rate.exp=rates.df$parent_rate,
+    fitness.exp=rates.df$fitness %>% as.numeric(),
+    init_t.exp=rates.df$init_time %>% as.integer()
+  ) %>%
+    dplyr::mutate(rate.exp=NA,
+                  p_rate.exp=ifelse(is.null(rates.df$parent_rate), NA, rates.df$parent_rate)) %>%
+    dplyr::inner_join(sigma, by="Lineage")
 
   try(expr = {
     pars = pars %>% dplyr::mutate(p_rate.exp=as.numeric(p_rate.exp))
@@ -99,29 +134,53 @@ get_growth_rates_exp = function(rates.df, lineages, cluster, timepoints_to_int) 
       # compute the rates for subclones
       dplyr::mutate(rate.exp=replace( rate.exp, !is.na(p_rate.exp), p_rate.exp * (1+fitness.exp) ),
                     rate.exp=replace( rate.exp, is.na(p_rate.exp), fitness.exp ),
-                    sigma.exp=list( setNames(object=rates.df$sigma, nm=c(0, unlist(timepoints_to_int))) ),
+                    # sigma.exp=list( setNames(object=rates.df$sigma, nm=c(0, unlist(timepoints_to_int))) ),
                     Identity=cluster) %>%
+
+      dplyr::left_join(posterior_df) %>%
 
       tibble::as_tibble()
   )
 }
 
 
-get_growth_rates_log = function(rates.df, lineages, cluster, timepoints_to_int) {
-  pars = data.frame() %>%
-    tibble::add_column("Lineage"=as.character(NA),
-                       "fitness.log"=NA,
-                       "K.log"=NA,
-                       "init_t.log"=NA,
-                       "p_rate.log"=NA,
-                       "sigma.log"=NA,
-                       "rate.log"=as.numeric(NA)) %>%
+get_growth_rates_log = function(rates.df, lineages, cluster, timepoints_to_int,
+                                posterior_samples) {
 
-    tibble::add_row(fitness.log=rates.df$fitness %>% as.numeric(),
-                    K.log=rates.df$carr_capac %>% as.integer(),
-                    init_t.log=rates.df$init_time %>% as.integer(),
-                    Lineage=lineages,
-                    p_rate.log=rates.df$parent_rate)
+  posterior_df = data.frame()
+  if (!is.null(posterior_samples)) {
+    posterior_df = posterior_samples$fitness %>% posterior_samples_to_df(lineages) %>%
+      dplyr::rename(post_fitness=param_samples) %>%
+      dplyr::left_join(
+        posterior_samples$init_time %>% posterior_samples_to_df(lineages) %>%
+          dplyr::rename(post_init_time=param_samples),
+        by="Lineage") %>%
+      dplyr::left_join(
+        posterior_samples$carr_capac %>% posterior_samples_to_df(lineages) %>%
+          dplyr::rename(post_carr_capacity=param_samples),
+        by="Lineage") %>%
+      dplyr::group_by(Lineage) %>%
+      tidyr::nest(posterior_samples.log=c(post_fitness, post_init_time, post_carr_capacity))
+  }
+
+  sigma = rates.df$sigma %>% as.matrix() %>% t() %>% as.data.frame()
+  colnames(sigma) = c(0, timepoints_to_int)
+  rownames(sigma) = lineages
+
+  sigma = sigma %>% tibble::rownames_to_column(var="Lineage") %>%
+    tidyr::pivot_longer(cols=-"Lineage") %>%
+    dplyr::group_by(Lineage) %>%
+    dplyr::summarise(sigma.log=list(value %>% setNames(name)))
+
+  pars = data.frame(
+    Lineage=lineages,
+    fitness.log=rates.df$fitness %>% as.numeric(),
+    K.log=rates.df$carr_capac %>% as.integer(),
+    init_t.log=rates.df$init_time %>% as.integer()
+  ) %>%
+    dplyr::mutate(rate.log=NA,
+                  p_rate.log=ifelse(is.null(rates.df$parent_rate), NA, rates.df$parent_rate)) %>%
+    dplyr::inner_join(sigma, by="Lineage")
 
   try(expr = {
     pars = pars %>% dplyr::mutate(p_rate.log=as.numeric(p_rate.log))
@@ -132,9 +191,10 @@ get_growth_rates_log = function(rates.df, lineages, cluster, timepoints_to_int) 
 
       dplyr::mutate(rate.log=replace( rate.log, !is.na(p_rate.log), p_rate.log * (1+fitness.log) ),
                     rate.log=replace( rate.log, is.na(p_rate.log), fitness.log ),
-                    sigma.log=list( setNames(object=rates.df$sigma, nm=c(0, unlist(timepoints_to_int))) ),
                     Identity=cluster
       ) %>%
+
+      dplyr::left_join(posterior_df) %>%
 
       tibble::as_tibble()
   )
