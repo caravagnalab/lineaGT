@@ -23,6 +23,7 @@ fit_growth_rates = function(x,
                             warmup_steps=500,
                             highlight=c(),
                             timepoints_to_int=c(),
+                            timepoints=get_timepoints(x),
                             growth_model="exp.log",
                             force=T,
                             tree_score=1,
@@ -207,28 +208,37 @@ run_py_growth = function(rates.df,
   y = torch$tensor(y %>% as.matrix())
 
   p.rate.exp = p.rate.log = NULL
+  posterior_samples.exp = posterior_samples.log = NULL
 
   x.reg = py_pkg$explogreg$Regression(times, y)
   if (grepl("exp", growth_model)) {  # exp training
     if (!is.null(p.rates[["exp"]])) p.rate.exp = torch$tensor(p.rates[["exp"]])$float()
 
-    # losses.exp = x.reg$train(regr="exp", p_rate=p.rate.exp, steps=as.integer(steps), random_state=as.integer(random_state))
-    posterior_samples.exp = x.reg$train_mcmc(regr="exp", p_rate=p.rate.log, num_samples=as.integer(steps),
-                                             warmup_steps=as.integer(warmup_steps), num_chains=as.integer(1),
-                                             random_state=as.integer(random_state))
+    losses.exp = x.reg$train(regr="exp", p_rate=p.rate.exp, steps=as.integer(steps), random_state=as.integer(random_state))
+    # posterior_samples.exp = x.reg$train_mcmc(regr="exp",
+    #                                          p_rate=p.rate.exp,
+    #                                          num_samples=as.integer(steps),
+    #                                          warmup_steps=as.integer(warmup_steps), num_chains=as.integer(1),
+    #                                          random_state=as.integer(random_state))
     p.exp = x.reg$get_learned_params()
     ll.exp = x.reg$compute_log_likelihood() %>% setNames(nm=lineages)
+    print("exp")
+    print(ll.exp)
   }
 
   if (grepl("log", growth_model)) {   # log training
     if (!is.null(p.rates[["log"]])) p.rate.log = torch$tensor(p.rates[["log"]])$float()
 
-    # losses.log = x.reg$train(regr="log", p_rate=p.rate.log, steps=as.integer(steps), random_state=as.integer(random_state))
-    posterior_samples.log = x.reg$train_mcmc(regr="log", p_rate=p.rate.log, num_samples=as.integer(steps),
-                                             warmup_steps=as.integer(warmup_steps), num_chains=as.integer(1),
-                                             random_state=as.integer(random_state))
+    losses.log = x.reg$train(regr="log", p_rate=p.rate.log, steps=as.integer(steps), random_state=as.integer(random_state))
+    # posterior_samples.log = x.reg$train_mcmc(regr="log",
+    #                                          p_rate=p.rate.log,
+    #                                          num_samples=as.integer(steps),
+    #                                          warmup_steps=as.integer(warmup_steps), num_chains=as.integer(1),
+    #                                          random_state=as.integer(random_state))
     p.log = x.reg$get_learned_params()
     ll.log = x.reg$compute_log_likelihood() %>% setNames(nm=lineages)
+    print("log")
+    print(ll.log)
   }
 
   params = get_growth_params(timepoints_to_int,
@@ -249,14 +259,18 @@ run_py_growth = function(rates.df,
   if (purrr::is_empty(rates.df))
     return(
       params %>%
-        dplyr::mutate(best_model=best[Lineage])
+        dplyr::mutate(best_model=best[Lineage],
+                      ll.log=ll.log[Lineage],
+                      ll.exp=ll.exp[Lineage])
     )
 
   return(
     rates.df %>%
       dplyr::add_row(
         params %>%
-          dplyr::mutate(best_model=best[Lineage])
+          dplyr::mutate(best_model=best[Lineage],
+                        ll.log=ll.log[Lineage],
+                        ll.exp=ll.exp[Lineage])
       )
   )
 }

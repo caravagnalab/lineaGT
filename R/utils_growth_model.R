@@ -93,7 +93,7 @@ posterior_samples_to_df = function(numpy_array, lineages) {
 get_growth_rates_exp = function(rates.df, lineages, cluster, timepoints_to_int,
                                 posterior_samples) {
 
-  posterior_df = data.frame()
+  posterior_df = NULL
   if (!is.null(posterior_samples)) {
     posterior_df = posterior_samples$fitness %>% posterior_samples_to_df(lineages) %>%
       dplyr::rename(post_fitness=param_samples) %>%
@@ -128,18 +128,18 @@ get_growth_rates_exp = function(rates.df, lineages, cluster, timepoints_to_int,
     pars = pars %>% dplyr::mutate(p_rate.exp=as.numeric(p_rate.exp))
   })
 
+  pars_final = pars %>%
+    # compute the rates for subclones
+    dplyr::mutate(rate.exp=replace( rate.exp, !is.na(p_rate.exp), p_rate.exp * (1+fitness.exp) ),
+                  rate.exp=replace( rate.exp, is.na(p_rate.exp), fitness.exp ),
+                  # sigma.exp=list( setNames(object=rates.df$sigma, nm=c(0, unlist(timepoints_to_int))) ),
+                  Identity=cluster) %>% tibble::as_tibble()
+
+  if (is.null(posterior_df)) return( pars_final )
+
   return(
-    pars %>%
-
-      # compute the rates for subclones
-      dplyr::mutate(rate.exp=replace( rate.exp, !is.na(p_rate.exp), p_rate.exp * (1+fitness.exp) ),
-                    rate.exp=replace( rate.exp, is.na(p_rate.exp), fitness.exp ),
-                    # sigma.exp=list( setNames(object=rates.df$sigma, nm=c(0, unlist(timepoints_to_int))) ),
-                    Identity=cluster) %>%
-
-      dplyr::left_join(posterior_df) %>%
-
-      tibble::as_tibble()
+     pars_final %>%
+      dplyr::left_join(posterior_df)
   )
 }
 
@@ -147,7 +147,7 @@ get_growth_rates_exp = function(rates.df, lineages, cluster, timepoints_to_int,
 get_growth_rates_log = function(rates.df, lineages, cluster, timepoints_to_int,
                                 posterior_samples) {
 
-  posterior_df = data.frame()
+  posterior_df = NULL
   if (!is.null(posterior_samples)) {
     posterior_df = posterior_samples$fitness %>% posterior_samples_to_df(lineages) %>%
       dplyr::rename(post_fitness=param_samples) %>%
@@ -186,17 +186,17 @@ get_growth_rates_log = function(rates.df, lineages, cluster, timepoints_to_int,
     pars = pars %>% dplyr::mutate(p_rate.log=as.numeric(p_rate.log))
   })
 
+  pars_final = pars %>%
+    dplyr::mutate(rate.log=replace( rate.log, !is.na(p_rate.log), p_rate.log * (1+fitness.log) ),
+                  rate.log=replace( rate.log, is.na(p_rate.log), fitness.log ),
+                  Identity=cluster
+    ) %>% tibble::as_tibble()
+
+  if (is.null(posterior_df)) return( pars_final )
+
   return(
-    pars %>%
-
-      dplyr::mutate(rate.log=replace( rate.log, !is.na(p_rate.log), p_rate.log * (1+fitness.log) ),
-                    rate.log=replace( rate.log, is.na(p_rate.log), fitness.log ),
-                    Identity=cluster
-      ) %>%
-
-      dplyr::left_join(posterior_df) %>%
-
-      tibble::as_tibble()
+    pars_final %>%
+      dplyr::left_join(posterior_df)
   )
 }
 

@@ -94,6 +94,7 @@ get_regression_df = function(x, pop_df, highlight) {
   n_cls = length(highlight)
 
   compute_credint = function(post_samples, p_rate, x_values, type) {
+    if (is.na(post_samples)) return(NA)
     post_fitness = post_samples$post_fitness[[1]]
     post_rate = dplyr::case_when(
       is.null(p_rate) | is.na(p_rate) ~ post_fitness,
@@ -114,6 +115,8 @@ get_regression_df = function(x, pop_df, highlight) {
     return( post_carr_capacity / ( 1 + (post_carr_capacity - 1) * exp(args) ) )
   }
 
+  if (!"posterior_samples" %in% colnames(rates)) rates = rates %>% dplyr::mutate(posterior_samples=NA)
+
   regr_df = rates %>%
     dplyr::mutate(x=list(tmin:tmax)) %>%
     tidyr::unnest(x) %>%
@@ -129,8 +132,13 @@ get_regression_df = function(x, pop_df, highlight) {
       )
     ) %>%
     dplyr::mutate(y_credint=list(compute_credint(posterior_samples, p_rate, x, type))) %>%
-    dplyr::mutate(y.min=quantile(y_credint, 0.05),
-                  y.max=quantile(y_credint, 0.95)) %>%
+
+    dplyr::mutate(y.min=replace(NA, as.character(x) %in% names(sigma), y-sigma[as.character(x)]),
+                  y.max=replace(NA, as.character(x) %in% names(sigma), y+sigma[as.character(x)])) %>%
+
+    dplyr::mutate(y.min=replace(y.min, !is.na(y_credint), quantile(y_credint, 0.05, na.rm=TRUE)),
+                  y.max=replace(y.max, !is.na(y_credint), quantile(y_credint, 0.95, na.rm=TRUE)),
+                  y_credint=replace(y_credint, is.na(y_credint), y)) %>%
 
     dplyr::ungroup() %>%
 
@@ -138,50 +146,6 @@ get_regression_df = function(x, pop_df, highlight) {
     dplyr::mutate(type=ifelse(type=="log", "Logistic", "Exponential")) %>%
     dplyr::mutate(best_model=ifelse(best_model=="log", "Logistic", "Exponential")) %>%
     dplyr::mutate(Identity=factor(Identity, levels=highlight))
-
-
-
-  # regr_df = rates %>%
-  #   dplyr::mutate(x=list(tmin:tmax)) %>%
-  #   tidyr::unnest(x) %>%
-  #   dplyr::mutate(sigma=unlist(sigma)[as.character(x)],
-  #                 args=as.numeric(NA),
-  #                 y=as.numeric(NA),
-  #                 y.min=as.numeric(NA),
-  #                 y.max=as.numeric(NA)) %>%
-  #   dplyr::arrange(x, Identity) %>%
-  #
-  #   dplyr::rowwise() %>%
-  #
-  #   dplyr::mutate(args=replace(args, type=="log", -rate*(x-init_t)),
-  #                 args=replace(args, type=="exp", rate*(x-init_t)),
-  #
-  #                 y=replace(y, type=="log", K / ( 1 + (K-1)*exp(args) ) ),
-  #                 y=replace(y, type=="exp", exp(args)),
-  #
-  #                 y.min=replace(y.min, type=="log", max(0, K / ( 1 + (K-1)*exp(args) ) - sigma)),
-  #                 y.min=replace(y.min, type=="exp", exp(args - sigma)),
-  #
-  #                 y.max=replace(y.max, type=="log", K / ( 1 + (K-1)*exp(args) ) + sigma),
-  #                 y.max=replace(y.max, type=="exp", exp(args + sigma)) ) %>%
-  #
-  #   # dplyr::mutate(args=replace(args, type=="log", -rate*(x-init_t)),
-  #   #               args=replace(args, type=="exp", rate*(x-init_t)),
-  #   #
-  #   #               y=replace(y, type=="log", K / ( 1 + (K-1)*exp(args) ) ),
-  #   #               y=replace(y, type=="exp", exp(args)),
-  #   #
-  #   #               y.min=replace(y.min, type=="log", max(0, K / ( 1 + (K-1)*exp(args) ) - sigma)),
-  #   #               y.min=replace(y.min, type=="exp", exp(args - sigma)),
-  #   #
-  #   #               y.max=replace(y.max, type=="log", K / ( 1 + (K-1)*exp(args) ) + sigma),
-  #   #               y.max=replace(y.max, type=="exp", exp(args + sigma)) ) %>%
-  #   dplyr::ungroup() %>%
-  #
-  #   dplyr::select(Lineage, Identity, type, best_model, init_t, x, y, y.min, y.max) %>%
-  #   dplyr::mutate(type=ifelse(type=="log", "Logistic", "Exponential")) %>%
-  #   dplyr::mutate(best_model=ifelse(best_model=="log", "Logistic", "Exponential")) %>%
-  #   dplyr::mutate(Identity=factor(Identity, levels=highlight))
 
   return(regr_df)
 }
