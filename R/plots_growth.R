@@ -39,7 +39,7 @@ plot_growth_regression = function(x,
 
   pop_df = x %>%
     get_muller_pop(mutations=mutations, timepoints_to_int=timepoints_to_int) %>%
-    filter(Identity %in% highlight)
+    dplyr::filter(Identity %in% highlight)
 
   regr.df = get_regression_df(x, pop_df=pop_df, highlight=highlight)
 
@@ -47,17 +47,19 @@ plot_growth_regression = function(x,
   color_palette = c(color_palette, x$color_palette)
 
   pl = pop_df %>%
+
     ggplot() +
 
     # geom_point(aes(x=Generation, y=Population), alpha=.5, size=.7) +
     geom_point(aes(x=Generation, y=Frequency), alpha=.5, size=.7) +
 
-    geom_line(data=filter(regr.df, type==best_model), aes(x=x, y=y, color=type), size=.7, alpha=.9) +
+    geom_line(data=filter(regr.df, type==best_model), aes(x=x, y=y/1000, color=type), size=.7, alpha=.9) +
 
     geom_vline(data=filter(regr.df, type==best_model),
                aes(xintercept=init_t, color=type), linetype="dashed", linewidth=.3, alpha=.7) +
 
-    geom_errorbar(data=filter(regr.df, type==best_model), aes(x=x, y=y, ymin=y.min, ymax=y.max, color=type),
+    geom_errorbar(data=filter(regr.df, type==best_model), 
+                  aes(x=x, y=y/1000, ymin=y.min/1000, ymax=y.max/1000, color=type),
                   width=.5, position=position_dodge(width=0.5), alpha=.9, size=.6) +
     facet_grid(rows=vars(Identity), cols=vars(Lineage), scales="free_y") +
     scale_color_manual(values=color_palette, breaks=unique(filter(regr.df, type==best_model)$best_model)) +
@@ -69,10 +71,11 @@ plot_growth_regression = function(x,
   if (!show_best)
     return(
       pl +
-        geom_line(data=filter(regr.df, type!=best_model), aes(x=x, y=y, color="gainsboro"), size=.4, alpha=.7) +
+        geom_line(data=filter(regr.df, type!=best_model), aes(x=x, y=y/1000, color="gainsboro"), size=.4, alpha=.7) +
         geom_vline(data=filter(regr.df, type!=best_model),
                    aes(xintercept=init_t, color="gainsboro"), linetype="dashed", size=.1, alpha=.4) +
-        geom_errorbar(data=filter(regr.df, type!=best_model), aes(x=x, y=y, ymin=y.min, ymax=y.max, color="gainsboro"),
+        geom_errorbar(data=filter(regr.df, type!=best_model), 
+                      aes(x=x, y=y/1000, ymin=y.min/1000, ymax=y.max/1000, color="gainsboro"),
                       width=.5, position=position_dodge(width=0.5), alpha=.7, size=.4) +
         scale_color_manual(values=color_palette, breaks=unique(regr.df$best_model))
     )
