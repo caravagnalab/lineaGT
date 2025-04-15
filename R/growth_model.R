@@ -222,8 +222,6 @@ run_py_growth = function(rates.df,
     #                                          random_state=as.integer(random_state))
     p.exp = x.reg$get_learned_params()
     ll.exp = x.reg$compute_log_likelihood() %>% setNames(nm=lineages)
-    print("exp")
-    print(ll.exp)
   }
 
   if (grepl("log", growth_model)) {   # log training
@@ -237,8 +235,6 @@ run_py_growth = function(rates.df,
     #                                          random_state=as.integer(random_state))
     p.log = x.reg$get_learned_params()
     ll.log = x.reg$compute_log_likelihood() %>% setNames(nm=lineages)
-    print("log")
-    print(ll.log)
   }
 
   params = get_growth_params(timepoints_to_int,

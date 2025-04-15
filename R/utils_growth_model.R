@@ -114,14 +114,17 @@ get_growth_rates_exp = function(rates.df, lineages, cluster, timepoints_to_int,
     dplyr::group_by(Lineage) %>%
     dplyr::summarise(sigma.exp=list(value %>% setNames(name)))
 
+  p_rates.exp = data.frame(Lineage=lineages, p_rate.exp=NA)
+  if (!is.null(rates.df$parent_rate))
+    p_rates.exp = data.frame(Lineage=lineages, p_rate.exp=rates.df$parent_rate)
+
   pars = data.frame(
     Lineage=lineages,
-    # p_rate.exp=rates.df$parent_rate,
     fitness.exp=rates.df$fitness %>% as.numeric(),
     init_t.exp=rates.df$init_time %>% as.integer()
   ) %>%
-    dplyr::mutate(rate.exp=NA,
-                  p_rate.exp=ifelse(is.null(rates.df$parent_rate), NA, rates.df$parent_rate)) %>%
+    dplyr::mutate(rate.exp=NA) %>%
+    dplyr::inner_join(p_rates.exp, by="Lineage") %>%
     dplyr::inner_join(sigma, by="Lineage")
 
   try(expr = {
@@ -172,14 +175,18 @@ get_growth_rates_log = function(rates.df, lineages, cluster, timepoints_to_int,
     dplyr::group_by(Lineage) %>%
     dplyr::summarise(sigma.log=list(value %>% setNames(name)))
 
+  p_rates.log = data.frame(Lineage=lineages, p_rate.log=NA)
+  if (!is.null(rates.df$parent_rate))
+    p_rates.log = data.frame(Lineage=lineages, p_rate.log=rates.df$parent_rate)
+
   pars = data.frame(
     Lineage=lineages,
     fitness.log=rates.df$fitness %>% as.numeric(),
     K.log=rates.df$carr_capac %>% as.integer(),
     init_t.log=rates.df$init_time %>% as.integer()
   ) %>%
-    dplyr::mutate(rate.log=NA,
-                  p_rate.log=ifelse(is.null(rates.df$parent_rate), NA, rates.df$parent_rate)) %>%
+    dplyr::mutate(rate.log=NA) %>%
+    dplyr::inner_join(p_rates.log, by="Lineage") %>%
     dplyr::inner_join(sigma, by="Lineage")
 
   try(expr = {
