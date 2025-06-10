@@ -60,7 +60,9 @@ util_plot_diff = function(mrca.df,
                      by=c("from","to")) %>%
     dplyr::mutate(n_clones=replace(n_clones, is.na(n_clones), 0),
                   Identity=to,
-                  cluster=replace(cluster, is.na(cluster), ""))
+                  cluster=replace(cluster, is.na(cluster), "")) %>%
+
+    mutate(cluster=stringr::str_wrap(cluster, width=30))
 
   gg = igraph::graph_from_data_frame(mrca.df)
   igraph::E(gg)$name = mrca.df$to
@@ -84,7 +86,7 @@ util_plot_diff = function(mrca.df,
     ggrepel::geom_label_repel(aes(label=cluster, x=x, y=y),
                               na.rm=TRUE,
                               nudge_x=.2,
-                              nudge_y=.2,
+                              nudge_y=.3,
                               size=2.5*cex) +
 
     ggraph::scale_edge_color_manual(values=col_palette, guide="none") +
