@@ -3,6 +3,7 @@ generate_synthetic_df = function(N_values,
                                  K_values,
                                  path,
                                  n_datasets=30,
+                                 likelihood="MVN",
                                  var_loc=110,
                                  var_scale=195,
                                  mean_loc=500,
@@ -38,19 +39,7 @@ generate_synthetic_df = function(N_values,
       for (tt in T_values) {
         for (kk in K_values) {
 
-          # if (tt == 1 && kk > 6) {
-          #   mean_scale = max(10100, mean_scale_inp)
-          #   # alpha = max(0.45, alpha_inp)
-          # } else if ((tt == 2 && kk > 6) || (tt == 1 && kk == 6)) {
-          #   mean_scale = max(8000, mean_scale_inp)
-          #   # alpha = max(0.35, alpha_inp)
-          # } else {
-          #   mean_scale = mean_scale_inp
-          #   # alpha = alpha_inp
-          # }
-
           cat(paste0("K=", kk, ", T=", tt, "\nmean_scale=", mean_scale, ", alpha=", alpha, "\n"))
-
 
           tmp_name = paste0("N", nn, ".T", tt, ".K", kk)
           subpath = paste0(path, "N", nn, "/", tmp_name, "/")
@@ -81,7 +70,8 @@ generate_synthetic_df = function(N_values,
                                   var_scale=as.integer(var_scale),
                                   mean_loc=as.integer(mean_loc),
                                   mean_scale=as.integer(mean_scale),
-                                  alpha=as.numeric(alpha))
+                                  alpha=as.numeric(alpha),
+                                  likelihood=likelihood)
 
             sim$generate_dataset()
             filename = sim$sim_id
