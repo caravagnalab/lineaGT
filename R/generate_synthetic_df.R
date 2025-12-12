@@ -4,12 +4,14 @@ generate_synthetic_df = function(N_values,
                                  path,
                                  n_datasets=30,
                                  likelihood="MVN",
+                                 mean_loc=500,
                                  var_loc=110,
                                  var_scale=195,
-                                 mean_loc=500,
-                                 mean_scale=5000,
+                                 g_alpha=2,
+                                 g_beta=0.05,
                                  steps=1000,
                                  alpha=0.2,
+                                 c=3.,
                                  lr=0.005,
                                  filename="",
                                  check_present=T,
@@ -25,7 +27,6 @@ generate_synthetic_df = function(N_values,
   torch = reticulate::import("torch")
   if (is.null(py_pkg)) py_pkg = reticulate::import("pylineaGT")
 
-  mean_scale_inp = mean_scale
   alpha_inp = alpha
 
   seeds = sample(0:min(50,n_datasets), size=n_datasets, replace=FALSE)
@@ -39,7 +40,13 @@ generate_synthetic_df = function(N_values,
       for (tt in T_values) {
         for (kk in K_values) {
 
-          cat(paste0("K=", kk, ", T=", tt, "\nmean_scale=", mean_scale, ", alpha=", alpha, "\n"))
+          if (likelihood == "MVN") cli::cli_text("N={nn}, K={kk}, T={tt}, seed={n_df}
+                                                 alpha={alpha}, mean_loc={mean_loc},
+                                                 var_loc={var_loc}, var_scale={var_scale}")
+
+          else if (likelihood == "NB") cli::cli_text("N={nn}, K={kk}, T={tt}, seed={n_df}
+                                                     c={c}, mean_loc={mean_loc},
+                                                     g_alpha={g_alpha}, g_beta={g_beta}")
 
           tmp_name = paste0("N", nn, ".T", tt, ".K", kk)
           subpath = paste0(path, "N", nn, "/", tmp_name, "/")
@@ -66,11 +73,13 @@ generate_synthetic_df = function(N_values,
                                   K=as.integer(kk),
                                   seed=as.integer(seeds[n_df]),
                                   label=as.character(n_df),
+                                  mean_loc=as.integer(mean_loc),
                                   var_loc=as.integer(var_loc),
                                   var_scale=as.integer(var_scale),
-                                  mean_loc=as.integer(mean_loc),
-                                  mean_scale=as.integer(mean_scale),
+                                  g_alpha=as.numeric(g_alpha),
+                                  g_beta=as.numeric(g_beta),
                                   alpha=as.numeric(alpha),
+                                  c=as.numeric(c),
                                   likelihood=likelihood)
 
             sim$generate_dataset()
@@ -118,8 +127,6 @@ generate_synthetic_df = function(N_values,
 
           saveRDS(x_fit, paste0(subpath, filename, ".fit.Rds"))
 
-          # rm(mean_scale)
-          # rm(alpha)
         }
       }
     }
