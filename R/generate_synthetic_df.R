@@ -14,9 +14,11 @@ generate_synthetic_df = function(N_values,
                                  c=3.,
                                  lr=0.005,
                                  filename="",
-                                 check_present=T,
+                                 check_present=TRUE,
                                  default_lm=FALSE,
-                                 run=T, py_pkg=NULL) {
+                                 run=TRUE,
+                                 run_NB=FALSE,
+                                 py_pkg=NULL) {
 
   if (!endsWith(path, "/"))
     path = paste0(path, "/")
@@ -91,41 +93,70 @@ generate_synthetic_df = function(N_values,
             saveRDS(x, paste0(subpath, filename, ".data.Rds"))
           }
 
-          if (!run) next
+          if (!run & !run_NB) next
 
           cov.df = x$dataset %>%
             filter_dataset(min_cov=5, min_frac=0)
-
           k_interval = get_sim_k_interval(x, cov.df)
 
-          start_time = Sys.time()
+          if (run) {
+            start_time = Sys.time()
 
-          x_fit = fit(cov.df=cov.df,
-                      k_interval=k_interval,
-                      infer_growth=F,
-                      infer_phylogenies=F,
-                      covariance="full",
-                      check_conv=TRUE,
-                      default_lm=default_lm,
+            x_fit = fit(cov.df=cov.df,
+                        k_interval=k_interval,
+                        infer_growth=F,
+                        infer_phylogenies=F,
+                        covariance="full",
+                        check_conv=TRUE,
+                        default_lm=default_lm,
 
-                      steps=steps,
-                      lr=lr,
+                        steps=steps,
+                        lr=lr,
 
-                      seed_optim=TRUE,
-                      # init_seed=5,
-                      sample_id=x$sim_id)
+                        seed_optim=TRUE,
+                        # init_seed=5,
+                        sample_id=x$sim_id)
 
-          end_time = Sys.time()
+            end_time = Sys.time()
 
-          x_fit$cov.dataframe = tibble::as_tibble(x$dataset) %>%
-            dplyr::mutate(coverage=as.integer(coverage)) %>%
-            dplyr::inner_join(x_fit$cov.dataframe, by=c("IS","timepoints","lineage","coverage"))
+            x_fit$cov.dataframe = tibble::as_tibble(x$dataset) %>%
+              dplyr::mutate(coverage=as.integer(coverage)) %>%
+              dplyr::inner_join(x_fit$cov.dataframe, by=c("IS","timepoints","lineage","coverage"))
 
-          x_fit$time = end_time - start_time
+            x_fit$time = end_time - start_time
 
-          print(aricode::ARI(x_fit$cov.dataframe$labels, x_fit$cov.dataframe$labels_true))
+            print(aricode::NMI(x_fit$cov.dataframe$labels, x_fit$cov.dataframe$labels_true))
 
-          saveRDS(x_fit, paste0(subpath, filename, ".fit.Rds"))
+            saveRDS(x_fit, paste0(subpath, filename, ".fit.Rds"))
+          }
+
+          if (run_NB) {
+            start_time = Sys.time()
+
+            cov.df_wide = cov.df %>% tidyr::unite("covariate", c("lineage","timepoints"), sep="_") %>%
+              tidyr::pivot_wider(id_cols=c("labels_true", "IS"),
+                                 names_from="covariate", values_from="coverage")
+
+            # input_df = cov.df_wide %>% select(-labels_true, -IS)
+            # Ks = replicate(10, {
+            #   NB.MClust::NB.MClust(Count=input_df, K=k_interval, iteration=500)$K
+            # })
+            #
+            # best_k = which.max(table(Ks)) %>% names() %>% as.integer()
+            # x_fit.NB = NB.MClust::NB.MClust(Count=input_df, K=best_k, iteration=10000)
+            #
+            # cov.df_wide$labels = x_fit.NB$cluster
+            # x_fit.NB$cov.dataframe = cov.df_wide %>%
+            #   tidyr::pivot_longer(cols=-c("labels", "labels_true", "IS"), values_to="coverage") %>%
+            #   tidyr::separate(name, into=c("lineage", "timepoints"))
+            #
+            # end_time = Sys.time()
+            #
+            # x_fit.NB$time = end_time - start_time
+            #
+            # print(aricode::NMI(x_fit.NB$cov.dataframe$labels, x_fit.NB$cov.dataframe$labels_true))
+            # saveRDS(x_fit, paste0(subpath, filename, ".fit_NB.Rds"))
+          }
 
         }
       }
