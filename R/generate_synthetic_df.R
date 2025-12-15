@@ -89,7 +89,7 @@ generate_synthetic_df = function(N_values,
 
             x = get_simulation_object(sim)
 
-            cat(paste0(subpath, filename, ".data.Rds\n"))
+            cli::cli_text(paste0(subpath, filename, ".data.Rds\n"))
             saveRDS(x, paste0(subpath, filename, ".data.Rds"))
           }
 
@@ -125,39 +125,37 @@ generate_synthetic_df = function(N_values,
 
             x_fit$time = end_time - start_time
 
-            print(aricode::NMI(x_fit$cov.dataframe$labels, x_fit$cov.dataframe$labels_true))
+            cli::cli_text("NMI={aricode::NMI(x_fit$cov.dataframe$labels, x_fit$cov.dataframe$labels_true)}")
 
             saveRDS(x_fit, paste0(subpath, filename, ".fit.Rds"))
           }
 
           if (run_NB) {
-            start_time = Sys.time()
 
             cov.df_wide = cov.df %>% tidyr::unite("covariate", c("lineage","timepoints"), sep="_") %>%
               tidyr::pivot_wider(id_cols=c("labels_true", "IS"),
                                  names_from="covariate", values_from="coverage")
 
-            # input_df = cov.df_wide %>% select(-labels_true, -IS)
-            # Ks = replicate(10, {
-            #   NB.MClust::NB.MClust(Count=input_df, K=k_interval, iteration=500)$K
-            # })
-            #
-            # best_k = which.max(table(Ks)) %>% names() %>% as.integer()
-            # x_fit.NB = NB.MClust::NB.MClust(Count=input_df, K=best_k, iteration=10000)
-            #
-            # cov.df_wide$labels = x_fit.NB$cluster
-            # x_fit.NB$cov.dataframe = cov.df_wide %>%
-            #   tidyr::pivot_longer(cols=-c("labels", "labels_true", "IS"), values_to="coverage") %>%
-            #   tidyr::separate(name, into=c("lineage", "timepoints"))
-            #
-            # end_time = Sys.time()
-            #
-            # x_fit.NB$time = end_time - start_time
-            #
-            # print(aricode::NMI(x_fit.NB$cov.dataframe$labels, x_fit.NB$cov.dataframe$labels_true))
-            # saveRDS(x_fit, paste0(subpath, filename, ".fit_NB.Rds"))
-          }
+            X = torch$tensor(cov.df_wide %>% select(-labels_true, -IS) %>% as.matrix(), dtype=torch$float32)
 
+            start_time = Sys.time()
+            x_fit.NB = run_NB_inference(X, k_interval=reticulate::r_to_py(as.integer(k_interval)),
+                                        seed=as.integer(n_df), return_object=as.logical(TRUE))
+            end_time = Sys.time()
+
+            x_fit.NB$time = end_time - start_time
+
+            cov.df_wide$labels = x_fit.NB[[4]]$numpy()
+            x_fit.NB$cov.dataframe = cov.df_wide %>%
+              tidyr::pivot_longer(cols=-c("labels", "labels_true", "IS"), values_to="coverage") %>%
+              tidyr::separate(name, into=c("lineage", "timepoints")) %>%
+              dplyr::mutate(labels=as.character(labels))
+
+            cli::cli_text("NMI={aricode::NMI(x_fit.NB$cov.dataframe$labels, x_fit.NB$cov.dataframe$labels_true)}")
+
+            saveRDS(x_fit.NB, paste0(subpath, filename, ".fit_NB.Rds"))
+
+          }
         }
       }
     }
