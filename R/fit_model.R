@@ -86,6 +86,7 @@ fit = function(cov.df,
                seed_optim=TRUE,
                seed=6,
                seed_init=reticulate::py_none(),
+               py_pkg=NULL,
                sample_id="") {
 
   cli::cli_process_start("\nStarting lineaGT model selection to retrieve the optimal number of clones\n")
@@ -95,7 +96,7 @@ fit = function(cov.df,
     return()
   }
 
-  py_pkg = reticulate::import("pylineaGT")
+  if (is.null(py_pkg)) py_pkg = reticulate::import("pylineaGT")
 
   cov.df = cov.df %>% check_cov_dimensions()
 
