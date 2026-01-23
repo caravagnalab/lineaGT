@@ -70,8 +70,6 @@ plot_mullerplot = function(x,
     dplyr::rename(Population=Pop.plot) %>%
     dplyr::arrange(Identity, Generation, Lineage)
 
-
-
   if (estimate_npops)
     pop_df = pop_df %>%
       dplyr::rename(Population.orig=Population) %>%
@@ -191,7 +189,7 @@ mullerplot_util = function(x, mullerdf, which, color_palette, highlight, legend.
     dplyr::rowwise() %>%
     dplyr::mutate(Identity=dplyr::case_when(
       grepl(".S", Identity) ~ strsplit(Identity, split="[.]")[[1]][1],
-      .default=Identity
+      .default=strsplit(Identity, split=" - ")[[1]][1]
     )) %>%
     dplyr::mutate(Identity=factor(Identity, levels=id_levels)) %>%
     dplyr::group_by(Generation, Identity, Lineage) %>%
