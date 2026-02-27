@@ -25,6 +25,7 @@ fit_growth_rates = function(x,
                             timepoints_to_int=c(),
                             timepoints=get_timepoints(x),
                             growth_model="exp.log",
+                            which="pop",
                             force=T,
                             tree_score=1,
                             py_pkg=NULL,
@@ -77,6 +78,7 @@ fit_growth_rates = function(x,
                                 growth_model=growth_model,
                                 steps=steps,
                                 warmup_steps=warmup_steps,
+                                which=which,
                                 timepoints_to_int=timepoints_to_int,
                                 py_pkg=py_pkg)
 
@@ -85,7 +87,7 @@ fit_growth_rates = function(x,
     cli::cli_process_done()
   }
 
-  x = add_growth_rates(x, rates.df)
+  x = add_growth_rates(x, rates.df %>% dplyr::mutate(which=which))
   x = add_tp_int(x, timepoints_to_int)
 
   return(x)
@@ -99,6 +101,7 @@ fit_growth_utils = function(rates.df,
                             growth_model,
                             steps,
                             warmup_steps,
+                            which,
                             timepoints_to_int,
                             py_pkg) {
 
@@ -111,6 +114,7 @@ fit_growth_utils = function(rates.df,
                       steps=steps,
                       warmup_steps=warmup_steps,
                       clonal=TRUE,
+                      which=which,
                       timepoints_to_int=timepoints_to_int,
                       py_pkg=py_pkg)
 
@@ -126,6 +130,7 @@ fit_growth_utils = function(rates.df,
                       steps=steps,
                       warmup_steps=warmup_steps,
                       clonal=FALSE,
+                      which=which,
                       timepoints_to_int=timepoints_to_int,
                       py_pkg=py_pkg)
 
@@ -141,6 +146,7 @@ fit_growth_clones = function(rates.df,
                              steps,
                              warmup_steps,
                              clonal,
+                             which,
                              timepoints_to_int,
                              py_pkg=NULL) {
 
@@ -157,6 +163,7 @@ fit_growth_clones = function(rates.df,
                                  timepoints_to_int=timepoints_to_int,
                                  # p.rates=get_parent_rate(par, rates.df, subcl),
                                  clonal=clonal,
+                                 which=which,
                                  growth_model=growth_model,
                                  steps=steps,
                                  warmup_steps=warmup_steps,
@@ -174,6 +181,7 @@ run_py_growth = function(rates.df,
                          warmup_steps=500,
                          # p.rates=list("exp"=NULL, "log"=NULL),
                          clonal=FALSE,
+                         which="pop",
                          growth_model="exp.log",
                          random_state=25,
                          py_pkg=NULL) {
@@ -184,21 +192,25 @@ run_py_growth = function(rates.df,
   torch = reticulate::import("torch")
   if (is.null(py_pkg)) py_pkg = reticulate::import("pylineaGT")
 
-  input.clone = pop_df.cl %>%
-    dplyr::filter(Identity == cluster) %>%
+  if (which == "pop") {
+    input.clone = pop_df.cl %>%
+      dplyr::filter(Identity == cluster) %>%
+      # Run with population size
+      dplyr::select(-Frequency) %>%
+      dplyr::mutate(Population=ifelse((Generation == 0 & clonal), 1, Population)) %>%
+      tidyr::pivot_wider(id_cols="Generation", names_from="Lineage", values_from="Population") %>%
+      dplyr::arrange(Generation)
 
-    ## Run with population size
-    # dplyr::select(-Frequency) %>%
-    # dplyr::mutate(Population=ifelse((Generation == 0 & clonal), 1, Population)) %>%
-    # tidyr::pivot_wider(id_cols="Generation", names_from="Lineage", values_from="Population") %>%
-
-    ## Run with re-scaled population size
-    dplyr::mutate(Frequency=Frequency * 1000) %>%
-    dplyr::select(-Population) %>%
-    dplyr::mutate(Frequency=ifelse((Generation == 0 & clonal), 1, Frequency)) %>%
-    tidyr::pivot_wider(id_cols="Generation", names_from="Lineage", values_from="Frequency") %>%
-
-    dplyr::arrange(Generation)
+  } else if (which == "frac") {
+    input.clone = pop_df.cl %>%
+      dplyr::filter(Identity == cluster) %>%
+      # Run with re-scaled population size
+      dplyr::mutate(Frequency=Frequency * 1000) %>%
+      dplyr::select(-Population) %>%
+      dplyr::mutate(Frequency=ifelse((Generation == 0 & clonal), 1, Frequency)) %>%
+      tidyr::pivot_wider(id_cols="Generation", names_from="Lineage", values_from="Frequency") %>%
+      dplyr::arrange(Generation)
+  }
 
   times = input.clone$Generation
   y = input.clone[2:ncol(input.clone)]

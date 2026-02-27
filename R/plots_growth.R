@@ -46,20 +46,25 @@ plot_growth_regression = function(x,
   color_palette = c("firebrick","steelblue"); names(color_palette) = c("Exponential","Logistic")
   color_palette = c(color_palette, x$color_palette)
 
-  pl = pop_df %>%
+  if (unique(regr.df$which) == "pop") {
+    pl = pop_df %>%
+      ggplot() +
+      geom_point(aes(x=Generation, y=Population), alpha=.5, size=.7)
+  } else if (unqiue(regr.df$which) == "frac") {
+    pl = pop_df %>%
+      ggplot() +
+      geom_point(aes(x=Generation, y=Frequency), alpha=.5, size=.7)
+  }
 
-    ggplot() +
+  pl = pl +
 
-    # geom_point(aes(x=Generation, y=Population), alpha=.5, size=.7) +
-    geom_point(aes(x=Generation, y=Frequency), alpha=.5, size=.7) +
-
-    geom_line(data=filter(regr.df, type==best_model), aes(x=x, y=y/1000, color=type), size=.7, alpha=.9) +
+    geom_line(data=filter(regr.df, type==best_model), aes(x=x, y=y, color=type), size=.7, alpha=.9) +
 
     geom_vline(data=filter(regr.df, type==best_model),
                aes(xintercept=init_t, color=type), linetype="dashed", linewidth=.3, alpha=.7) +
 
-    geom_errorbar(data=filter(regr.df, type==best_model), 
-                  aes(x=x, y=y/1000, ymin=y.min/1000, ymax=y.max/1000, color=type),
+    geom_errorbar(data=filter(regr.df, type==best_model),
+                  aes(x=x, y=y, ymin=y.min, ymax=y.max, color=type),
                   width=.5, position=position_dodge(width=0.5), alpha=.9, size=.6) +
     facet_grid(rows=vars(Identity), cols=vars(Lineage), scales="free_y") +
     scale_color_manual(values=color_palette, breaks=unique(filter(regr.df, type==best_model)$best_model)) +
@@ -74,8 +79,8 @@ plot_growth_regression = function(x,
         geom_line(data=filter(regr.df, type!=best_model), aes(x=x, y=y/1000, color="gainsboro"), size=.4, alpha=.7) +
         geom_vline(data=filter(regr.df, type!=best_model),
                    aes(xintercept=init_t, color="gainsboro"), linetype="dashed", size=.1, alpha=.4) +
-        geom_errorbar(data=filter(regr.df, type!=best_model), 
-                      aes(x=x, y=y/1000, ymin=y.min/1000, ymax=y.max/1000, color="gainsboro"),
+        geom_errorbar(data=filter(regr.df, type!=best_model),
+                      aes(x=x, y=y, ymin=y.min, ymax=y.max, color="gainsboro"),
                       width=.5, position=position_dodge(width=0.5), alpha=.7, size=.4) +
         scale_color_manual(values=color_palette, breaks=unique(regr.df$best_model))
     )
@@ -148,7 +153,16 @@ get_regression_df = function(x, pop_df, highlight) {
     dplyr::select(Lineage, Identity, type, best_model, init_t, x, y, y.min, y.max) %>%
     dplyr::mutate(type=ifelse(type=="log", "Logistic", "Exponential")) %>%
     dplyr::mutate(best_model=ifelse(best_model=="log", "Logistic", "Exponential")) %>%
-    dplyr::mutate(Identity=factor(Identity, levels=highlight))
+    dplyr::mutate(Identity=factor(Identity, levels=highlight)) %>%
+
+    dplyr::mutate(which=unique(rates$which))
+
+  if (unique(rates$which) == "frac") {
+    regr_df = regr_df %>%
+      dplyr::mutate(y=y/1000,
+                    y.min=y.min/1000,
+                    y.max=y.max/1000)
+  }
 
   return(regr_df)
 }
