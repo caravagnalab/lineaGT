@@ -4,7 +4,7 @@
 \alias{plot_mixture_weights}
 \title{Barplot of the per-cluster mixture weights and number of ISs.}
 \usage{
-plot_mixture_weights(x)
+plot_mixture_weights(x, vcn = NULL)
 }
 \arguments{
 \item{x}{a mvnmm object.}

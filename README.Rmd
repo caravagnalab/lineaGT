@@ -50,6 +50,8 @@ You can install the released version of `lineaGT` from [GitHub](https://github.c
 devtools::install_github("caravagnalab/lineaGT")
 ```
 
+If you want to fit your data with `lineaGT`, you also need to install the required Python dependencies. Please follow the instructions in the [Get Started](https://caravagnalab.github.io/lineaGT/articles/lineaGT.html) article.
+
 ------------------------------------------------------------------------
 
 #### Copyright and contacts

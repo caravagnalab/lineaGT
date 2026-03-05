@@ -8,10 +8,11 @@ plot_differentiation_tree(
   x,
   edges = differentiation_tree(),
   highlight = c(),
-  single_tree = T,
+  by_timepoint = F,
   clonal = T,
   wrap = T,
-  timepoints = c()
+  timepoints = c(),
+  min_abundance = 0
 )
 }
 \arguments{
@@ -21,9 +22,9 @@ plot_differentiation_tree(
 
 \item{highlight}{add}
 
-\item{single_tree}{add}
-
 \item{wrap}{add}
+
+\item{single_tree}{add}
 }
 \value{
 A \code{ggplot} object showing the identified subclones in the hematopoietic tree.

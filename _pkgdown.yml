@@ -6,13 +6,6 @@ template:
 url: caravagnalab.github.io/lineaGT
 
 reference:
-- title: Data
-  desc: Example of the input datasets and of the fitted object.
-  contents:
-  - cov.df.example
-  - vaf.df.example
-  - x.example
-
 - title: Fit function
   desc: Main function to perform the fit of the model.
   contents:
@@ -69,11 +62,9 @@ reference:
   - print.mvnmm
   - plot.mvnmm
 
-- title: Helper functions
-  desc: Function to configure and install the required dependencies.
+- title: Data
+  desc: Example of the input datasets and of the fitted object.
   contents:
-  - configure_environment
-  - have_loaded_env
-  - have_python_deps
-  - which_conda_env
-  - load_conda_env
+  - cov.df.example
+  - vaf.df.example
+  - x.example

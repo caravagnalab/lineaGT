@@ -9,9 +9,20 @@ knitr::opts_chunk$set(
 )
 ```
 
+`lineaGT` Bayesian models are implemented in Python using the Pyro probabilistic programming language and thus require a working Python programme and `pylineaGT` package. We recommend reading the [Get Started](https://caravagnalab.github.io/lineaGT/articles/lineaGT.html) article to correctly install the Python package.
+
+```{r}
+reticulate::conda_create(envname="lineaGT", python_version="3.8")
+reticulate::use_condaenv("lineaGT")
+reticulate::conda_install(envname="lineaGT", packages="pylineaGT", pip=TRUE)
+```
+
+Remember to load the new environment in order to have the `pylineaGT` module accessible.
+
 ```{r setup}
 library(lineaGT)
 library(magrittr)
+reticulate::use_condaenv("lineaGT")
 ```
 
 The coverage dataset can be filtered calling the `filter_dataset()` function.
@@ -35,7 +46,6 @@ x = fit(
   cov.df = cov.example.filt,
   vaf.df = vaf.df.example,
   steps = 500,
-  # n_runs = 1,
   k_interval = c(5, 15),
   timepoints_to_int = unlist(list("t1"=60, "t2"=150))
   )

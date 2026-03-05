@@ -4,7 +4,7 @@
 \alias{estimate_n_pops}
 \title{Function implemented to estimate the real number of clones in each cluster.}
 \usage{
-estimate_n_pops(x, highlight = c())
+estimate_n_pops(x, highlight = c(), vcn = NULL)
 }
 \arguments{
 \item{x}{mvnmm object}

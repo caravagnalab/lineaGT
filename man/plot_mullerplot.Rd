@@ -9,7 +9,9 @@ plot_mullerplot(
   which = "frac",
   highlight = c(),
   min_frac = 0,
+  min_abundance = 0,
   estimate_npops = FALSE,
+  vcn = NULL,
   rm_mixt = FALSE,
   timepoints_to_int = c(),
   mutations = F,
@@ -28,6 +30,8 @@ computed assuming a exponential growth.}
 \item{highlight}{a vector of clusters IDs to highlight in the plot.}
 
 \item{min_frac}{min_frac numeric value in \code{[0,1]} representing the minimum abundance to highlight a clone.}
+
+\item{rm_mixt}{remove clusters estimated as polyclonal}
 
 \item{timepoints_to_int}{a list to map each \code{timepoint} value to an integer.}
 

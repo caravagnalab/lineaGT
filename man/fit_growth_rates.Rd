@@ -7,9 +7,12 @@
 fit_growth_rates(
   x,
   steps = 500,
+  warmup_steps = 500,
   highlight = c(),
   timepoints_to_int = c(),
+  timepoints = get_timepoints(x),
   growth_model = "exp.log",
+  which = "pop",
   force = T,
   tree_score = 1,
   py_pkg = NULL,

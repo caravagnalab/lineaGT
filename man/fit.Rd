@@ -29,6 +29,7 @@ fit(
   seed_optim = TRUE,
   seed = 6,
   seed_init = reticulate::py_none(),
+  py_pkg = NULL,
   sample_id = ""
 )
 }
