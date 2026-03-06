@@ -125,11 +125,11 @@ pop_df_add_empty = function(mullerdf) {
     dplyr::ungroup()
 
   mullerdf$Group_id = factor(mullerdf$Group_id,
-                             levels=rev(unlist(
-                               as.data.frame(mullerdf %>%
-                                               dplyr::filter_(~Generation == max(Generation)) %>%
-                                               dplyr::select_(~Group_id)),
-                               use.names=FALSE) %>% unique()))
+                             levels=rev(unique(
+                               mullerdf %>%
+                                 dplyr::filter(Generation == max(Generation)) %>%
+                                 dplyr::pull(Group_id)
+                             )))
   return(mullerdf)
 }
 
