@@ -1,7 +1,8 @@
-plots
 .Rproj.user
 .Rhistory
 inst/doc
+docs
+pkgdown
 **._*
 **.RData
 **.DS_Store
