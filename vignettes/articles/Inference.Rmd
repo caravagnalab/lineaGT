@@ -11,10 +11,11 @@ knitr::opts_chunk$set(
 
 `lineaGT` Bayesian models are implemented in Python using the Pyro probabilistic programming language and thus require a working Python programme and `pylineaGT` package. We recommend reading the [Get Started](https://caravagnalab.github.io/lineaGT/articles/lineaGT.html) article to correctly install the Python package.
 
-```{r}
+```{r, collapse=TRUE}
 reticulate::conda_create(envname="lineaGT", python_version="3.8")
 reticulate::use_condaenv("lineaGT")
 reticulate::conda_install(envname="lineaGT", packages="pylineaGT", pip=TRUE)
+py_pkg = reticulate::import("pylineaGT")
 ```
 
 Remember to load the new environment in order to have the `pylineaGT` module accessible.
@@ -41,12 +42,13 @@ cov.example.filt
 
 # Fitting the model
 
-```{r warning=FALSE}
+```{r warning=FALSE, collapse=TRUE}
 x = fit(
   cov.df = cov.example.filt,
   vaf.df = vaf.df.example,
   steps = 500,
   k_interval = c(5, 15),
+  infer_growth = TRUE,
   timepoints_to_int = unlist(list("t1"=60, "t2"=150))
   )
 ```
@@ -62,6 +64,5 @@ Printing the fitted object information regarding the data:
 -   for each clone, the number of assigned ISs and the mean coverage, per timepoint and lineage.
 
 ```{r}
-data(x.example)
-x.example
+x
 ```
