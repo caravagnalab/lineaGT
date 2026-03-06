@@ -6,12 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Lineage inference • lineaGT</title>
-<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
-<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
-<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
-<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
-<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
@@ -43,7 +42,6 @@
 <li><a class="dropdown-item" href="../articles/Inference.html">Lineage inference</a></li>
     <li><a class="dropdown-item" href="../articles/Input-formats.html">Input formats</a></li>
     <li><a class="dropdown-item" href="../articles/Plotting-functions.html">Plotting functions</a></li>
-    <li><a class="dropdown-item" href="../articles/Utilities.html">Utilities</a></li>
   </ul>
 </li>
       </ul>
@@ -73,7 +71,22 @@
 
     
     
+<p><code>lineaGT</code> Bayesian models are implemented in Python using
+the Pyro probabilistic programming language and thus require a working
+Python programme and <code>pylineaGT</code> package. We recommend
+reading the <a href="https://caravagnalab.github.io/lineaGT/articles/lineaGT.html">Get
+Started</a> article to correctly install the Python package.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/conda-tools.html" class="external-link">conda_create</a></span><span class="op">(</span>envname<span class="op">=</span><span class="st">"lineaGT"</span>, python_version<span class="op">=</span><span class="st">"3.8"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; + /usr/share/miniconda/bin/conda create --yes --name lineaGT 'python=3.8' --quiet -c conda-forge</span></span>
+<span><span class="co">#&gt; [1] "/usr/share/miniconda/envs/lineaGT/bin/python"</span></span>
+<span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/use_python.html" class="external-link">use_condaenv</a></span><span class="op">(</span><span class="st">"lineaGT"</span><span class="op">)</span></span>
+<span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/conda-tools.html" class="external-link">conda_install</a></span><span class="op">(</span>envname<span class="op">=</span><span class="st">"lineaGT"</span>, packages<span class="op">=</span><span class="st">"pylineaGT"</span>, pip<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "pylineaGT"</span></span>
+<span><span class="va">py_pkg</span> <span class="op">=</span> <span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/import.html" class="external-link">import</a></span><span class="op">(</span><span class="st">"pylineaGT"</span><span class="op">)</span></span></code></pre></div>
+<p>Remember to load the new environment in order to have the
+<code>pylineaGT</code> module accessible.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/caravagnalab/lineaGT" class="external-link">lineaGT</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: replacing previous import 'cli::num_ansi_colors' by</span></span>
 <span><span class="co">#&gt; 'crayon::num_ansi_colors' when loading 'VIBER'</span></span>
@@ -84,14 +97,14 @@
 <span><span class="co">#&gt; 'VIBER'</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Loading <span style="color: #00BB00;">VIBER</span>, <span style="font-style: italic;">'Variational inference for multivariate Binomial mixtures'</span>. Support : <span style="color: #0000BB; font-style: italic;">&lt;https://caravagn.github.io/VIBER/&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Loading <span style="color: #00BB00;">lineaGT</span>, <span style="font-style: italic;">'Lineage inference from gene therapy'</span>. Support : <span style="color: #0000BB; font-style: italic;">&lt;https://caravagnalab.github.io/lineaGT/&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> The 'lineagt-env' environment is already loaded!</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span></span></code></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span></span>
+<span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/use_python.html" class="external-link">use_condaenv</a></span><span class="op">(</span><span class="st">"lineaGT"</span><span class="op">)</span></span></code></pre></div>
 <p>The coverage dataset can be filtered calling the
 <code><a href="../reference/filter_dataset.html">filter_dataset()</a></code> function.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">cov.df.example</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">vaf.df.example</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cov.example.filt</span> <span class="op">=</span> <span class="va">cov.df.example</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/filter_dataset.html">filter_dataset</a></span><span class="op">(</span>min_cov<span class="op">=</span><span class="fl">5</span>, min_frac<span class="op">=</span><span class="fl">0.05</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Filtering the input dataset with minimum coverage 5 and minimum clusters frac…</span></span>
@@ -116,13 +129,13 @@
 <div class="section level2">
 <h2 id="fitting-the-model">Fitting the model<a class="anchor" aria-label="anchor" href="#fitting-the-model"></a>
 </h2>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">x</span> <span class="op">=</span> <span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span></span>
 <span>  cov.df <span class="op">=</span> <span class="va">cov.example.filt</span>,</span>
 <span>  vaf.df <span class="op">=</span> <span class="va">vaf.df.example</span>,</span>
 <span>  steps <span class="op">=</span> <span class="fl">500</span>,</span>
-<span>  <span class="co"># n_runs = 1,</span></span>
 <span>  k_interval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">15</span><span class="op">)</span>,</span>
+<span>  infer_growth <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  timepoints_to_int <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"t1"</span><span class="op">=</span><span class="fl">60</span>, <span class="st">"t2"</span><span class="op">=</span><span class="fl">150</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting lineaGT model selection to retrieve the optimal number of clones</span></span>
@@ -141,9 +154,9 @@
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="font-weight: bold;">VIBER fit</span> completed in 0.03 mins (status: <span style="color: #00BB00;">converged</span>)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C0 mutations</span></span>
 <span><span class="co">#&gt; ── <span style="color: #000000; background-color: #BBBB00;">[ VIBER ] My VIBER model</span> n = 3 (w = 4 dimensions). Fit with <span style="color: #00BB00;">k = 3</span> clusters. ─</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C0 mutations• Clusters: π = 67% [<span style="color: #BBBB00;">C3</span>] and 33% [<span style="color: #BBBB00;">C1</span>], with π &gt; 0.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C0 mutations• Binomials: θ = &lt;0.09, 0.19, 0.01, 0&gt; [<span style="color: #BBBB00;">C3</span>] and &lt;0.01, 0.36, 0.03, 0.4&gt; [<span style="color: #BBBB00;">C1</span>].</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C0 mutations<span style="color: #00BBBB;">ℹ</span> Score(s): ELBO = -1461.828. Fit <span style="color: #00BB00;">converged</span> in 6 steps, ε = 1e-10.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C0 mutations• Clusters: π = 67% [<span style="color: #BBBB00;">C1</span>] and 33% [<span style="color: #BBBB00;">C3</span>], with π &gt; 0.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C0 mutations• Binomials: θ = &lt;0.09, 0.19, 0.01, 0&gt; [<span style="color: #BBBB00;">C1</span>] and &lt;0.01, 0.36, 0.03, 0.4&gt; [<span style="color: #BBBB00;">C3</span>].</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C0 mutations<span style="color: #00BBBB;">ℹ</span> Score(s): ELBO = -1461.843. Fit <span style="color: #00BB00;">converged</span> in 6 steps, ε = 1e-10.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C0 mutations<span style="color: #00BB00;">✔</span> Reduced to k = 2 (from 3) selecting VIBER cluster(s) with π &gt; 0.166666666666667, and Binomial p &gt; 0 in w &gt; 0 dimension(s).</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C0 mutations<span style="color: #00BB00;">✔</span> Starting clustering of clone C0 mutations ... done</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -153,8 +166,8 @@
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 8</span></span></span>
 <span><span class="co">#&gt;   cluster   t1.l1 t2.l1  t1.l2 t2.l2 nMuts is.clonal is.driver</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> S1      0.006<span style="text-decoration: underline;">82</span> 0.362 0.028<span style="text-decoration: underline;">8</span> 0.396     1 FALSE     FALSE    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> S2      0.085<span style="text-decoration: underline;">6</span>  0.190 0      0         2 FALSE     TRUE     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> S1      0.085<span style="text-decoration: underline;">6</span>  0.190 0      0         2 FALSE     TRUE     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> S2      0.006<span style="text-decoration: underline;">81</span> 0.362 0.028<span style="text-decoration: underline;">6</span> 0.396     1 FALSE     FALSE    </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> C0      1       1     1      1         1 TRUE      FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Trees per region <span style="color: #00BB00;">1, 2, 1, 1</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting phylogeny inference of clone C0<span style="color: #00BBBB;">ℹ</span> Total <span style="color: #00BB00;">2</span> tree structures - search is <span style="font-weight: bold;">exahustive</span></span></span>
@@ -169,29 +182,32 @@
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Input n = 8, with k &lt; 8. Dirichlet concentration <span style="color: #00BB00;">α = 1e-06</span>.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C1 mutations<span style="color: #00BBBB;">ℹ</span> Beta (a_0, b_0) = (1, 1); q_i = prior. Optimise: ε = 1e-10 or 5000 steps, r = 10 starts.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C1 mutations</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="font-weight: bold;">VIBER fit</span> completed in 0.03 mins (status: <span style="color: #00BB00;">converged</span>)</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="font-weight: bold;">VIBER fit</span> completed in 0.04 mins (status: <span style="color: #00BB00;">converged</span>)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C1 mutations</span></span>
 <span><span class="co">#&gt; ── <span style="color: #000000; background-color: #BBBB00;">[ VIBER ] My VIBER model</span> n = 8 (w = 4 dimensions). Fit with <span style="color: #00BB00;">k = 8</span> clusters. ─</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C1 mutations• Clusters: π = 37% [<span style="color: #BBBB00;">C4</span>], 37% [<span style="color: #BBBB00;">C6</span>], 13% [<span style="color: #BBBB00;">C1</span>], and 13% [<span style="color: #BBBB00;">C3</span>], with π &gt; 0.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C1 mutations• Binomials: θ = &lt;0, 0.13, 0.01, 0.12&gt; [<span style="color: #BBBB00;">C4</span>], &lt;0.11, 0, 0.01, 0&gt; [<span style="color: #BBBB00;">C6</span>], &lt;0.43,</span></span>
-<span><span class="co">#&gt; 0.01, 0.02, 0.32&gt; [<span style="color: #BBBB00;">C1</span>], and &lt;0.2, 0.01, 0.02, 0.23&gt; [<span style="color: #BBBB00;">C3</span>].</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C1 mutations<span style="color: #00BBBB;">ℹ</span> Score(s): ELBO = -4612.117. Fit <span style="color: #00BB00;">converged</span> in 6 steps, ε = 1e-10.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C1 mutations<span style="color: #00BB00;">✔</span> Reduced to k = 4 (from 8) selecting VIBER cluster(s) with π &gt; 0.0625, and Binomial p &gt; 0 in w &gt; 0 dimension(s).</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C1 mutations• Clusters: π = 25% [<span style="color: #BBBB00;">C3</span>], 25% [<span style="color: #BBBB00;">C5</span>], 25% [<span style="color: #BBBB00;">C8</span>], 13% [<span style="color: #BBBB00;">C2</span>], and 13% [<span style="color: #BBBB00;">C4</span>], with π &gt;</span></span>
+<span><span class="co">#&gt; 0.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C1 mutations• Binomials: θ = &lt;0.18, 0, 0.01, 0&gt; [<span style="color: #BBBB00;">C3</span>], &lt;0, 0.14, 0.01, 0&gt; [<span style="color: #BBBB00;">C5</span>], &lt;0, 0.08,</span></span>
+<span><span class="co">#&gt; 0.01, 0.15&gt; [<span style="color: #BBBB00;">C8</span>], &lt;0.2, 0.01, 0.02, 0.23&gt; [<span style="color: #BBBB00;">C2</span>], and &lt;0.43, 0.01, 0.02, 0.32&gt;</span></span>
+<span><span class="co">#&gt; [<span style="color: #BBBB00;">C4</span>].</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C1 mutations<span style="color: #00BBBB;">ℹ</span> Score(s): ELBO = -4571.199. Fit <span style="color: #00BB00;">converged</span> in 7 steps, ε = 1e-10.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C1 mutations<span style="color: #00BB00;">✔</span> Reduced to k = 5 (from 8) selecting VIBER cluster(s) with π &gt; 0.0625, and Binomial p &gt; 0 in w &gt; 0 dimension(s).</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C1 mutations<span style="color: #00BB00;">✔</span> Starting clustering of clone C1 mutations ... done</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Fitting model to cluster mutations<span style="color: #00BBBB;">ℹ</span> Starting phylogeny inference of clone C1</span></span>
 <span><span class="co">#&gt; <span style="color: #BBBBBB; background-color: #0000BB;"> [ ctree ~ clone trees generator for C1 ] </span></span></span>
 <span><span class="co"><span style="color: #BBBBBB; background-color: #0000BB;">#&gt; </span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 8</span></span></span>
-<span><span class="co">#&gt;   cluster   t1.l1   t2.l1   t1.l2 t2.l2 nMuts is.clonal is.driver</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> S1      0.430   0.005<span style="text-decoration: underline;">58</span> 0.017<span style="text-decoration: underline;">0</span>  0.318     1 FALSE     FALSE    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> S2      0.198   0.005<span style="text-decoration: underline;">56</span> 0.017<span style="text-decoration: underline;">0</span>  0.225     1 FALSE     FALSE    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> S3      0.001<span style="text-decoration: underline;">17</span> 0.127   0.009<span style="text-decoration: underline;">57</span> 0.124     3 FALSE     TRUE     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> S4      0.115   0.001<span style="text-decoration: underline;">87</span> 0       0         3 FALSE     FALSE    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> C1      1       1       1       1         1 TRUE      FALSE</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Trees per region <span style="color: #00BB00;">6, 1, 2, 5</span></span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting phylogeny inference of clone C1<span style="color: #00BBBB;">ℹ</span> Total <span style="color: #00BB00;">36</span> tree structures - search is <span style="font-weight: bold;">exahustive</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 8</span></span></span>
+<span><span class="co">#&gt;   cluster   t1.l1   t2.l1  t1.l2 t2.l2 nMuts is.clonal is.driver</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> S1      0.198   0.005<span style="text-decoration: underline;">59</span> 0.017<span style="text-decoration: underline;">0</span> 0.225     1 FALSE     FALSE    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> S2      0.184   0.002<span style="text-decoration: underline;">80</span> 0      0         2 FALSE     FALSE    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> S3      0.430   0.005<span style="text-decoration: underline;">59</span> 0.017<span style="text-decoration: underline;">0</span> 0.318     1 FALSE     FALSE    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> S4      0.001<span style="text-decoration: underline;">62</span> 0.142   0      0         2 FALSE     FALSE    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> S5      0.001<span style="text-decoration: underline;">61</span> 0.075<span style="text-decoration: underline;">6</span>  0.012<span style="text-decoration: underline;">3</span> 0.147     2 FALSE     TRUE     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> C1      1       1       1      1         1 TRUE      FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Trees per region <span style="color: #00BB00;">6, 2, 5, 5</span></span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting phylogeny inference of clone C1<span style="color: #00BBBB;">ℹ</span> Total <span style="color: #00BB00;">24</span> tree structures - search is <span style="font-weight: bold;">exahustive</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting phylogeny inference of clone C1</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting phylogeny inference of clone C1── Ranking trees </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting phylogeny inference of clone C1<span style="color: #00BB00;">✔</span> <span style="color: #00BB00;">24</span>  trees with non-zero score, storing <span style="font-weight: bold;">24</span></span></span>
@@ -203,36 +219,35 @@
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Input n = 6, with k &lt; 6. Dirichlet concentration <span style="color: #00BB00;">α = 1e-06</span>.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C4 mutations<span style="color: #00BBBB;">ℹ</span> Beta (a_0, b_0) = (1, 1); q_i = prior. Optimise: ε = 1e-10 or 5000 steps, r = 10 starts.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C4 mutations</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="font-weight: bold;">VIBER fit</span> completed in 0.03 mins (status: <span style="color: #00BB00;">converged</span>)</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="font-weight: bold;">VIBER fit</span> completed in 0.04 mins (status: <span style="color: #00BB00;">converged</span>)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C4 mutations</span></span>
 <span><span class="co">#&gt; ── <span style="color: #000000; background-color: #BBBB00;">[ VIBER ] My VIBER model</span> n = 6 (w = 4 dimensions). Fit with <span style="color: #00BB00;">k = 6</span> clusters. ─</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C4 mutations• Clusters: π = 33% [<span style="color: #BBBB00;">C1</span>], 17% [<span style="color: #BBBB00;">C2</span>], 17% [<span style="color: #BBBB00;">C3</span>], 17% [<span style="color: #BBBB00;">C4</span>], and 17% [<span style="color: #BBBB00;">C5</span>], with π &gt;</span></span>
-<span><span class="co">#&gt; 0.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C4 mutations• Binomials: θ = &lt;0.22, 0, 0.01, 0&gt; [<span style="color: #BBBB00;">C1</span>], &lt;0.36, 0, 0.02, 0.28&gt; [<span style="color: #BBBB00;">C2</span>], &lt;0.19,</span></span>
-<span><span class="co">#&gt; 0.22, 0.3, 0.2&gt; [<span style="color: #BBBB00;">C3</span>], &lt;0, 0, 0.02, 0.29&gt; [<span style="color: #BBBB00;">C4</span>], and &lt;0, 0, 0.02, 0&gt; [<span style="color: #BBBB00;">C5</span>].</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C4 mutations<span style="color: #00BBBB;">ℹ</span> Score(s): ELBO = -3580.914. Fit <span style="color: #00BB00;">converged</span> in 6 steps, ε = 1e-10.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C4 mutations<span style="color: #00BB00;">✔</span> Reduced to k = 5 (from 6) selecting VIBER cluster(s) with π &gt; 0.0833333333333333, and Binomial p &gt; 0 in w &gt; 0 dimension(s).</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C4 mutations• Clusters: π = 50% [<span style="color: #BBBB00;">C4</span>], 17% [<span style="color: #BBBB00;">C1</span>], 17% [<span style="color: #BBBB00;">C2</span>], and 17% [<span style="color: #BBBB00;">C5</span>], with π &gt; 0.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C4 mutations• Binomials: θ = &lt;0.15, 0, 0.01, 0&gt; [<span style="color: #BBBB00;">C4</span>], &lt;0.36, 0, 0.02, 0.28&gt; [<span style="color: #BBBB00;">C1</span>], &lt;0, 0,</span></span>
+<span><span class="co">#&gt; 0.02, 0.29&gt; [<span style="color: #BBBB00;">C2</span>], and &lt;0.19, 0.22, 0.3, 0.2&gt; [<span style="color: #BBBB00;">C5</span>].</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C4 mutations<span style="color: #00BBBB;">ℹ</span> Score(s): ELBO = -3594.639. Fit <span style="color: #00BB00;">converged</span> in 6 steps, ε = 1e-10.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C4 mutations<span style="color: #00BB00;">✔</span> Reduced to k = 4 (from 6) selecting VIBER cluster(s) with π &gt; 0.0833333333333333, and Binomial p &gt; 0 in w &gt; 0 dimension(s).</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C4 mutations<span style="color: #00BB00;">✔</span> Starting clustering of clone C4 mutations ... done</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Fitting model to cluster mutations<span style="color: #00BBBB;">ℹ</span> Starting phylogeny inference of clone C4</span></span>
 <span><span class="co">#&gt; <span style="color: #BBBBBB; background-color: #0000BB;"> [ ctree ~ clone trees generator for C4 ] </span></span></span>
 <span><span class="co"><span style="color: #BBBBBB; background-color: #0000BB;">#&gt; </span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 8</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 8</span></span></span>
 <span><span class="co">#&gt;   cluster t1.l1   t2.l1  t1.l2 t2.l2 nMuts is.clonal is.driver</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> S1      0.219 0.002<span style="text-decoration: underline;">39</span> 0      0         2 FALSE     FALSE    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> S2      0.358 0.004<span style="text-decoration: underline;">76</span> 0.017<span style="text-decoration: underline;">0</span> 0.275     1 FALSE     FALSE    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> S3      0.192 0.222   0.296  0.198     1 FALSE     FALSE    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> S4      0     0       0.018<span style="text-decoration: underline;">6</span> 0.292     1 FALSE     TRUE     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> S5      0     0       0      0         1 FALSE     FALSE    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> C4      1     1       1      1         1 TRUE      FALSE</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Trees per region <span style="color: #00BB00;">5, 1, 6, 5</span></span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting phylogeny inference of clone C4<span style="color: #00BBBB;">ℹ</span> Total <span style="color: #00BB00;">48</span> tree structures - search is <span style="font-weight: bold;">exahustive</span></span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting phylogeny inference of clone C4<span style="color: #BB0000;">✖</span> Starting phylogeny inference of clone C4 ... failed</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> S1      0.358 0.004<span style="text-decoration: underline;">73</span> 0.017<span style="text-decoration: underline;">1</span> 0.275     1 FALSE     FALSE    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> S2      0     0       0.018<span style="text-decoration: underline;">5</span> 0.292     1 FALSE     FALSE    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> S3      0.146 0.001<span style="text-decoration: underline;">58</span> 0      0         3 FALSE     TRUE     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> S4      0.192 0.222   0.296  0.198     1 FALSE     FALSE    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> C4      1     1       1      1         1 TRUE      FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Trees per region <span style="color: #00BB00;">6, 1, 6, 5</span></span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting phylogeny inference of clone C4<span style="color: #00BBBB;">ℹ</span> Total <span style="color: #00BB00;">54</span> tree structures - search is <span style="font-weight: bold;">exahustive</span></span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting phylogeny inference of clone C4</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting phylogeny inference of clone C4── Ranking trees </span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting phylogeny inference of clone C4<span style="color: #00BB00;">✔</span> <span style="color: #00BB00;">33</span>  trees with non-zero score, storing <span style="font-weight: bold;">33</span></span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting phylogeny inference of clone C4<span style="color: #00BB00;">✔</span> Starting phylogeny inference of clone C4 ... done</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Fitting model to cluster mutations</span></span>
-<span><span class="co">#&gt; &lt;subscriptOutOfBoundsError in model[var, ]: subscript out of bounds&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C7 mutations</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Fitting model to cluster mutations<span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C7 mutations</span></span>
 <span><span class="co">#&gt; <span style="color: #BBBBBB; background-color: #0000BB;"> [ VIBER - variational fit ] </span></span></span>
 <span><span class="co"><span style="color: #BBBBBB; background-color: #0000BB;">#&gt; </span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Input n = 2, with k &lt; 2. Dirichlet concentration <span style="color: #00BB00;">α = 1e-06</span>.</span></span>
@@ -243,7 +258,7 @@
 <span><span class="co">#&gt; ── <span style="color: #000000; background-color: #BBBB00;">[ VIBER ] My VIBER model</span> n = 2 (w = 4 dimensions). Fit with <span style="color: #00BB00;">k = 2</span> clusters. ─</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C7 mutations• Clusters: π = 50% [<span style="color: #BBBB00;">C1</span>] and 50% [<span style="color: #BBBB00;">C2</span>], with π &gt; 0.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C7 mutations• Binomials: θ = &lt;0.01, 0.11, 0, 0&gt; [<span style="color: #BBBB00;">C1</span>] and &lt;0.4, 0, 0.31, 0.35&gt; [<span style="color: #BBBB00;">C2</span>].</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C7 mutations<span style="color: #00BBBB;">ℹ</span> Score(s): ELBO = -1584.511. Fit <span style="color: #00BB00;">converged</span> in 5 steps, ε = 1e-10.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C7 mutations<span style="color: #00BBBB;">ℹ</span> Score(s): ELBO = -1584.528. Fit <span style="color: #00BB00;">converged</span> in 5 steps, ε = 1e-10.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting clustering of clone C7 mutations<span style="color: #00BB00;">✔</span> Starting clustering of clone C7 mutations ... done</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Fitting model to cluster mutations<span style="color: #00BBBB;">ℹ</span> Starting phylogeny inference of clone C7</span></span>
@@ -252,8 +267,8 @@
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 8</span></span></span>
 <span><span class="co">#&gt;   cluster  t1.l1   t2.l1 t1.l2 t2.l2 nMuts is.clonal is.driver</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> S1      0.010<span style="text-decoration: underline;">4</span> 0.112   0     0         1 FALSE     FALSE    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> S2      0.396  0.002<span style="text-decoration: underline;">34</span> 0.308 0.348     1 FALSE     TRUE     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> S1      0.010<span style="text-decoration: underline;">5</span> 0.112   0     0         1 FALSE     TRUE     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> S2      0.396  0.002<span style="text-decoration: underline;">35</span> 0.308 0.348     1 FALSE     FALSE    </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> C7      1      1       1     1         1 TRUE      FALSE</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Trees per region <span style="color: #00BB00;">2, 1, 1, 1</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Starting phylogeny inference of clone C7<span style="color: #00BBBB;">ℹ</span> Total <span style="color: #00BB00;">2</span> tree structures - search is <span style="font-weight: bold;">exahustive</span></span></span>
@@ -299,10 +314,9 @@ on the input range of number of clusters,</p></li>
 <li><p>for each clone, the number of assigned ISs and the mean coverage,
 per timepoint and lineage.</p></li>
 </ul>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">x.example</span><span class="op">)</span></span>
-<span><span class="va">x.example</span></span>
-<span><span class="co">#&gt; ── <span style="color: #000000; background-color: #BBBB00;">[ lineaGT ] </span> ──── <span style="font-weight: bold;">Python:</span> <span style="color: #555555;">/usr/share/miniconda/envs/lineagt-env/bin/python</span> ──</span></span>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">x</span></span>
+<span><span class="co">#&gt; ── <span style="color: #000000; background-color: #BBBB00;">[ lineaGT ] </span> ──────── <span style="font-weight: bold;">Python:</span> <span style="color: #555555;">/usr/share/miniconda/envs/lineaGT/bin/python</span> ──</span></span>
 <span><span class="co">#&gt; → Lineages: <span style="color: #00BB00;">l1</span> and <span style="color: #00BB00;">l2</span>.</span></span>
 <span><span class="co">#&gt; → Timepoints: <span style="color: #00BB00;">t1</span> and <span style="color: #00BB00;">t2</span>.</span></span>
 <span><span class="co">#&gt; → Number of Insertion Sites: <span style="color: #00BB00;">66</span>.</span></span>
@@ -328,7 +342,7 @@ per timepoint and lineage.</p></li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

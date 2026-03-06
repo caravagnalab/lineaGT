@@ -6,12 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Plotting functions • lineaGT</title>
-<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
-<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
-<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
-<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
-<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
@@ -43,7 +42,6 @@
 <li><a class="dropdown-item" href="../articles/Inference.html">Lineage inference</a></li>
     <li><a class="dropdown-item" href="../articles/Input-formats.html">Input formats</a></li>
     <li><a class="dropdown-item" href="../articles/Plotting-functions.html">Plotting functions</a></li>
-    <li><a class="dropdown-item" href="../articles/Utilities.html">Utilities</a></li>
   </ul>
 </li>
       </ul>
@@ -84,13 +82,12 @@
 <span><span class="co">#&gt; 'VIBER'</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Loading <span style="color: #00BB00;">VIBER</span>, <span style="font-style: italic;">'Variational inference for multivariate Binomial mixtures'</span>. Support : <span style="color: #0000BB; font-style: italic;">&lt;https://caravagn.github.io/VIBER/&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Loading <span style="color: #00BB00;">lineaGT</span>, <span style="font-style: italic;">'Lineage inference from gene therapy'</span>. Support : <span style="color: #0000BB; font-style: italic;">&lt;https://caravagnalab.github.io/lineaGT/&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> The 'lineagt-env' environment is already loaded!</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://patchwork.data-imaginist.com" class="external-link">patchwork</a></span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">x.example</span><span class="op">)</span></span>
 <span><span class="va">x.example</span></span>
-<span><span class="co">#&gt; ── <span style="color: #000000; background-color: #BBBB00;">[ lineaGT ] </span> ──── <span style="font-weight: bold;">Python:</span> <span style="color: #555555;">/usr/share/miniconda/envs/lineagt-env/bin/python</span> ──</span></span>
+<span><span class="co">#&gt; ── <span style="color: #000000; background-color: #BBBB00;">[ lineaGT ] </span> ──────────────────────────────────────────────────── <span style="font-weight: bold;">Python:</span>  ──</span></span>
 <span><span class="co">#&gt; → Lineages: <span style="color: #00BB00;">l1</span> and <span style="color: #00BB00;">l2</span>.</span></span>
 <span><span class="co">#&gt; → Timepoints: <span style="color: #00BB00;">t1</span> and <span style="color: #00BB00;">t2</span>.</span></span>
 <span><span class="co">#&gt; → Number of Insertion Sites: <span style="color: #00BB00;">66</span>.</span></span>
@@ -112,7 +109,7 @@
 with the function <code><a href="../reference/plot_mixture_weights.html">plot_mixture_weights()</a></code> .</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_mixture_weights.html">plot_mixture_weights</a></span><span class="op">(</span><span class="va">x.example</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 <div class="section level2">
 <h2 id="scatterplot">Scatterplot<a class="anchor" aria-label="anchor" href="#scatterplot"></a>
@@ -127,8 +124,16 @@ are modeled as independent, therefore each dimension corresponds to a
 combination of time-point and lineage.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plots</span> <span class="op">=</span> <span class="fu"><a href="../reference/plot_scatter_density.html">plot_scatter_density</a></span><span class="op">(</span><span class="va">x.example</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: `aes_string()` was deprecated in ggplot2 3.0.0.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use tidy evaluation idioms with `aes()`.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> See also `vignette("ggplot2-in-packages")` for more information.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The deprecated feature was likely used in the <span style="color: #0000BB;">lineaGT</span> package.</span></span>
+<span><span class="co">#&gt;   Please report the issue to the authors.</span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once per session.</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span>
 <span><span class="va">plots</span><span class="op">$</span><span class="va">`cov.t2.l1:cov.t1.l2`</span> <span class="co"># to visualize a single plot</span></span></code></pre></div>
-<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 <div class="section level2">
 <h2 id="marginal-distributions">Marginal distributions<a class="anchor" aria-label="anchor" href="#marginal-distributions"></a>
@@ -142,7 +147,7 @@ mixture grouped by lineage and time-point.</p>
 <code class="sourceCode R"><span><span class="va">marginals</span> <span class="op">=</span> <span class="fu"><a href="../reference/plot_marginal.html">plot_marginal</a></span><span class="op">(</span><span class="va">x.example</span><span class="op">)</span></span>
 <span><span class="va">marginals_mixture</span> <span class="op">=</span> <span class="fu"><a href="../reference/plot_marginal.html">plot_marginal</a></span><span class="op">(</span><span class="va">x.example</span>, single_plot<span class="op">=</span><span class="cn">T</span><span class="op">)</span></span>
 <span><span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span><span class="va">marginals</span> <span class="op">/</span> <span class="va">marginals_mixture</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 <div class="section level2">
 <h2 id="mullerplot">Mullerplot<a class="anchor" aria-label="anchor" href="#mullerplot"></a>
@@ -155,7 +160,7 @@ population abundance and the relative fraction, respectively.</p>
 <code class="sourceCode R"><span><span class="va">mp1</span> <span class="op">=</span> <span class="fu"><a href="../reference/plot_mullerplot.html">plot_mullerplot</a></span><span class="op">(</span><span class="va">x.example</span>, which<span class="op">=</span><span class="st">"frac"</span><span class="op">)</span></span>
 <span><span class="va">mp2</span> <span class="op">=</span> <span class="fu"><a href="../reference/plot_mullerplot.html">plot_mullerplot</a></span><span class="op">(</span><span class="va">x.example</span>, which<span class="op">=</span><span class="st">"pop"</span><span class="op">)</span></span>
 <span><span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span><span class="va">mp1</span>, <span class="va">mp2</span>, ncol<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="" width="700"></p>
 <p>If the option <code>mutations</code> is set to <code>TRUE</code>,
 then the subclones originated within each population will be reported as
 well in the mullerplot.</p>
@@ -163,13 +168,13 @@ well in the mullerplot.</p>
 <code class="sourceCode R"><span><span class="va">mp1</span> <span class="op">=</span> <span class="fu"><a href="../reference/plot_mullerplot.html">plot_mullerplot</a></span><span class="op">(</span><span class="va">x.example</span>, which<span class="op">=</span><span class="st">"frac"</span>, mutations<span class="op">=</span><span class="cn">T</span><span class="op">)</span></span>
 <span><span class="va">mp2</span> <span class="op">=</span> <span class="fu"><a href="../reference/plot_mullerplot.html">plot_mullerplot</a></span><span class="op">(</span><span class="va">x.example</span>, which<span class="op">=</span><span class="st">"pop"</span>, mutations<span class="op">=</span><span class="cn">T</span><span class="op">)</span></span>
 <span><span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span><span class="va">mp1</span>, <span class="va">mp2</span>, ncol<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="700"></p>
 <p>The function supports also the visualization of a single clone to
 monitor the growth of subpopulations, through the argument
 <code>single_clone</code>.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_mullerplot.html">plot_mullerplot</a></span><span class="op">(</span><span class="va">x.example</span>, highlight<span class="op">=</span><span class="st">"C4"</span>, mutations<span class="op">=</span><span class="cn">T</span>, single_clone<span class="op">=</span><span class="cn">T</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="700"></p>
 <p>Moreover, some of the identified clusters (showing low coverage in
 all dimensions) represents poly-clonal populations, since they cannot be
 uniquely identified by the mixture model. Therefore, the estimated
@@ -181,7 +186,7 @@ of populations in each clusters.</p>
 <span><span class="co">#&gt;  1  2  1  1  2  1  1  1</span></span></code></pre></div>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_mullerplot.html">plot_mullerplot</a></span><span class="op">(</span><span class="va">x.example</span>, which<span class="op">=</span><span class="st">"frac"</span>, mutations<span class="op">=</span><span class="cn">T</span>, estimate_npops<span class="op">=</span><span class="cn">T</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 <div class="section level2">
 <h2 id="vaf">VAF<a class="anchor" aria-label="anchor" href="#vaf"></a>
@@ -190,8 +195,15 @@ of populations in each clusters.</p>
 the behaviour of mutations variant allele frequencies over time for each
 subclone.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_vaf_time.html">plot_vaf_time</a></span><span class="op">(</span><span class="va">x.example</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_vaf_time.html">plot_vaf_time</a></span><span class="op">(</span><span class="va">x.example</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `linewidth` instead.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The deprecated feature was likely used in the <span style="color: #0000BB;">lineaGT</span> package.</span></span>
+<span><span class="co">#&gt;   Please report the issue to the authors.</span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once per session.</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span></code></pre></div>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 <div class="section level2">
 <h2 id="phylogenetic-evolution">Phylogenetic evolution<a class="anchor" aria-label="anchor" href="#phylogenetic-evolution"></a>
@@ -200,29 +212,17 @@ subclone.</p>
 reports the estimated phylogenetic tree.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_phylogeny.html">plot_phylogeny</a></span><span class="op">(</span><span class="va">x.example</span><span class="op">)</span></span>
-<span><span class="co">#&gt; This graph was created by an old(er) igraph version.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Call `igraph::upgrade_graph()` on it to use with the current igraph version.</span></span>
-<span><span class="co">#&gt; For now we convert it on the fly...</span></span>
-<span><span class="co">#&gt; This graph was created by an old(er) igraph version.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Call `igraph::upgrade_graph()` on it to use with the current igraph version.</span></span>
-<span><span class="co">#&gt; For now we convert it on the fly...</span></span>
-<span><span class="co">#&gt; This graph was created by an old(er) igraph version.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Call `igraph::upgrade_graph()` on it to use with the current igraph version.</span></span>
-<span><span class="co">#&gt; For now we convert it on the fly...</span></span>
-<span><span class="co">#&gt; This graph was created by an old(er) igraph version.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Call `igraph::upgrade_graph()` on it to use with the current igraph version.</span></span>
-<span><span class="co">#&gt; For now we convert it on the fly...</span></span>
 <span><span class="co">#&gt; $C0</span></span></code></pre></div>
-<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-12-1.png" class="r-plt" alt="" width="700"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $C1</span></span></code></pre>
-<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-12-2.png" width="700"></p>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-12-2.png" class="r-plt" alt="" width="700"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $C4</span></span></code></pre>
-<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-12-3.png" width="700"></p>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-12-3.png" class="r-plt" alt="" width="700"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $C7</span></span></code></pre>
-<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-12-4.png" width="700"></p>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-12-4.png" class="r-plt" alt="" width="700"></p>
 </div>
 <div class="section level2">
 <h2 id="clonal-growth">Clonal Growth<a class="anchor" aria-label="anchor" href="#clonal-growth"></a>
@@ -236,12 +236,12 @@ of the best model, selected as the one with the highest likelihood.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_growth_regression.html">plot_growth_regression</a></span><span class="op">(</span><span class="va">x.example</span>, show_best<span class="op">=</span><span class="cn">F</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Scale for <span style="color: #00BB00;">colour</span> is already present.</span></span>
 <span><span class="co">#&gt; Adding another scale for <span style="color: #00BB00;">colour</span>, which will replace the existing scale.</span></span></code></pre></div>
-<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-13-1.png" class="r-plt" alt="" width="700"></p>
 <p>The same function can be used to show the growth regressions for the
 subclones identified by somatic mutations.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_growth_regression.html">plot_growth_regression</a></span><span class="op">(</span><span class="va">x.example</span>, highlight<span class="op">=</span><span class="st">"C4"</span>, mutations<span class="op">=</span><span class="cn">T</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-14-1.png" width="700"></p>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-14-1.png" class="r-plt" alt="" width="700"></p>
 <p>An alternative way of visualising differences in growth rates is
 through <code><a href="../reference/plot_growth_rates.html">plot_growth_rates()</a></code> function, reporting the values
 of estimated growth rates for each (sub)population.</p>
@@ -249,7 +249,7 @@ of estimated growth rates for each (sub)population.</p>
 likelihood is shown as a dashed line.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_growth_rates.html">plot_growth_rates</a></span><span class="op">(</span><span class="va">x.example</span>, show_best<span class="op">=</span><span class="cn">F</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-15-1.png" width="700"></p>
+<p><img src="Plotting-functions_files/figure-html/unnamed-chunk-15-1.png" class="r-plt" alt="" width="700"></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
@@ -262,7 +262,7 @@ likelihood is shown as a dashed line.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

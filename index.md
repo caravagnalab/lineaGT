@@ -1,0 +1,64 @@
+# lineaGT
+
+This package implements algorithm to determine lineage inference for
+gene therapy assays based on insertion sites, accounting also for
+somatic mutations accumulation. More specifically, starting from
+coverage values of ISs identified in a gene therapy assays and
+associated somatic mutations, `lineaGT` can:
+
+- cluster ISs from the observed multi-lineage longitudinal coverage to
+  identify populations of cells originated from the same Haematopoietic
+  Stem Cell and estimate their abundances in the sample;
+
+- cluster somatic mutations from the observed multi-lineage longitudinal
+  variant allele frequency within each clone, to identify
+  subpopulations;
+
+- infer population genetics parameters, i.e., growth rates, for each
+  population supporting the exponential and logistic growth models and
+  selecting the optimal one.
+
+This R package provides an R interface for the Python algorithms
+developed in the [pyLineaGT](https://github.com/caravagnalab/pyLineaGT)
+package, which uses the Pyro probabilistic programming language to infer
+lineage histories.
+
+#### Citation
+
+[![](https://img.shields.io/badge/doi-.....-red.svg)](https://doi.org/....)
+
+If you use `lineaGT`, please cite:
+
+- E. Buscaroli, S. Milite, R. Bergamin, N. Calonaci, F. Gazzo, A.
+  Calabria, G. Caravagna. Bayesian multi-lineage tracing in gene therapy
+  assays. *In preparation.*
+
+#### Help and support
+
+[![](https://img.shields.io/badge/GitHub%20Pages-https://caravagnalab.github.io/lineaGT/-steelblue.svg)](https://caravagnalab.github.io/lineaGT)
+
+### Installation
+
+You can install the released version of `lineaGT` from
+[GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("caravagnalab/lineaGT")
+```
+
+If you want to fit your data with `lineaGT`, you also need to install
+the required Python dependencies. Please follow the instructions in the
+[Get
+Started](https://caravagnalab.github.io/lineaGT/articles/lineaGT.html)
+article.
+
+------------------------------------------------------------------------
+
+#### Copyright and contacts
+
+Elena Buscaroli, Giulio Caravagna. Cancer Data Science (CDS) Laboratory,
+University of Trieste, Italy.
+
+[![](https://img.shields.io/badge/CDS%20Lab%20Github-caravagnalab-seagreen.svg)](https://github.com/caravagnalab)
+[![](https://img.shields.io/badge/CDS%20Lab%20webpage-https://www.caravagnalab.org/-red.svg)](https://www.caravagnalab.org/)

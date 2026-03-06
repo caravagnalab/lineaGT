@@ -1,0 +1,76 @@
+# Get started
+
+### Installing the package
+
+The `lineaGT` R package can be installed directly from GitHub using
+`devtools`:
+
+``` r
+devtools::install_github("caravagnalab/lineaGT")
+```
+
+Once installed, load the package in your R session:
+
+``` r
+library(lineaGT) 
+```
+
+### Installing Python dependencies
+
+The `lineaGT` package relies on the Python module `pylineaGT`. The
+recommended approach is to install these Python dependencies inside a
+dedicated conda environment.
+
+This can be done from R using the `reticulate` package through the
+following steps.
+
+- if Miniconda is not already available on your system, you can install
+  it using through
+  [`reticulate`](https://rstudio.github.io/reticulate/reference/install_miniconda.html):
+
+``` r
+install_miniconda(path=miniconda_path(), update=TRUE, force=FALSE)
+```
+
+- create a new conda environment with Python version 3.10:
+
+``` r
+reticulate::conda_create(envname="lineaGT", python_version="3.8")
+```
+
+- activate the new conda environment within the current R session:
+
+``` r
+reticulate::use_condaenv("lineaGT")
+```
+
+- install the `pylineaGT` Python module using pip inside the conda
+  environment:
+
+``` r
+reticulate::conda_install(envname="lineaGT", packages="pylineaGT", pip=TRUE)
+```
+
+## Fitting a `lineaGT` object
+
+Before fitting a `lineaGT` object with the
+[`fit()`](caravagnalab.github.io/lineaGT/reference/fit.md) or the
+[`fit_growth_rates()`](caravagnalab.github.io/lineaGT/reference/fit_growth_rates.md)
+functions, make sure that the correct conda environment is active so
+that the `pylineaGT` module can be accessed:
+
+``` r
+reticulate::use_condaenv("lineaGT")
+```
+
+Functions that rely on `pylineaGT` include an additional argument, `py`,
+which allows you to explicitly pass the imported Python module. This
+ensures that the correct version of `pylineaGT` is used.
+
+``` r
+reticulate::use_condaenv("lineaGT")
+py = reticulate::import("pylineaGT")
+x = fit(..., py=py)
+# or
+x = fit_growth_rates(..., py=py)
+```

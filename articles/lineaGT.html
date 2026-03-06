@@ -6,12 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Get started • lineaGT</title>
-<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
-<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
-<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
-<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
-<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
@@ -43,7 +42,6 @@
 <li><a class="dropdown-item" href="../articles/Inference.html">Lineage inference</a></li>
     <li><a class="dropdown-item" href="../articles/Input-formats.html">Input formats</a></li>
     <li><a class="dropdown-item" href="../articles/Plotting-functions.html">Plotting functions</a></li>
-    <li><a class="dropdown-item" href="../articles/Utilities.html">Utilities</a></li>
   </ul>
 </li>
       </ul>
@@ -74,73 +72,67 @@
     
     
 <div class="section level3">
-<h3 id="installation-of-the-package">Installation of the package<a class="anchor" aria-label="anchor" href="#installation-of-the-package"></a>
+<h3 id="installing-the-package">Installing the package<a class="anchor" aria-label="anchor" href="#installing-the-package"></a>
 </h3>
-<p>You can install LineaGT from GitHub using <code>devtools</code>.</p>
+<p>The <code>lineaGT</code> R package can be installed directly from
+GitHub using <code>devtools</code>:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"caravagnalab/lineaGT"</span><span class="op">)</span></span></code></pre></div>
-<p>Load the package.</p>
+<p>Once installed, load the package in your R session:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/caravagnalab/lineaGT" class="external-link">lineaGT</a></span><span class="op">)</span> </span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="python-dependencies-installation">Python dependencies installation<a class="anchor" aria-label="anchor" href="#python-dependencies-installation"></a>
+<h3 id="installing-python-dependencies">Installing Python dependencies<a class="anchor" aria-label="anchor" href="#installing-python-dependencies"></a>
 </h3>
-<p>When the package is loaded, the package will automatically check
-whether:</p>
+<p>The <code>lineaGT</code> package relies on the Python module
+<code>pylineaGT</code>. The recommended approach is to install these
+Python dependencies inside a dedicated conda environment.</p>
+<p>This can be done from R using the <code>reticulate</code> package
+through the following steps.</p>
 <ul>
-<li><p>a version of Anaconda or Miniconda is available, otherwise a
-Miniconda installation will be started,</p></li>
-<li><p>if there is no <code>conda</code> environment loaded, the package
-will check if the <code>lineagt-env</code> is present, otherwise it will
-be created,</p></li>
-<li><p>to use an existing <code>conda</code> environment, it can be
-loaded <strong>before</strong> loading the package, either through the
-<code>reticulate</code> function <code><a href="https://rstudio.github.io/reticulate/reference/use_python.html" class="external-link">reticulate::use_condaenv()</a></code>
-or by using the <code>lineaGT</code> function
-<code><a href="../reference/load_conda_env.html">load_conda_env()</a></code>:</p></li>
+<li>if Miniconda is not already available on your system, you can
+install it using through <a href="https://rstudio.github.io/reticulate/reference/install_miniconda.html" class="external-link"><code>reticulate</code></a>:</li>
 </ul>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/use_python.html" class="external-link">use_condaenv</a></span><span class="op">(</span><span class="st">"env-name"</span>, required<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/load_conda_env.html">load_conda_env</a></span><span class="op">(</span>envname<span class="op">=</span><span class="st">"env-name"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">install_miniconda</span><span class="op">(</span>path<span class="op">=</span><span class="fu">miniconda_path</span><span class="op">(</span><span class="op">)</span>, update<span class="op">=</span><span class="cn">TRUE</span>, force<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <ul>
-<li>eventually, if the required <code>Python</code> dependencies are not
-installed in the loaded environment, they will be installed.</li>
+<li>create a new conda environment with Python version 3.10:</li>
 </ul>
-</div>
-<div class="section level3">
-<h3 id="functions-to-manually-configure-an-environment">Functions to manually configure an environment<a class="anchor" aria-label="anchor" href="#functions-to-manually-configure-an-environment"></a>
-</h3>
-<p>The function pylineaGT can also be used interactively to manually
-configure an existing environment, or to create one from scratch.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/configure_environment.html">configure_environment</a></span><span class="op">(</span>env_name<span class="op">=</span><span class="st">"lineaget-env"</span>, use_default<span class="op">=</span><span class="cn">F</span><span class="op">)</span></span></code></pre></div>
-<p>The function will first check if a Anaconda or Miniconda installation
-is available, otherwise it will prompt a Miniconda installation. The
-input name of the environment is either the name of an existing
-environment or the name of the environment to be created. The
-environment will be loaded or created, and the required
-<code>Python</code> dependencies will be installed.</p>
-</div>
-<div class="section level3">
-<h3 id="check-the-loaded-python-version-and-environment">Check the loaded Python version and environment<a class="anchor" aria-label="anchor" href="#check-the-loaded-python-version-and-environment"></a>
-</h3>
-<p>The package provides also a set of helper functions to check if an
-environment is loaded.</p>
+<code class="sourceCode R"><span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/conda-tools.html" class="external-link">conda_create</a></span><span class="op">(</span>envname<span class="op">=</span><span class="st">"lineaGT"</span>, python_version<span class="op">=</span><span class="st">"3.8"</span><span class="op">)</span></span></code></pre></div>
 <ul>
-<li>
-<code><a href="../reference/have_loaded_env.html">have_loaded_env()</a></code> to check if an environment is already
-loaded,</li>
-<li>
-<code><a href="../reference/which_conda_env.html">which_conda_env()</a></code> to check which environment is
-loaded.</li>
-<li>
-<code><a href="../reference/have_python_deps.html">have_python_deps()</a></code> to check if a <code>Python</code>
-packages list is installed in the specified environment.</li>
-<li>
-<code><a href="../reference/load_conda_env.html">load_conda_env()</a></code> to load the specified
-environment.</li>
+<li>activate the new conda environment within the current R
+session:</li>
 </ul>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/use_python.html" class="external-link">use_condaenv</a></span><span class="op">(</span><span class="st">"lineaGT"</span><span class="op">)</span></span></code></pre></div>
+<ul>
+<li>install the <code>pylineaGT</code> Python module using pip inside
+the conda environment:</li>
+</ul>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/conda-tools.html" class="external-link">conda_install</a></span><span class="op">(</span>envname<span class="op">=</span><span class="st">"lineaGT"</span>, packages<span class="op">=</span><span class="st">"pylineaGT"</span>, pip<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="fitting-a-lineagt-object">Fitting a <code>lineaGT</code> object<a class="anchor" aria-label="anchor" href="#fitting-a-lineagt-object"></a>
+</h2>
+<p>Before fitting a <code>lineaGT</code> object with the
+<code><a href="../reference/fit.html">fit()</a></code> or the <code><a href="../reference/fit_growth_rates.html">fit_growth_rates()</a></code> functions,
+make sure that the correct conda environment is active so that the
+<code>pylineaGT</code> module can be accessed:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/use_python.html" class="external-link">use_condaenv</a></span><span class="op">(</span><span class="st">"lineaGT"</span><span class="op">)</span></span></code></pre></div>
+<p>Functions that rely on <code>pylineaGT</code> include an additional
+argument, <code>py</code>, which allows you to explicitly pass the
+imported Python module. This ensures that the correct version of
+<code>pylineaGT</code> is used.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/use_python.html" class="external-link">use_condaenv</a></span><span class="op">(</span><span class="st">"lineaGT"</span><span class="op">)</span></span>
+<span><span class="va">py</span> <span class="op">=</span> <span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/import.html" class="external-link">import</a></span><span class="op">(</span><span class="st">"pylineaGT"</span><span class="op">)</span></span>
+<span><span class="va">x</span> <span class="op">=</span> <span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span><span class="va">...</span>, py<span class="op">=</span><span class="va">py</span><span class="op">)</span></span>
+<span><span class="co"># or</span></span>
+<span><span class="va">x</span> <span class="op">=</span> <span class="fu"><a href="../reference/fit_growth_rates.html">fit_growth_rates</a></span><span class="op">(</span><span class="va">...</span>, py<span class="op">=</span><span class="va">py</span><span class="op">)</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
@@ -153,7 +145,7 @@ environment.</li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>
