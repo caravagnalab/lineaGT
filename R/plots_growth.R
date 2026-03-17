@@ -22,8 +22,7 @@ plot_growth_regression = function(x,
                                   mutations=F,
                                   timepoints_to_int=list(),
                                   fit=F,
-                                  show_best=T,
-                                  ratio=NULL) {
+                                  show_best=T) {
 
   timepoints_to_int = map_timepoints_int(x, timepoints_to_int)
   highlight = get_highlight(x, min_frac=min_frac, highlight=highlight, mutations=mutations)
@@ -39,50 +38,56 @@ plot_growth_regression = function(x,
 
   pop_df = x %>%
     get_muller_pop(mutations=mutations, timepoints_to_int=timepoints_to_int) %>%
-    dplyr::filter(Identity %in% highlight)
+    dplyr::filter(Identity %in% highlight) %>%
 
-  regr.df = get_regression_df(x, pop_df=pop_df, highlight=highlight)
+    mutate(Identity_facet=Identity) %>%
+    separate(Identity_facet, into=c("Identity_facet"), sep="[.]", extra="drop")
+
+  regr.df = get_regression_df(x, pop_df=pop_df, highlight=highlight) %>%
+    mutate(Identity_facet=as.character(Identity)) %>%
+    separate(Identity_facet, into=c("Identity_facet"), sep="[.]", extra="drop")
 
   color_palette = c("firebrick","steelblue"); names(color_palette) = c("Exponential","Logistic")
-  color_palette = c(color_palette, x$color_palette)
+  color_palette = c(color_palette, get_color_palette(x))
 
   if (unique(regr.df$which) == "pop") {
     pl = pop_df %>%
       ggplot() +
-      geom_point(aes(x=Generation, y=Population), alpha=.5, size=.7)
+      geom_point(aes(x=Generation, y=Population, color=Identity), alpha=.5, size=.7)
   } else if (unqiue(regr.df$which) == "frac") {
     pl = pop_df %>%
       ggplot() +
-      geom_point(aes(x=Generation, y=Frequency), alpha=.5, size=.7)
+      geom_point(aes(x=Generation, y=Frequency, color=Identity), alpha=.5, size=.7)
   }
 
   pl = pl +
 
-    geom_line(data=filter(regr.df, type==best_model), aes(x=x, y=y, color=type), size=.7, alpha=.9) +
+    geom_line(data=filter(regr.df, type==best_model),
+              aes(x=x, y=y, color=Identity, linetype=type), linewidth=.7, alpha=.9) +
 
     geom_vline(data=filter(regr.df, type==best_model),
-               aes(xintercept=init_t, color=type), linetype="dashed", linewidth=.3, alpha=.7) +
+               aes(xintercept=init_t, color=Identity, linetype=type), linewidth=.3, alpha=.7) +
 
     geom_errorbar(data=filter(regr.df, type==best_model),
-                  aes(x=x, y=y, ymin=y.min, ymax=y.max, color=type),
+                  aes(x=x, y=y, ymin=y.min, ymax=y.max, color=Identity, linetype=type),
                   width=.5, position=position_dodge(width=0.5), alpha=.9, size=.6) +
-    facet_grid(rows=vars(Identity), cols=vars(Lineage), scales="free_y") +
-    scale_color_manual(values=color_palette, breaks=unique(filter(regr.df, type==best_model)$best_model)) +
+    facet_grid(rows=vars(Identity_facet), cols=vars(Lineage), scales="free_y") +
+    # scale_color_manual(values=color_palette, breaks=unique(filter(regr.df, type==best_model)$best_model)) +
+    scale_linetype_manual(values=c("Logistic"="solid", "Exponential"="dashed")) +
+    scale_color_manual(values=get_color_palette(x)) +
     labs(color="") + my_ggplot_theme()
-
-  if (!is.null(ratio))
-    pl = pl + theme(aspect.ratio=ratio)
 
   if (!show_best)
     return(
       pl +
-        geom_line(data=filter(regr.df, type!=best_model), aes(x=x, y=y/1000, color="gainsboro"), size=.4, alpha=.7) +
+        geom_line(data=filter(regr.df, type!=best_model),
+                  aes(x=x, y=y, color=Identity, linetype=type), size=.4, alpha=.7) +
         geom_vline(data=filter(regr.df, type!=best_model),
-                   aes(xintercept=init_t, color="gainsboro"), linetype="dashed", size=.1, alpha=.4) +
+                   aes(xintercept=init_t, color=Identity, linetype=type), size=.1, alpha=.4) +
         geom_errorbar(data=filter(regr.df, type!=best_model),
-                      aes(x=x, y=y, ymin=y.min, ymax=y.max, color="gainsboro"),
-                      width=.5, position=position_dodge(width=0.5), alpha=.7, size=.4) +
-        scale_color_manual(values=color_palette, breaks=unique(regr.df$best_model))
+                      aes(x=x, y=y, ymin=y.min, ymax=y.max, color=Identity, linetype=type),
+                      width=.5, position=position_dodge(width=0.5), alpha=.7, size=.4)
+        # scale_color_manual(values=color_palette, breaks=unique(regr.df$best_model))
     )
 
   return( pl )
@@ -136,7 +141,7 @@ get_regression_df = function(x, pop_df, highlight) {
         ),
       y=dplyr::case_when(
         type=="log" ~ K / ( 1 + (K-1)*exp(args) ),
-        type=="exp" ~ exp(args)
+        type=="exp" ~ exp(args) # assuming N_0 is 1
       )
     ) %>%
     dplyr::mutate(y_credint=list(compute_credint(posterior_samples, p_rate, x, type))) %>%

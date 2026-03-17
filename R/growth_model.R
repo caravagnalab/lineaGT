@@ -222,6 +222,10 @@ run_py_growth = function(rates.df,
   p.rate.exp = p.rate.log = NULL
   posterior_samples.exp = posterior_samples.log = NULL
 
+  print(cluster)
+  print(times)
+  print(y)
+
   x.reg = py_pkg$explogreg$Regression(times, y)
   if (grepl("exp", growth_model)) {  # exp training
     if (!is.null(p.rates[["exp"]])) p.rate.exp = torch$tensor(p.rates[["exp"]])$float()
@@ -234,6 +238,7 @@ run_py_growth = function(rates.df,
     #                                          random_state=as.integer(random_state))
     p.exp = x.reg$get_learned_params()
     ll.exp = x.reg$compute_log_likelihood() %>% setNames(nm=lineages)
+    bic.exp = x.reg$compute_bic() %>% setNames(nm=lineages)
   }
 
   if (grepl("log", growth_model)) {   # log training
@@ -247,6 +252,7 @@ run_py_growth = function(rates.df,
     #                                          random_state=as.integer(random_state))
     p.log = x.reg$get_learned_params()
     ll.log = x.reg$compute_log_likelihood() %>% setNames(nm=lineages)
+    bic.log = x.reg$compute_bic() %>% setNames(nm=lineages)
   }
 
   params = get_growth_params(timepoints_to_int,
@@ -259,7 +265,7 @@ run_py_growth = function(rates.df,
 
   best = c()
   for (ll in lineages)
-    if (ll.exp[ll] > ll.log[ll])
+    if (bic.exp[ll] < bic.log[ll])
       best = c(best, "exp") %>% setNames(nm=c(names(best), ll)) else
       best = c(best, "log") %>% setNames(nm=c(names(best), ll))
 
@@ -269,7 +275,9 @@ run_py_growth = function(rates.df,
       params %>%
         dplyr::mutate(best_model=best[Lineage],
                       ll.log=ll.log[Lineage],
-                      ll.exp=ll.exp[Lineage])
+                      ll.exp=ll.exp[Lineage],
+                      bic.log=bic.log[Lineage],
+                      bic.exp=bic.exp[Lineage])
     )
 
   return(
@@ -278,7 +286,9 @@ run_py_growth = function(rates.df,
         params %>%
           dplyr::mutate(best_model=best[Lineage],
                         ll.log=ll.log[Lineage],
-                        ll.exp=ll.exp[Lineage])
+                        ll.exp=ll.exp[Lineage],
+                        bic.log=bic.log[Lineage],
+                        bic.exp=bic.exp[Lineage])
       )
   )
 }
