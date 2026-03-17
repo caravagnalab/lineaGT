@@ -210,8 +210,6 @@ Both regressions can be inspected setting `show_best=F` .
 
 ``` r
 plot_growth_regression(x.example, show_best=F)
-#> Scale for colour is already present.
-#> Adding another scale for colour, which will replace the existing scale.
 ```
 
 ![](Plotting-functions_files/figure-html/unnamed-chunk-13-1.png)
