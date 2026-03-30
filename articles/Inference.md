@@ -96,7 +96,7 @@ x = fit(
 #> ── [ VIBER ] My VIBER model n = 3 (w = 4 dimensions). Fit with k = 3 clusters. ─
 #> ℹ Starting clustering of clone C0 mutations• Clusters: π = 67% [C1] and 33% [C3], with π > 0.
 #> ℹ Starting clustering of clone C0 mutations• Binomials: θ = <0.09, 0.19, 0.01, 0> [C1] and <0.01, 0.36, 0.03, 0.4> [C3].
-#> ℹ Starting clustering of clone C0 mutationsℹ Score(s): ELBO = -1461.853. Fit converged in 6 steps, ε = 1e-10.
+#> ℹ Starting clustering of clone C0 mutationsℹ Score(s): ELBO = -1461.823. Fit converged in 6 steps, ε = 1e-10.
 #> ℹ Starting clustering of clone C0 mutations✔ Reduced to k = 2 (from 3) selecting VIBER cluster(s) with π > 0.166666666666667, and Binomial p > 0 in w > 0 dimension(s).
 #> ℹ Starting clustering of clone C0 mutations✔ Starting clustering of clone C0 mutations ... done
 #> 
@@ -107,7 +107,7 @@ x = fit(
 #>   cluster   t1.l1 t2.l1  t1.l2 t2.l2 nMuts is.clonal is.driver
 #>   <chr>     <dbl> <dbl>  <dbl> <dbl> <dbl> <lgl>     <lgl>    
 #> 1 S1      0.0856  0.190 0      0         2 FALSE     TRUE     
-#> 2 S2      0.00681 0.362 0.0288 0.396     1 FALSE     FALSE    
+#> 2 S2      0.00683 0.362 0.0286 0.396     1 FALSE     FALSE    
 #> 3 C0      1       1     1      1         1 TRUE      FALSE
 #> ✔ Trees per region 1, 2, 1, 1
 #> ℹ Starting phylogeny inference of clone C0ℹ Total 2 tree structures - search is exahustive
@@ -125,33 +125,32 @@ x = fit(
 #> ✔ VIBER fit completed in 0.04 mins (status: converged)
 #> ℹ Starting clustering of clone C1 mutations
 #> ── [ VIBER ] My VIBER model n = 8 (w = 4 dimensions). Fit with k = 8 clusters. ─
-#> ℹ Starting clustering of clone C1 mutations• Clusters: π = 25% [C1], 25% [C4], 25% [C8], 13% [C3], and 13% [C5], with π >
-#> 0.
-#> ℹ Starting clustering of clone C1 mutations• Binomials: θ = <0.18, 0, 0.01, 0> [C1], <0, 0.08, 0.01, 0.15> [C4], <0.31, 0,
-#> 0.01, 0.27> [C8], <0, 0.01, 0.02, 0> [C3], and <0, 0.28, 0.04, 0> [C5].
-#> ℹ Starting clustering of clone C1 mutationsℹ Score(s): ELBO = -4566.431. Fit converged in 7 steps, ε = 1e-10.
-#> ℹ Starting clustering of clone C1 mutations✔ Reduced to k = 5 (from 8) selecting VIBER cluster(s) with π > 0.0625, and Binomial p > 0 in w > 0 dimension(s).
+#> ℹ Starting clustering of clone C1 mutations• Clusters: π = 25% [C1], 25% [C2], 25% [C3], and 25% [C8], with π > 0.
+#> ℹ Starting clustering of clone C1 mutations• Binomials: θ = <0, 0.08, 0.01, 0.15> [C1], <0.31, 0, 0.01, 0.27> [C2], <0,
+#> 0.14, 0.01, 0> [C3], and <0.18, 0, 0.01, 0> [C8].
+#> ℹ Starting clustering of clone C1 mutationsℹ Score(s): ELBO = -4567.662. Fit converged in 6 steps, ε = 1e-10.
+#> ℹ Starting clustering of clone C1 mutations✔ Reduced to k = 4 (from 8) selecting VIBER cluster(s) with π > 0.0625, and Binomial p > 0 in w > 0 dimension(s).
 #> ℹ Starting clustering of clone C1 mutations✔ Starting clustering of clone C1 mutations ... done
 #> 
 #> ℹ Fitting model to cluster mutationsℹ Starting phylogeny inference of clone C1
 #>  [ ctree ~ clone trees generator for C1 ] 
 #> 
-#> # A tibble: 6 × 8
+#> # A tibble: 5 × 8
 #>   cluster   t1.l1   t2.l1   t1.l2 t2.l2 nMuts is.clonal is.driver
 #>   <chr>     <dbl>   <dbl>   <dbl> <dbl> <dbl> <lgl>     <lgl>    
-#> 1 S1      0.184   0.00279 0       0         2 FALSE     FALSE    
-#> 2 S2      0       0       0       0         1 FALSE     FALSE    
-#> 3 S3      0.00162 0.0756  0.0122  0.147     2 FALSE     TRUE     
-#> 4 S4      0.00405 0.283   0       0         1 FALSE     FALSE    
-#> 5 S5      0.314   0.00281 0.00862 0.271     2 FALSE     FALSE    
-#> 6 C1      1       1       1       1         1 TRUE      FALSE
+#> 1 S1      0.00161 0.0756  0.0123  0.147     2 FALSE     TRUE     
+#> 2 S2      0.314   0.00280 0.00866 0.271     2 FALSE     FALSE    
+#> 3 S3      0.00162 0.142   0       0         2 FALSE     FALSE    
+#> 4 S4      0.184   0.00281 0       0         2 FALSE     FALSE    
+#> 5 C1      1       1       1       1         1 TRUE      FALSE
 #> ✔ Trees per region 2, 2, 1, 2
 #> ℹ Starting phylogeny inference of clone C1ℹ Total 6 tree structures - search is exahustive
-#> ℹ Starting phylogeny inference of clone C1✖ Starting phylogeny inference of clone C1 ... failed
+#> ℹ Starting phylogeny inference of clone C1
+#> ℹ Starting phylogeny inference of clone C1── Ranking trees 
+#> ℹ Starting phylogeny inference of clone C1✔ 6  trees with non-zero score, storing 6
+#> ℹ Starting phylogeny inference of clone C1✔ Starting phylogeny inference of clone C1 ... done
 #> 
-#> ℹ Fitting model to cluster mutations
-#> <subscriptOutOfBoundsError in model[var, ]: subscript out of bounds>
-#> ℹ Starting clustering of clone C4 mutations
+#> ℹ Fitting model to cluster mutationsℹ Starting clustering of clone C4 mutations
 #>  [ VIBER - variational fit ] 
 #> 
 #> ℹ Input n = 6, with k < 6. Dirichlet concentration α = 1e-06.
@@ -160,10 +159,10 @@ x = fit(
 #> ✔ VIBER fit completed in 0.04 mins (status: converged)
 #> ℹ Starting clustering of clone C4 mutations
 #> ── [ VIBER ] My VIBER model n = 6 (w = 4 dimensions). Fit with k = 6 clusters. ─
-#> ℹ Starting clustering of clone C4 mutations• Clusters: π = 50% [C2], 17% [C1], 17% [C3], and 17% [C5], with π > 0.
-#> ℹ Starting clustering of clone C4 mutations• Binomials: θ = <0.15, 0, 0.01, 0> [C2], <0, 0, 0.02, 0.29> [C1], <0.19, 0.22,
-#> 0.3, 0.2> [C3], and <0.36, 0, 0.02, 0.28> [C5].
-#> ℹ Starting clustering of clone C4 mutationsℹ Score(s): ELBO = -3594.675. Fit converged in 6 steps, ε = 1e-10.
+#> ℹ Starting clustering of clone C4 mutations• Clusters: π = 50% [C4], 17% [C3], 17% [C5], and 17% [C6], with π > 0.
+#> ℹ Starting clustering of clone C4 mutations• Binomials: θ = <0.15, 0, 0.01, 0> [C4], <0, 0, 0.02, 0.29> [C3], <0.36, 0,
+#> 0.02, 0.28> [C5], and <0.19, 0.22, 0.3, 0.2> [C6].
+#> ℹ Starting clustering of clone C4 mutationsℹ Score(s): ELBO = -3594.694. Fit converged in 7 steps, ε = 1e-10.
 #> ℹ Starting clustering of clone C4 mutations✔ Reduced to k = 4 (from 6) selecting VIBER cluster(s) with π > 0.0833333333333333, and Binomial p > 0 in w > 0 dimension(s).
 #> ℹ Starting clustering of clone C4 mutations✔ Starting clustering of clone C4 mutations ... done
 #> 
@@ -175,8 +174,8 @@ x = fit(
 #>   <chr>   <dbl>   <dbl>  <dbl> <dbl> <dbl> <lgl>     <lgl>    
 #> 1 S1      0     0       0.0186 0.292     1 FALSE     TRUE     
 #> 2 S2      0.146 0.00159 0      0         3 FALSE     FALSE    
-#> 3 S3      0.192 0.222   0.296  0.198     1 FALSE     FALSE    
-#> 4 S4      0.358 0.00474 0.0170 0.275     1 FALSE     FALSE    
+#> 3 S3      0.358 0.00476 0.0171 0.275     1 FALSE     FALSE    
+#> 4 S4      0.192 0.222   0.296  0.198     1 FALSE     FALSE    
 #> 5 C4      1     1       1      1         1 TRUE      FALSE
 #> ✔ Trees per region 6, 1, 6, 5
 #> ℹ Starting phylogeny inference of clone C4ℹ Total 54 tree structures - search is exahustive
@@ -196,7 +195,7 @@ x = fit(
 #> ── [ VIBER ] My VIBER model n = 2 (w = 4 dimensions). Fit with k = 2 clusters. ─
 #> ℹ Starting clustering of clone C7 mutations• Clusters: π = 50% [C1] and 50% [C2], with π > 0.
 #> ℹ Starting clustering of clone C7 mutations• Binomials: θ = <0.4, 0, 0.31, 0.35> [C1] and <0.01, 0.11, 0, 0> [C2].
-#> ℹ Starting clustering of clone C7 mutationsℹ Score(s): ELBO = -1584.512. Fit converged in 5 steps, ε = 1e-10.
+#> ℹ Starting clustering of clone C7 mutationsℹ Score(s): ELBO = -1584.51. Fit converged in 5 steps, ε = 1e-10.
 #> ℹ Starting clustering of clone C7 mutations✔ Starting clustering of clone C7 mutations ... done
 #> 
 #> ℹ Fitting model to cluster mutationsℹ Starting phylogeny inference of clone C7
@@ -205,8 +204,8 @@ x = fit(
 #> # A tibble: 3 × 8
 #>   cluster  t1.l1   t2.l1 t1.l2 t2.l2 nMuts is.clonal is.driver
 #>   <chr>    <dbl>   <dbl> <dbl> <dbl> <dbl> <lgl>     <lgl>    
-#> 1 S1      0.396  0.00234 0.308 0.348     1 FALSE     FALSE    
-#> 2 S2      0.0104 0.112   0     0         1 FALSE     TRUE     
+#> 1 S1      0.396  0.00234 0.308 0.348     1 FALSE     TRUE     
+#> 2 S2      0.0104 0.112   0     0         1 FALSE     FALSE    
 #> 3 C7      1      1       1     1         1 TRUE      FALSE
 #> ✔ Trees per region 2, 1, 1, 1
 #> ℹ Starting phylogeny inference of clone C7ℹ Total 2 tree structures - search is exahustive
@@ -218,28 +217,39 @@ x = fit(
 #> ℹ Fitting model to cluster mutations✔ Fitting model to cluster mutations ... done
 #> 
 #> ℹ Fitting model to estimate population growth rates
+#>  t1  t2 
+#>  60 150
 #> ℹ Starting growth models inference of clone C0
 #> [1] "C0"
 #> tensor([[  0],
 #>         [ 60],
 #>         [150]], dtype=torch.int32)
-#> tensor([[  1.0000,   1.0000],
-#>         [144.9737,  32.1573],
-#>         [240.2606, 373.0132]], dtype=torch.float64)
+#> # A tibble: 3 × 2
+#>      l1    l2
+#>   <dbl> <dbl>
+#> 1    1    1  
+#> 2  145.  32.2
+#> 3  240. 373. 
 #> [1] "C0.S1"
 #> tensor([[  0],
 #>         [ 60],
 #>         [150]], dtype=torch.int32)
-#> tensor([[ 0.0000,  0.0000],
-#>         [12.4154,  0.0000],
-#>         [45.6714,  0.0000]], dtype=torch.float64)
+#> # A tibble: 3 × 2
+#>      l1    l2
+#>   <dbl> <dbl>
+#> 1   0       0
+#> 2  12.4     0
+#> 3  45.7     0
 #> [1] "C0.S2"
 #> tensor([[  0],
 #>         [ 60],
 #>         [150]], dtype=torch.int32)
-#> tensor([[  0.0000,   0.0000],
-#>         [  0.9877,   0.9275],
-#>         [ 87.0084, 147.8174]], dtype=torch.float64)
+#> # A tibble: 3 × 2
+#>       l1      l2
+#>    <dbl>   <dbl>
+#> 1  0       0    
+#> 2  0.990   0.919
+#> 3 87.0   148.
 #> ✔ Starting growth models inference of clone C0 ... done
 #> 
 #> ℹ Fitting model to estimate population growth ratesℹ Starting growth models inference of clone C1
@@ -247,44 +257,52 @@ x = fit(
 #> tensor([[  0],
 #>         [ 60],
 #>         [150]], dtype=torch.int32)
-#> tensor([[  1.0000,   1.0000],
-#>         [245.1873,  22.7707],
-#>         [177.3688, 289.0849]], dtype=torch.float64)
+#> # A tibble: 3 × 2
+#>      l1    l2
+#>   <dbl> <dbl>
+#> 1    1    1  
+#> 2  245.  22.8
+#> 3  177. 289. 
 #> [1] "C1.S1"
 #> tensor([[  0],
 #>         [ 60],
 #>         [150]], dtype=torch.int32)
-#> tensor([[ 0.0000,  0.0000],
-#>         [45.0851,  0.0000],
-#>         [ 0.4955,  0.0000]], dtype=torch.float64)
+#> # A tibble: 3 × 2
+#>       l1     l2
+#>    <dbl>  <dbl>
+#> 1  0      0    
+#> 2  0.396  0.279
+#> 3 13.4   42.5
 #> [1] "C1.S2"
 #> tensor([[  0],
 #>         [ 60],
 #>         [150]], dtype=torch.int32)
-#> tensor([[0., 0.],
-#>         [0., 0.],
-#>         [0., 0.]], dtype=torch.float64)
+#> # A tibble: 3 × 2
+#>       l1     l2
+#>    <dbl>  <dbl>
+#> 1  0      0    
+#> 2 76.9    0.197
+#> 3  0.496 78.4
 #> [1] "C1.S3"
 #> tensor([[  0],
 #>         [ 60],
 #>         [150]], dtype=torch.int32)
-#> tensor([[ 0.0000,  0.0000],
-#>         [ 0.3962,  0.2778],
-#>         [13.4135, 42.4975]], dtype=torch.float64)
+#> # A tibble: 3 × 2
+#>       l1    l2
+#>    <dbl> <dbl>
+#> 1  0         0
+#> 2  0.396     0
+#> 3 25.3       0
 #> [1] "C1.S4"
 #> tensor([[  0],
 #>         [ 60],
 #>         [150]], dtype=torch.int32)
-#> tensor([[ 0.0000,  0.0000],
-#>         [ 0.9934,  0.0000],
-#>         [50.2584,  0.0000]], dtype=torch.float64)
-#> [1] "C1.S5"
-#> tensor([[  0],
-#>         [ 60],
-#>         [150]], dtype=torch.int32)
-#> tensor([[ 0.0000,  0.0000],
-#>         [76.9098,  0.1963],
-#>         [ 0.4990, 78.4075]], dtype=torch.float64)
+#> # A tibble: 3 × 2
+#>       l1    l2
+#>    <dbl> <dbl>
+#> 1  0         0
+#> 2 45.1       0
+#> 3  0.499     0
 #> ✔ Starting growth models inference of clone C1 ... done
 #> 
 #> ℹ Fitting model to estimate population growth ratesℹ Starting growth models inference of clone C2
@@ -292,9 +310,12 @@ x = fit(
 #> tensor([[  0],
 #>         [ 60],
 #>         [150]], dtype=torch.int32)
-#> tensor([[  1.0000,   1.0000],
-#>         [  1.1279,   1.1034],
-#>         [546.8077, 388.3853]], dtype=torch.float64)
+#> # A tibble: 3 × 2
+#>       l1     l2
+#>    <dbl>  <dbl>
+#> 1   1      1   
+#> 2   1.13   1.10
+#> 3 547.   388.
 #> ✔ Starting growth models inference of clone C2 ... done
 #> 
 #> ℹ Fitting model to estimate population growth ratesℹ Starting growth models inference of clone C3
@@ -302,16 +323,22 @@ x = fit(
 #> tensor([[  0],
 #>         [ 60],
 #>         [150]], dtype=torch.int32)
-#> tensor([[  1.0000,   1.0000],
-#>         [ 91.9191, 245.4643],
-#>         [109.1249, 751.2116]], dtype=torch.float64)
+#> # A tibble: 3 × 2
+#>      l1    l2
+#>   <dbl> <dbl>
+#> 1   1      1 
+#> 2  91.9  245.
+#> 3 109.   751.
 #> [1] "C3.S1"
 #> tensor([[  0],
 #>         [ 60],
 #>         [150]], dtype=torch.int32)
-#> tensor([[ 0.0000,  0.0000],
-#>         [17.2780,  0.0000],
-#>         [ 0.0000,  0.0000]], dtype=torch.float64)
+#> # A tibble: 3 × 2
+#>      l1    l2
+#>   <dbl> <dbl>
+#> 1   0       0
+#> 2  17.3     0
+#> 3   0       0
 #> ✔ Starting growth models inference of clone C3 ... done
 #> 
 #> ℹ Fitting model to estimate population growth ratesℹ Starting growth models inference of clone C4
@@ -319,37 +346,52 @@ x = fit(
 #> tensor([[  0],
 #>         [ 60],
 #>         [150]], dtype=torch.int32)
-#> tensor([[  1.0000,   1.0000],
-#>         [284.7689,  51.3752],
-#>         [209.2327, 491.7685]], dtype=torch.float64)
+#> # A tibble: 3 × 2
+#>      l1    l2
+#>   <dbl> <dbl>
+#> 1    1    1  
+#> 2  285.  51.4
+#> 3  209. 492. 
 #> [1] "C4.S1"
 #> tensor([[  0],
 #>         [ 60],
 #>         [150]], dtype=torch.int32)
-#> tensor([[  0.0000,   0.0000],
-#>         [  0.0000,   0.9543],
-#>         [  0.0000, 143.3544]], dtype=torch.float64)
+#> # A tibble: 3 × 2
+#>      l1      l2
+#>   <dbl>   <dbl>
+#> 1     0   0    
+#> 2     0   0.958
+#> 3     0 143.
 #> [1] "C4.S3"
 #> tensor([[  0],
 #>         [ 60],
 #>         [150]], dtype=torch.int32)
-#> tensor([[ 0.0000,  0.0000],
-#>         [54.6822, 15.2270],
-#>         [46.3942, 97.5620]], dtype=torch.float64)
+#> # A tibble: 3 × 2
+#>        l1      l2
+#>     <dbl>   <dbl>
+#> 1   0       0    
+#> 2 102.      0.876
+#> 3   0.996 135.
 #> [1] "C4.S4"
 #> tensor([[  0],
 #>         [ 60],
 #>         [150]], dtype=torch.int32)
-#> tensor([[  0.0000,   0.0000],
-#>         [102.0333,   0.8729],
-#>         [  0.9927, 135.3893]], dtype=torch.float64)
+#> # A tibble: 3 × 2
+#>      l1    l2
+#>   <dbl> <dbl>
+#> 1   0     0  
+#> 2  54.7  15.2
+#> 3  46.4  97.6
 #> [1] "C4.S2"
 #> tensor([[  0],
 #>         [ 60],
 #>         [150]], dtype=torch.int32)
-#> tensor([[0.0000e+00, 0.0000e+00],
-#>         [1.4882e+01, 0.0000e+00],
-#>         [1.5798e-03, 0.0000e+00]], dtype=torch.float64)
+#> # A tibble: 3 × 2
+#>         l1    l2
+#>      <dbl> <dbl>
+#> 1  0           0
+#> 2 14.9         0
+#> 3  0.00158     0
 #> ✔ Starting growth models inference of clone C4 ... done
 #> 
 #> ℹ Fitting model to estimate population growth ratesℹ Starting growth models inference of clone C5
@@ -357,16 +399,22 @@ x = fit(
 #> tensor([[  0],
 #>         [ 60],
 #>         [150]], dtype=torch.int32)
-#> tensor([[1.0000e+00, 1.0000e+00],
-#>         [4.6677e-01, 9.0327e-01],
-#>         [5.5075e+02, 8.2758e+02]], dtype=torch.float64)
+#> # A tibble: 3 × 2
+#>        l1      l2
+#>     <dbl>   <dbl>
+#> 1   1       1    
+#> 2   0.467   0.903
+#> 3 551.    828.   
 #> [1] "C5.S1"
 #> tensor([[  0],
 #>         [ 60],
 #>         [150]], dtype=torch.int32)
-#> tensor([[  0.0000,   0.0000],
-#>         [  0.0000,   0.0000],
-#>         [ 88.3387, 158.3940]], dtype=torch.float64)
+#> # A tibble: 3 × 2
+#>      l1    l2
+#>   <dbl> <dbl>
+#> 1   0      0 
+#> 2   0      0 
+#> 3  88.3  158.
 #> ✔ Starting growth models inference of clone C5 ... done
 #> 
 #> ℹ Fitting model to estimate population growth ratesℹ Starting growth models inference of clone C6
@@ -374,9 +422,12 @@ x = fit(
 #> tensor([[  0],
 #>         [ 60],
 #>         [150]], dtype=torch.int32)
-#> tensor([[  1.0000,   1.0000],
-#>         [329.5520,  17.2995],
-#>         [ 15.8495,  38.2649]], dtype=torch.float64)
+#> # A tibble: 3 × 2
+#>      l1    l2
+#>   <dbl> <dbl>
+#> 1   1     1  
+#> 2 330.   17.3
+#> 3  15.8  38.3
 #> ✔ Starting growth models inference of clone C6 ... done
 #> 
 #> ℹ Fitting model to estimate population growth ratesℹ Starting growth models inference of clone C7
@@ -384,23 +435,32 @@ x = fit(
 #> tensor([[  0],
 #>         [ 60],
 #>         [150]], dtype=torch.int32)
-#> tensor([[  1.0000,   1.0000],
-#>         [  0.4702,   0.7794],
-#>         [425.7162, 197.8717]], dtype=torch.float64)
+#> # A tibble: 3 × 2
+#>        l1      l2
+#>     <dbl>   <dbl>
+#> 1   1       1    
+#> 2   0.470   0.779
+#> 3 426.    198.   
 #> [1] "C7.S1"
 #> tensor([[  0],
 #>         [ 60],
 #>         [150]], dtype=torch.int32)
-#> tensor([[ 0.0000,  0.0000],
-#>         [ 0.1861,  0.2401],
-#>         [ 0.9975, 68.8124]], dtype=torch.float64)
+#> # A tibble: 3 × 2
+#>      l1     l2
+#>   <dbl>  <dbl>
+#> 1 0      0    
+#> 2 0.186  0.240
+#> 3 0.996 68.8
 #> [1] "C7.S2"
 #> tensor([[  0],
 #>         [ 60],
 #>         [150]], dtype=torch.int32)
-#> tensor([[0.0000e+00, 0.0000e+00],
-#>         [4.9108e-03, 0.0000e+00],
-#>         [4.7749e+01, 0.0000e+00]], dtype=torch.float64)
+#> # A tibble: 3 × 2
+#>         l1    l2
+#>      <dbl> <dbl>
+#> 1  0           0
+#> 2  0.00490     0
+#> 3 47.8         0
 #> ✔ Starting growth models inference of clone C7 ... done
 #> 
 #> ℹ Fitting model to estimate population growth rates✔ Fitting model to estimate population growth rates ... done
