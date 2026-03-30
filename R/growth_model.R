@@ -33,7 +33,9 @@ fit_growth_rates = function(x,
 
   highlight.cov = get_highlight(x, highlight=highlight, mutations=F)
   highlight.muts = get_highlight(x, highlight=highlight, mutations=T)
-  timepoints_to_int = map_timepoints_int(x, timepoints_to_int)
+  timepoints_to_int = map_timepoints_int(x, timepoints_to_int, timepoints=timepoints)
+
+  print(timepoints_to_int)
 
   if (!mutations && have_muts_fit(x)) mutations = T
 
@@ -217,7 +219,7 @@ run_py_growth = function(rates.df,
   lineages = colnames(y)
 
   times = torch$tensor(times)$int()$unsqueeze(as.integer(1))
-  y = torch$tensor(y %>% as.matrix())
+  # y = torch$tensor(y %>% as.matrix())
 
   p.rate.exp = p.rate.log = NULL
   posterior_samples.exp = posterior_samples.log = NULL
@@ -226,49 +228,56 @@ run_py_growth = function(rates.df,
   print(times)
   print(y)
 
-  x.reg = py_pkg$explogreg$Regression(times, y)
-  if (grepl("exp", growth_model)) {  # exp training
-    if (!is.null(p.rates[["exp"]])) p.rate.exp = torch$tensor(p.rates[["exp"]])$float()
+  best = ll.log = ll.exp = bic.log = bic.exp = c()
+  params = tibble()
+  for (l_id in lineages) {
+    y_i = torch$tensor(y[[l_id]])$unsqueeze(as.integer(1))
 
-    losses.exp = x.reg$train(regr="exp", p_rate=p.rate.exp, steps=as.integer(steps), random_state=as.integer(random_state))
-    # posterior_samples.exp = x.reg$train_mcmc(regr="exp",
-    #                                          p_rate=p.rate.exp,
-    #                                          num_samples=as.integer(steps),
-    #                                          warmup_steps=as.integer(warmup_steps), num_chains=as.integer(1),
-    #                                          random_state=as.integer(random_state))
-    p.exp = x.reg$get_learned_params()
-    ll.exp = x.reg$compute_log_likelihood() %>% setNames(nm=lineages)
-    bic.exp = x.reg$compute_bic() %>% setNames(nm=lineages)
+    x.reg = py_pkg$explogreg$Regression(times, y_i)
+
+    if (grepl("exp", growth_model)) {  # exp training
+      if (!is.null(p.rates[["exp"]])) p.rate.exp = torch$tensor(p.rates[["exp"]])$float()
+
+      losses.exp = x.reg$train(regr="exp", p_rate=p.rate.exp, steps=as.integer(steps), random_state=as.integer(random_state))
+      # posterior_samples.exp = x.reg$train_mcmc(regr="exp",
+      #                                          p_rate=p.rate.exp,
+      #                                          num_samples=as.integer(steps),
+      #                                          warmup_steps=as.integer(warmup_steps), num_chains=as.integer(1),
+      #                                          random_state=as.integer(random_state))
+      p.exp = x.reg$get_learned_params()
+      ll.exp[l_id] = x.reg$compute_log_likelihood() %>% setNames(nm=l_id)
+      bic.exp[l_id] = x.reg$compute_bic() %>% setNames(nm=l_id)
+    }
+
+    if (grepl("log", growth_model)) {   # log training
+      if (!is.null(p.rates[["log"]])) p.rate.log = torch$tensor(p.rates[["log"]])$float()
+
+      losses.log = x.reg$train(regr="log", p_rate=p.rate.log, steps=as.integer(steps), random_state=as.integer(random_state))
+      # posterior_samples.log = x.reg$train_mcmc(regr="log",
+      #                                          p_rate=p.rate.log,
+      #                                          num_samples=as.integer(steps),
+      #                                          warmup_steps=as.integer(warmup_steps), num_chains=as.integer(1),
+      #                                          random_state=as.integer(random_state))
+      p.log = x.reg$get_learned_params()
+      ll.log[l_id] = x.reg$compute_log_likelihood() %>% setNames(nm=l_id)
+      bic.log[l_id] = x.reg$compute_bic() %>% setNames(nm=l_id)
+    }
+
+    params = params %>% dplyr::bind_rows(
+      get_growth_params(timepoints_to_int,
+                        rates.exp=p.exp,
+                        rates.log=p.log,
+                        lineages=l_id, # pop_df.cl$Lineage %>% unique(),
+                        cluster=cluster,
+                        posterior_samples.exp=posterior_samples.exp,
+                        posterior_samples.log=posterior_samples.log)
+    )
+
+    # best = c()
+    if (bic.exp[l_id] < bic.log[l_id])
+      best[l_id] = c(l_id="exp") else
+        best[l_id] = c(l_id="log")
   }
-
-  if (grepl("log", growth_model)) {   # log training
-    if (!is.null(p.rates[["log"]])) p.rate.log = torch$tensor(p.rates[["log"]])$float()
-
-    losses.log = x.reg$train(regr="log", p_rate=p.rate.log, steps=as.integer(steps), random_state=as.integer(random_state))
-    # posterior_samples.log = x.reg$train_mcmc(regr="log",
-    #                                          p_rate=p.rate.log,
-    #                                          num_samples=as.integer(steps),
-    #                                          warmup_steps=as.integer(warmup_steps), num_chains=as.integer(1),
-    #                                          random_state=as.integer(random_state))
-    p.log = x.reg$get_learned_params()
-    ll.log = x.reg$compute_log_likelihood() %>% setNames(nm=lineages)
-    bic.log = x.reg$compute_bic() %>% setNames(nm=lineages)
-  }
-
-  params = get_growth_params(timepoints_to_int,
-                             rates.exp=p.exp,
-                             rates.log=p.log,
-                             lineages=pop_df.cl$Lineage %>% unique(),
-                             cluster=cluster,
-                             posterior_samples.exp=posterior_samples.exp,
-                             posterior_samples.log=posterior_samples.log)
-
-  best = c()
-  for (ll in lineages)
-    if (bic.exp[ll] < bic.log[ll])
-      best = c(best, "exp") %>% setNames(nm=c(names(best), ll)) else
-      best = c(best, "log") %>% setNames(nm=c(names(best), ll))
-
 
   if (purrr::is_empty(rates.df))
     return(

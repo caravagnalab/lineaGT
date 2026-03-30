@@ -115,37 +115,39 @@ highlight_palette = function(x, highlight=c()) {
 }
 
 
-map_timepoints_int = function(x, timepoints_to_int=list()) {
+map_timepoints_int = function(x, timepoints_to_int=list(), timepoints=get_timepoints(x)) {
   if (!purrr::is_empty(timepoints_to_int)) return(timepoints_to_int %>% unlist())
 
-  suppressMessages( expr = { if (!purrr::is_empty(x %>% get_tp_to_int())) return(x %>% get_tp_to_int()) } )
+  names(timepoints) = as.character(timepoints)
 
-  tp = x %>% get_timepoints()
-  names(tp) = as.character(tp)
+  suppressMessages( expr = {
+    if (!purrr::is_empty(get_tp_to_int(x)[names(timepoints)]))
+      return(get_tp_to_int(x)[names(timepoints)])
+  } )
 
   # if is numeric or integer
-  if (is.numeric(tp)) return( tp %>% sort() )
+  if (is.numeric(timepoints)) return( timepoints %>% sort() )
   else # check if they are convertible to numeric
     tryCatch(expr = {
-      tp = as.numeric(tp) %>% sort()
-      return( tp %>% setNames( as.character(tp) ) )
+      timepoints = as.numeric(timepoints) %>% sort()
+      return( timepoints %>% setNames( as.character(timepoints) ) )
       },
       warning = function(w) {} )
 
-  if ( is.factor(tp) ) {
+  if ( is.factor(timepoints) ) {
     cli::cli_alert_warning("The provided timepoints are Factors.
                             They will be converted to integer, with time unit of 50.")
-    tp.int = seq(from=50, to=50*length(tp), length.out=length(tp)) %>%
-      setNames( nm=levels(tp) )
+    tp.int = seq(from=50, to=50*length(timepoints), length.out=length(timepoints)) %>%
+      setNames( nm=levels(timepoints) )
     return( tp.int )
   }
 
-  if (is.character( tp )) {
+  if (is.character( timepoints )) {
     cli::cli_alert_warning("The provided timepoints are characters.
                             If you want to provide a temporal order, insert them as numeric or factors.
                             They will be converted to integer, with time unit of 50.")
-    tp.int = seq(from=50, to=50*length(tp), length.out=length(tp)) %>%
-      setNames( nm=tp )
+    tp.int = seq(from=50, to=50*length(timepoints), length.out=length(timepoints)) %>%
+      setNames( nm=timepoints )
     return( tp.int )
   }
 }

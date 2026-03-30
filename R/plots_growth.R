@@ -21,10 +21,11 @@ plot_growth_regression = function(x,
                                   min_frac=0,
                                   mutations=F,
                                   timepoints_to_int=list(),
+                                  timepoints=get_timepoints(x),
                                   fit=F,
                                   show_best=T) {
 
-  timepoints_to_int = map_timepoints_int(x, timepoints_to_int)
+  timepoints_to_int = map_timepoints_int(x, timepoints_to_int, timepoints)
   highlight = get_highlight(x, min_frac=min_frac, highlight=highlight, mutations=mutations)
   color_palette = highlight_palette(x, highlight)
 
@@ -54,7 +55,7 @@ plot_growth_regression = function(x,
     pl = pop_df %>%
       ggplot() +
       geom_point(aes(x=Generation, y=Population, color=Identity), alpha=.5, size=.7)
-  } else if (unqiue(regr.df$which) == "frac") {
+  } else if (unique(regr.df$which) == "frac") {
     pl = pop_df %>%
       ggplot() +
       geom_point(aes(x=Generation, y=Frequency, color=Identity), alpha=.5, size=.7)
