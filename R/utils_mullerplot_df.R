@@ -63,7 +63,7 @@ get_edges_muts = function(x, highlight=c(), tree_score=1) {
 # means format must be a dataframe with columns: labels, timepoints, lineage, mean_cov
 get_muller_pop = function(x,
                           mutations=F,
-                          timepoints_to_int=c(),
+                          timepoints_to_int=get_tp_to_int(x),
                           highlight=c(),
                           add_t0=T,
                           single_clone=T,

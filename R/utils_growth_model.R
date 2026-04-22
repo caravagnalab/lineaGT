@@ -43,11 +43,12 @@ get_parent_rate = function(par, rates.df, cluster) {
 
   # par = get_parent(parents, cluster)
   par.rates = rates.df %>%
-    filter(Identity==par) %>%
-    dplyr::select("rate", "type")
+    dplyr::filter(Identity == par) %>%
+    dplyr::select(Lineage, rate, type) %>%
+    split(.$type)
 
-  p_rates = list("exp"=dplyr::filter(par.rates, type=="exp")$rate,
-                 "log"=dplyr::filter(par.rates, type=="log")$rate)
+  p_rates = list("exp"=par.rates$exp$rate %>% setNames(par.rates$exp$Lineage),
+                 "log"=par.rates$log$rate %>% setNames(par.rates$exp$Lineage))
 
   if (NA %in% unlist(par.rates)) return(list("exp"=NULL, "log"=NULL))
 
@@ -70,7 +71,7 @@ get_growth_params = function(timepoints_to_int,
   if (is.null(rates.log)) return(params.exp)
 
   df = dplyr::inner_join(params.exp, params.log, by=c("Lineage", "Identity"))
-  return( df %>% get_growth_rates_long() )
+  return( df %>% get_growth_rates_long() %>% unique() )
 }
 
 

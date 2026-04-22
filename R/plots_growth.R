@@ -134,7 +134,7 @@ get_regression_df = function(x, pop_df, highlight) {
   regr_df = rates %>%
     dplyr::mutate(x=list(tmin:tmax)) %>%
     tidyr::unnest(x) %>%
-    dplyr::rowwise() %>%
+    # dplyr::rowwise() %>%
     dplyr::mutate(
       args=dplyr::case_when(
         type=="log" ~ -rate*(x-init_t),
@@ -145,16 +145,10 @@ get_regression_df = function(x, pop_df, highlight) {
         type=="exp" ~ exp(args) # assuming N_0 is 1
       )
     ) %>%
-    dplyr::mutate(y_credint=list(compute_credint(posterior_samples, p_rate, x, type))) %>%
-
-    dplyr::mutate(y.min=replace(NA, as.character(x) %in% names(sigma), y-sigma[as.character(x)]),
-                  y.max=replace(NA, as.character(x) %in% names(sigma), y+sigma[as.character(x)])) %>%
-
-    dplyr::mutate(y.min=replace(y.min, !is.na(y_credint), quantile(y_credint, 0.05, na.rm=TRUE)),
-                  y.max=replace(y.max, !is.na(y_credint), quantile(y_credint, 0.95, na.rm=TRUE)),
-                  y_credint=replace(y_credint, is.na(y_credint), y)) %>%
-
-    dplyr::ungroup() %>%
+    dplyr::mutate(sigma_val=Map(function(s, xi) {s[as.character(xi)]}, sigma, x),
+                  sigma_val=as.numeric(sigma_val),
+                  y.min=y-sigma_val,
+                  y.max=y+sigma_val) %>%
 
     dplyr::select(Lineage, Identity, type, best_model, init_t, x, y, y.min, y.max) %>%
     dplyr::mutate(type=ifelse(type=="log", "Logistic", "Exponential")) %>%

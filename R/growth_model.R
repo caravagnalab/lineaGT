@@ -82,7 +82,7 @@ fit_growth_rates = function(x,
                                 warmup_steps=warmup_steps,
                                 which=which,
                                 timepoints_to_int=timepoints_to_int,
-                                py_pkg=py_pkg)
+                                py_pkg=py_pkg) %>% unique()
 
     evaluated = c(cluster, evaluated)
 
@@ -224,10 +224,6 @@ run_py_growth = function(rates.df,
   p.rate.exp = p.rate.log = NULL
   posterior_samples.exp = posterior_samples.log = NULL
 
-  print(cluster)
-  print(times)
-  print(y)
-
   best = ll.log = ll.exp = bic.log = bic.exp = c()
   params = tibble()
   for (l_id in lineages) {
@@ -236,7 +232,7 @@ run_py_growth = function(rates.df,
     x.reg = py_pkg$explogreg$Regression(times, y_i)
 
     if (grepl("exp", growth_model)) {  # exp training
-      if (!is.null(p.rates[["exp"]])) p.rate.exp = torch$tensor(p.rates[["exp"]])$float()
+      if (!is.null(p.rates[["exp"]])) p.rate.exp = torch$tensor(p.rates[["exp"]][[l_id]])$float()
 
       losses.exp = x.reg$train(regr="exp", p_rate=p.rate.exp, steps=as.integer(steps), random_state=as.integer(random_state))
       # posterior_samples.exp = x.reg$train_mcmc(regr="exp",
@@ -250,7 +246,7 @@ run_py_growth = function(rates.df,
     }
 
     if (grepl("log", growth_model)) {   # log training
-      if (!is.null(p.rates[["log"]])) p.rate.log = torch$tensor(p.rates[["log"]])$float()
+      if (!is.null(p.rates[["log"]])) p.rate.log = torch$tensor(p.rates[["log"]][[l_id]])$float()
 
       losses.log = x.reg$train(regr="log", p_rate=p.rate.log, steps=as.integer(steps), random_state=as.integer(random_state))
       # posterior_samples.log = x.reg$train_mcmc(regr="log",
@@ -272,6 +268,8 @@ run_py_growth = function(rates.df,
                         posterior_samples.exp=posterior_samples.exp,
                         posterior_samples.log=posterior_samples.log)
     )
+
+    # print(params)
 
     # best = c()
     if (bic.exp[l_id] < bic.log[l_id])
